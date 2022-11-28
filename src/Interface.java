@@ -5,6 +5,12 @@ import java.util.List;
 
 public class Interface {
 	public short interface_index;
+
+    @Override
+	public String toString() {
+		return "Interface:\n" +
+				" - interface_index = " + interface_index;
+	}
 }
 
 class Interface_Helper {

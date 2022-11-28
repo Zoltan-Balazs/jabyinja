@@ -44,6 +44,8 @@ class ClassFile {
 	private static short SUPER_CLASS;
 	private static short INTERFACES_COUNT;
 	private static List<Interface> INTERFACES;
+	private static short FIELDS_COUNT;
+	private static List<Field_Info> FIELDS;
 	
 	public ClassFile(String fileName) {
 		readClassFile(fileName);
@@ -63,6 +65,8 @@ class ClassFile {
 			ACCESS_FLAGS = ClassFile_Helper.readShort(classFile);
 			THIS_CLASS = ClassFile_Helper.readShort(classFile);
 			SUPER_CLASS = ClassFile_Helper.readShort(classFile);
+			FIELDS_COUNT = ClassFile_Helper.readShort(classFile);
+			FIELDS = Field_Helper.readFields(classFile, FIELDS_COUNT);
         } catch (FileNotFoundException e) {
 			System.err.println("The file " + fileName + " cannot be found!");
 		} catch (InvalidClassFileException e) {
