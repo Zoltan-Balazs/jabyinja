@@ -2,6 +2,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -46,6 +47,10 @@ class ClassFile {
 	private static List<Interface> INTERFACES;
 	private static short FIELDS_COUNT;
 	private static List<Field_Info> FIELDS;
+	private static short METHODS_COUNT;
+	private static List<Method_Info> METHODS;
+	private static short ATTRIBUTES_COUNT;
+	private static List<Attribute_Info> ATTRIBUTES;
 	
 	public ClassFile(String fileName) {
 		readClassFile(fileName);
@@ -67,10 +72,18 @@ class ClassFile {
 			SUPER_CLASS = ClassFile_Helper.readShort(classFile);
 			FIELDS_COUNT = ClassFile_Helper.readShort(classFile);
 			FIELDS = Field_Helper.readFields(classFile, FIELDS_COUNT);
+			METHODS_COUNT = ClassFile_Helper.readShort(classFile);
+			METHODS = Method_Helper.readMethods(classFile, METHODS_COUNT);
+			ATTRIBUTES_COUNT = ClassFile_Helper.readShort(classFile);
+			ATTRIBUTES = Attribute_Helper.readAttributes(classFile, ATTRIBUTES_COUNT);	
         } catch (FileNotFoundException e) {
-			System.err.println("The file " + fileName + " cannot be found!");
+			System.err.println("The file '" + fileName + "' cannot be found!");
 		} catch (InvalidClassFileException e) {
 			System.err.println("The file '" + fileName + "' is not a valid Java Class file!");
+		} catch (InvalidConstantPoolTagException e) {
+			System.err.println("The file '" + fileName + "' contains invalid Constant Pool tag!");
+		} catch (BufferUnderflowException e) {
+			System.err.println("The file '" + fileName + "' contains contradicting information!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
