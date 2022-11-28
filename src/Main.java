@@ -2,16 +2,43 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HexFormat;
+import java.util.List;
 
 class InvalidClassFileException extends RuntimeException { }
+
+class ClassFile_Helper {
+	public static byte readByte(InputStream file) throws IOException {
+		byte[] tmp = file.readNBytes(1);
+		return tmp[0];
+	}
+
+	public static short readShort(InputStream file) throws IOException {
+		ByteBuffer wrapper;
+		byte[] tmp = file.readNBytes(2);
+		wrapper = ByteBuffer.wrap(tmp);
+		return wrapper.getShort();
+	}
+
+	public static int readInt(InputStream file) throws IOException {
+		ByteBuffer wrapper;
+		byte[] tmp = file.readNBytes(4);
+		wrapper = ByteBuffer.wrap(tmp);
+		return wrapper.getInt();
+	}
+}
 
 // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
 class ClassFile {
  	private static final byte[] MAGIC_NUMBER = HexFormat.of().parseHex("CAFEBABE");
     
     private static boolean VALID_CLASS_FILE = false;
+	private static short MINOR_VERSION;
+	private static short MAJOR_VERSION;
+	private static short CONSTANT_POOL_COUNT;
+	private static List<CP_Info> CONSTANT_POOL;
 	
 	public ClassFile(String fileName) {
 		readClassFile(fileName);
@@ -23,6 +50,12 @@ class ClassFile {
 				throw new InvalidClassFileException();
 			}
             VALID_CLASS_FILE = true;
+
+			MINOR_VERSION = ClassFile_Helper.readShort(classFile);
+			MAJOR_VERSION = ClassFile_Helper.readShort(classFile);
+			CONSTANT_POOL_COUNT = ClassFile_Helper.readShort(classFile);
+			CONSTANT_POOL = Constant_Pool_Helper.readConstantPool(classFile, CONSTANT_POOL_COUNT);
+			System.out.println(CONSTANT_POOL);
         } catch (FileNotFoundException e) {
 			System.err.println("The file " + fileName + " cannot be found!");
 		} catch (InvalidClassFileException e) {
