@@ -39,6 +39,9 @@ class ClassFile {
 	private static short MAJOR_VERSION;
 	private static short CONSTANT_POOL_COUNT;
 	private static List<CP_Info> CONSTANT_POOL;
+	private static short ACCESS_FLAGS;
+	private static short THIS_CLASS;
+	private static short SUPER_CLASS;
 	
 	public ClassFile(String fileName) {
 		readClassFile(fileName);
@@ -55,7 +58,9 @@ class ClassFile {
 			MAJOR_VERSION = ClassFile_Helper.readShort(classFile);
 			CONSTANT_POOL_COUNT = ClassFile_Helper.readShort(classFile);
 			CONSTANT_POOL = Constant_Pool_Helper.readConstantPool(classFile, CONSTANT_POOL_COUNT);
-			System.out.println(CONSTANT_POOL);
+			ACCESS_FLAGS = ClassFile_Helper.readShort(classFile);
+			THIS_CLASS = ClassFile_Helper.readShort(classFile);
+			SUPER_CLASS = ClassFile_Helper.readShort(classFile);
         } catch (FileNotFoundException e) {
 			System.err.println("The file " + fileName + " cannot be found!");
 		} catch (InvalidClassFileException e) {
