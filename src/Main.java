@@ -42,6 +42,8 @@ class ClassFile {
 	private static short ACCESS_FLAGS;
 	private static short THIS_CLASS;
 	private static short SUPER_CLASS;
+	private static short INTERFACES_COUNT;
+	private static List<Interface> INTERFACES;
 	
 	public ClassFile(String fileName) {
 		readClassFile(fileName);
