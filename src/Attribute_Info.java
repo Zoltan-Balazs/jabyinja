@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ class Attribute_Info {
 		return "Attribute:\n" +
 				" - attribute_name_index = " + attribute_name_index + "\n" +
 				" - attribute_length = " + attribute_length + "\n" +
-				" - info = " + info;
+				" - info = " + info + "\n" +
+				" - info (as string) = " + new String(info, StandardCharsets.UTF_8);
 	}
 }

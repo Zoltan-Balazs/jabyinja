@@ -32,6 +32,7 @@ class ClassFile_Helper {
 }
 
 // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
+// https://en.wikipedia.org/wiki/Java_class_file
 class ClassFile {
  	private static final byte[] MAGIC_NUMBER = HexFormat.of().parseHex("CAFEBABE");
     
@@ -70,6 +71,8 @@ class ClassFile {
 			ACCESS_FLAGS = ClassFile_Helper.readShort(classFile);
 			THIS_CLASS = ClassFile_Helper.readShort(classFile);
 			SUPER_CLASS = ClassFile_Helper.readShort(classFile);
+			INTERFACES_COUNT = ClassFile_Helper.readShort(classFile);
+			INTERFACES = Interface_Helper.readInterfaces(classFile, INTERFACES_COUNT);
 			FIELDS_COUNT = ClassFile_Helper.readShort(classFile);
 			FIELDS = Field_Helper.readFields(classFile, FIELDS_COUNT);
 			METHODS_COUNT = ClassFile_Helper.readShort(classFile);

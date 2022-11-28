@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -257,6 +258,7 @@ class CONSTANT_Utf8_Info extends CP_Info {
 		return "CONSTANT_Utf8_Info:\n" +
 				" - length = " + length + "\n" +
 				" - bytes = " + bytes + "\n" +
+				" - bytes (as string) = " + new String(bytes, StandardCharsets.UTF_8) + "\n" + 
 				" - tag = " + tag;
 	}
 }
