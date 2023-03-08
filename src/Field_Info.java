@@ -31,10 +31,21 @@ public class Field_Info {
 
 	@Override
 	public String toString() {
-		return "Field:\n" +
-				" - access_flags = " + access_flags + "\n" +
-				" - name_index = " + name_index + "\n" +
-				" - description_index = " + description_index + "\n" +
-				" - attributes_count = " + attributes_count;
+		StringBuilder str = new StringBuilder();
+
+		str.append("Field:\n");
+		str.append(" - access_flags = " + access_flags + "\n");
+		str.append(" - name_index = " + name_index + "\n");
+		str.append(" - description_index = " + description_index + "\n");
+		str.append(" - attributes_count = " + attributes_count + "\n");
+
+		for (Attribute_Info ATTRIBUTE : attributes) {
+			str.append(ATTRIBUTE + "\n");
+		}
+		if (attributes_count == 0) {
+			str.append("\n");
+		}
+
+		return str.toString();
 	}
 }

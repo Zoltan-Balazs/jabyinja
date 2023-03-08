@@ -33,7 +33,6 @@ class Attribute_Info {
 		return "Attribute:\n" +
 				" - attribute_name_index = " + attribute_name_index + "\n" +
 				" - attribute_length = " + attribute_length + "\n" +
-				" - info = " + info + "\n" +
-				" - info (as string) = " + new String(info, StandardCharsets.UTF_8);
+				" - info = " + info;
 	}
 }

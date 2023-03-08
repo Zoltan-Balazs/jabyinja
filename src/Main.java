@@ -87,9 +87,7 @@ class ClassFile {
 		}
 	}
 
-	public List<Method_Info> findMethodsByName(String methodName) throws UnsupportedEncodingException {
-		List<Method_Info> methods = new ArrayList<Method_Info>();
-
+	public Method_Info findMethodsByName(String methodName) {
 		for (Method_Info METHOD : METHODS) {
 			CP_Info currentItem = CONSTANT_POOL.get(METHOD.name_index - 1);
 			if (currentItem instanceof CONSTANT_Utf8_Info) {
@@ -99,12 +97,32 @@ class ClassFile {
 				// FIXME: That doesn't work yet... String.getBytes() doesn't return the correct
 				// byte array, even when forcing the encoding
 				if (new String(currentItemUTF8.bytes, StandardCharsets.UTF_8).equals(methodName)) {
-					methods.add(METHOD);
+					return METHOD;
 				}
 			}
 		}
 
-		return methods;
+		return null;
+	}
+
+	public List<Attribute_Info> findAttributesByName(List<Attribute_Info> attributes, String attributeName) {
+		List<Attribute_Info> attr = new ArrayList<Attribute_Info>();
+
+		for (Attribute_Info ATTRIBUTE : attributes) {
+			CP_Info currentItem = CONSTANT_POOL.get(ATTRIBUTE.attribute_name_index - 1);
+			if (currentItem instanceof CONSTANT_Utf8_Info) {
+				CONSTANT_Utf8_Info currentItemUTF8 = (CONSTANT_Utf8_Info) currentItem;
+
+				// TODO: Instead of doing it this way, convert the user input into bytes
+				// FIXME: That doesn't work yet... String.getBytes() doesn't return the correct
+				// byte array, even when forcing the encoding
+				if (new String(currentItemUTF8.bytes, StandardCharsets.UTF_8).equals(attributeName)) {
+					attr.add(ATTRIBUTE);
+				}
+			}
+		}
+
+		return attr;
 	}
 
 	@Override
@@ -167,12 +185,10 @@ public class Main {
 
 		// System.out.println(CLASS_FILE);
 
-		try {
-			List<Method_Info> methods = CLASS_FILE.findMethodsByName("main");
-			System.out.println(methods);
-		} catch (UnsupportedEncodingException uee) {
-			System.out.println("Encoding isn't supported");
-			uee.printStackTrace();
-		}
+		Method_Info method = CLASS_FILE.findMethodsByName("main");
+		System.out.println(method);
+
+		List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
+		System.out.println(attributes);
 	}
 }
