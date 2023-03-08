@@ -9,7 +9,7 @@ class Method_Helper {
 
 		for (int i = 0; i < count; ++i) {
 			Method_Info tmp = new Method_Info();
-			tmp.access_flags = ClassFile_Helper.readShort(in);
+			tmp.access_flags = Method_Access_Flags.parseFlags(ClassFile_Helper.readShort(in));
 			tmp.name_index = ClassFile_Helper.readShort(in);
 			tmp.description_index = ClassFile_Helper.readShort(in);
 			tmp.attributes_count = ClassFile_Helper.readShort(in);
@@ -22,7 +22,7 @@ class Method_Helper {
 }
 
 class Method_Info {
-	public short access_flags;
+	public List<Method_Access_Flags> access_flags;
 	public short name_index;
 	public short description_index;
 	public short attributes_count;

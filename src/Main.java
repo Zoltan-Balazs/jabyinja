@@ -42,7 +42,7 @@ class ClassFile {
 	private static short MAJOR_VERSION;
 	private static short CONSTANT_POOL_COUNT;
 	private static List<CP_Info> CONSTANT_POOL;
-	private static short ACCESS_FLAGS;
+	private static List<Class_Access_Flags> ACCESS_FLAGS;
 	private static short THIS_CLASS;
 	private static short SUPER_CLASS;
 	private static short INTERFACES_COUNT;
@@ -69,7 +69,7 @@ class ClassFile {
 			MAJOR_VERSION = ClassFile_Helper.readShort(classFile);
 			CONSTANT_POOL_COUNT = ClassFile_Helper.readShort(classFile);
 			CONSTANT_POOL = Constant_Pool_Helper.readConstantPool(classFile, CONSTANT_POOL_COUNT);
-			ACCESS_FLAGS = ClassFile_Helper.readShort(classFile);
+			ACCESS_FLAGS = Class_Access_Flags.parseFlags(ClassFile_Helper.readShort(classFile));
 			THIS_CLASS = ClassFile_Helper.readShort(classFile);
 			SUPER_CLASS = ClassFile_Helper.readShort(classFile);
 			INTERFACES_COUNT = ClassFile_Helper.readShort(classFile);
@@ -105,6 +105,9 @@ class ClassFile {
 		for (CP_Info CONSTANT : CONSTANT_POOL) {
 			str.append(CONSTANT + "\n");
 		}
+		if (CONSTANT_POOL_COUNT == 0) {
+			str.append("\n");
+		}
 		str.append("Access flags: " + ACCESS_FLAGS + "\n");
 		str.append("This class: " + THIS_CLASS + "\n");
 		str.append("Super class: " + SUPER_CLASS + "\n");
@@ -112,13 +115,22 @@ class ClassFile {
 		for (Interface INTERFACE : INTERFACES) {
 			str.append(INTERFACE + "\n");
 		}
+		if (INTERFACES_COUNT == 0) {
+			str.append("\n");
+		}
 		str.append("Fields count: " + FIELDS_COUNT + "\n");
 		for (Field_Info FIELD : FIELDS) {
 			str.append(FIELD + "\n");
 		}
+		if (FIELDS_COUNT == 0) {
+			str.append("\n");
+		}
 		str.append("Methods count: " + METHODS_COUNT + "\n");
 		for (Method_Info METHOD : METHODS) {
 			str.append(METHOD + "\n");
+		}
+		if (METHODS_COUNT == 0) {
+			str.append("\n");
 		}
 		str.append("Attributes count: " + ATTRIBUTES_COUNT + "\n");
 		for (Attribute_Info ATTRIBUTE : ATTRIBUTES) {

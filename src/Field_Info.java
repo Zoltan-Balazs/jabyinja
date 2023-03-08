@@ -9,7 +9,7 @@ class Field_Helper {
 
 		for (int i = 0; i < count; ++i) {
 			Field_Info tmp = new Field_Info();
-			tmp.access_flags = ClassFile_Helper.readShort(in);
+			tmp.access_flags = Field_Access_Flags.parseFlags(ClassFile_Helper.readShort(in));
 			tmp.name_index = ClassFile_Helper.readShort(in);
 			tmp.description_index = ClassFile_Helper.readShort(in);
 			tmp.attributes_count = ClassFile_Helper.readShort(in);
@@ -22,7 +22,7 @@ class Field_Helper {
 }
 
 public class Field_Info {
-	public short access_flags;
+	public List<Field_Access_Flags> access_flags;
 	public short name_index;
 	public short description_index;
 	public short attributes_count;
