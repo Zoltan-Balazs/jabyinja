@@ -3,6 +3,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
@@ -84,6 +87,26 @@ class ClassFile {
 		}
 	}
 
+	public List<Method_Info> findMethodsByName(String methodName) throws UnsupportedEncodingException {
+		List<Method_Info> methods = new ArrayList<Method_Info>();
+
+		for (Method_Info METHOD : METHODS) {
+			CP_Info currentItem = CONSTANT_POOL.get(METHOD.name_index - 1);
+			if (currentItem instanceof CONSTANT_Utf8_Info) {
+				CONSTANT_Utf8_Info currentItemUTF8 = (CONSTANT_Utf8_Info) currentItem;
+
+				// TODO: Instead of doing it this way, convert the user input into bytes
+				// FIXME: That doesn't work yet... String.getBytes() doesn't return the correct
+				// byte array, even when forcing the encoding
+				if (new String(currentItemUTF8.bytes, StandardCharsets.UTF_8).equals(methodName)) {
+					methods.add(METHOD);
+				}
+			}
+		}
+
+		return methods;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
@@ -142,6 +165,14 @@ public class Main {
 			CLASS_FILE = new ClassFile(args[0]);
 		}
 
-		System.out.println(CLASS_FILE);
+		// System.out.println(CLASS_FILE);
+
+		try {
+			List<Method_Info> methods = CLASS_FILE.findMethodsByName("main");
+			System.out.println(methods);
+		} catch (UnsupportedEncodingException uee) {
+			System.out.println("Encoding isn't supported");
+			uee.printStackTrace();
+		}
 	}
 }

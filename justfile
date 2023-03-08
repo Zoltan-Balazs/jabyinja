@@ -9,7 +9,7 @@ compile:
     javac src/*.java
 
 run-default:
-    cd src && java Main
+    cd src && java -Dfile.encoding=UTF-8 Main
 
 run FILE:
-    cd src && java Main {{FILE}}
+    cd src && java -Dfile.encoding=UTF-8 Main {{FILE}}
