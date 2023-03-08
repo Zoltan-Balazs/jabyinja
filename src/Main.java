@@ -1,3 +1,5 @@
+package com.zoltanbalazs;
+
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -193,7 +195,7 @@ public class Main {
 
 		for (Attribute_Info attribute : attributes) {
 			try {
-				Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute.info);
+				Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 				System.out.println(codeAttribute);
 			} catch (Exception e) {
 				e.printStackTrace();

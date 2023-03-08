@@ -13,3 +13,6 @@ run-default:
 
 run FILE:
     cd src && java -Dfile.encoding=UTF-8 Main {{FILE}}
+
+package:
+    cd src && jar -cmf ../manifest.mf jabyinja.jar

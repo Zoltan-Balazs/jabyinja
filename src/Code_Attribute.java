@@ -1,3 +1,5 @@
+package com.zoltanbalazs;
+
 import java.io.DataInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -6,14 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Code_Attribute_Helper {
-    public static Code_Attribute readCodeAttributes(byte[] info) throws IOException {
+    public static Code_Attribute readCodeAttributes(Attribute_Info attribute) throws IOException {
         Code_Attribute codeAttribute = new Code_Attribute();
 
-        try (InputStream infoStream = new ByteArrayInputStream(info);
+        try (InputStream infoStream = new ByteArrayInputStream(attribute.info);
                 DataInputStream infoData = new DataInputStream(infoStream)) {
 
-            // codeAttribute.attribute_name_index = ClassFile_Helper.readShort(infoData);
-            // codeAttribute.attribute_length = ClassFile_Helper.readInt(infoData);
+            codeAttribute.attribute_name_index = attribute.attribute_name_index;
+            codeAttribute.attribute_length = attribute.attribute_length;
             codeAttribute.max_stack = ClassFile_Helper.readShort(infoData);
             codeAttribute.max_locals = ClassFile_Helper.readShort(infoData);
             codeAttribute.code_length = ClassFile_Helper.readInt(infoData);

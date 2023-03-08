@@ -1,3 +1,5 @@
+package com.zoltanbalazs;
+
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
