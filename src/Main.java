@@ -190,5 +190,14 @@ public class Main {
 
 		List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
 		System.out.println(attributes);
+
+		for (Attribute_Info attribute : attributes) {
+			try {
+				Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute.info);
+				System.out.println(codeAttribute);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
