@@ -1,9 +1,8 @@
+import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
@@ -12,23 +11,16 @@ class InvalidClassFileException extends RuntimeException {
 }
 
 class ClassFile_Helper {
-	public static byte readByte(InputStream file) throws IOException {
-		byte[] tmp = file.readNBytes(1);
-		return tmp[0];
+	public static byte readByte(DataInputStream classFileData) throws IOException {
+		return (byte) classFileData.readUnsignedByte();
 	}
 
-	public static short readShort(InputStream file) throws IOException {
-		ByteBuffer wrapper;
-		byte[] tmp = file.readNBytes(2);
-		wrapper = ByteBuffer.wrap(tmp);
-		return wrapper.getShort();
+	public static short readShort(DataInputStream classFileData) throws IOException {
+		return (short) classFileData.readUnsignedShort();
 	}
 
-	public static int readInt(InputStream file) throws IOException {
-		ByteBuffer wrapper;
-		byte[] tmp = file.readNBytes(4);
-		wrapper = ByteBuffer.wrap(tmp);
-		return wrapper.getInt();
+	public static int readInt(DataInputStream classFileData) throws IOException {
+		return classFileData.readInt();
 	}
 }
 
@@ -59,35 +51,34 @@ class ClassFile {
 	}
 
 	public void readClassFile(String fileName) {
-		try (InputStream classFile = new FileInputStream(fileName)) {
+		try (InputStream classFile = new FileInputStream(fileName);
+				DataInputStream classFileData = new DataInputStream(classFile)) {
 			if (!Arrays.equals(classFile.readNBytes(4), MAGIC_NUMBER)) {
 				throw new InvalidClassFileException();
 			}
 			VALID_CLASS_FILE = true;
 
-			MINOR_VERSION = ClassFile_Helper.readShort(classFile);
-			MAJOR_VERSION = ClassFile_Helper.readShort(classFile);
-			CONSTANT_POOL_COUNT = ClassFile_Helper.readShort(classFile);
-			CONSTANT_POOL = Constant_Pool_Helper.readConstantPool(classFile, CONSTANT_POOL_COUNT);
-			ACCESS_FLAGS = Class_Access_Flags.parseFlags(ClassFile_Helper.readShort(classFile));
-			THIS_CLASS = ClassFile_Helper.readShort(classFile);
-			SUPER_CLASS = ClassFile_Helper.readShort(classFile);
-			INTERFACES_COUNT = ClassFile_Helper.readShort(classFile);
-			INTERFACES = Interface_Helper.readInterfaces(classFile, INTERFACES_COUNT);
-			FIELDS_COUNT = ClassFile_Helper.readShort(classFile);
-			FIELDS = Field_Helper.readFields(classFile, FIELDS_COUNT);
-			METHODS_COUNT = ClassFile_Helper.readShort(classFile);
-			METHODS = Method_Helper.readMethods(classFile, METHODS_COUNT);
-			ATTRIBUTES_COUNT = ClassFile_Helper.readShort(classFile);
-			ATTRIBUTES = Attribute_Helper.readAttributes(classFile, ATTRIBUTES_COUNT);
+			MINOR_VERSION = ClassFile_Helper.readShort(classFileData);
+			MAJOR_VERSION = ClassFile_Helper.readShort(classFileData);
+			CONSTANT_POOL_COUNT = ClassFile_Helper.readShort(classFileData);
+			CONSTANT_POOL = Constant_Pool_Helper.readConstantPool(classFileData, CONSTANT_POOL_COUNT);
+			ACCESS_FLAGS = Class_Access_Flags.parseFlags(ClassFile_Helper.readShort(classFileData));
+			THIS_CLASS = ClassFile_Helper.readShort(classFileData);
+			SUPER_CLASS = ClassFile_Helper.readShort(classFileData);
+			INTERFACES_COUNT = ClassFile_Helper.readShort(classFileData);
+			INTERFACES = Interface_Helper.readInterfaces(classFileData, INTERFACES_COUNT);
+			FIELDS_COUNT = ClassFile_Helper.readShort(classFileData);
+			FIELDS = Field_Helper.readFields(classFileData, FIELDS_COUNT);
+			METHODS_COUNT = ClassFile_Helper.readShort(classFileData);
+			METHODS = Method_Helper.readMethods(classFileData, METHODS_COUNT);
+			ATTRIBUTES_COUNT = ClassFile_Helper.readShort(classFileData);
+			ATTRIBUTES = Attribute_Helper.readAttributes(classFileData, ATTRIBUTES_COUNT);
 		} catch (FileNotFoundException e) {
 			System.err.println("The file '" + fileName + "' cannot be found!");
 		} catch (InvalidClassFileException e) {
 			System.err.println("The file '" + fileName + "' is not a valid Java Class file!");
 		} catch (InvalidConstantPoolTagException e) {
 			System.err.println("The file '" + fileName + "' contains invalid Constant Pool tag!");
-		} catch (BufferUnderflowException e) {
-			System.err.println("The file '" + fileName + "' contains contradicting information!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

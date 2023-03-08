@@ -1,3 +1,5 @@
+import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -5,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Attribute_Helper {
-	public static List<Attribute_Info> readAttributes(InputStream in, int count) throws IOException {
+	public static List<Attribute_Info> readAttributes(DataInputStream in, int count) throws IOException {
 		List<Attribute_Info> attributes = new ArrayList<Attribute_Info>(count);
 
 		for (int i = 0; i < count; ++i) {

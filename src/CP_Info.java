@@ -1,13 +1,15 @@
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-class InvalidConstantPoolTagException extends RuntimeException { }
+class InvalidConstantPoolTagException extends RuntimeException {
+}
 
 class Constant_Pool_Helper {
-	public static List<CP_Info> readConstantPool(InputStream in, int count)
+	public static List<CP_Info> readConstantPool(DataInputStream in, int count)
 			throws IOException, InvalidConstantPoolTagException {
 		List<CP_Info> constant_pool = new ArrayList<CP_Info>(count - 1);
 
@@ -21,7 +23,7 @@ class Constant_Pool_Helper {
 					tmp.name_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
 				}
-					
+
 				case CONSTANT_Fieldref -> {
 					CONSTANT_Fieldref_Info tmp = new CONSTANT_Fieldref_Info();
 					tmp.class_index = ClassFile_Helper.readShort(in);
@@ -258,7 +260,7 @@ class CONSTANT_Utf8_Info extends CP_Info {
 		return "CONSTANT_Utf8_Info:\n" +
 				" - length = " + length + "\n" +
 				" - bytes = " + bytes + "\n" +
-				" - bytes (as string) = " + new String(bytes, StandardCharsets.UTF_8) + "\n" + 
+				" - bytes (as string) = " + new String(bytes, StandardCharsets.UTF_8) + "\n" +
 				" - tag = " + tag;
 	}
 }
@@ -318,17 +320,18 @@ enum ConstantPoolTag {
 	ERROR(-1);
 
 	private final int tagValue;
-    private ConstantPoolTag(int tagValue) {
-        this.tagValue = tagValue;
-    }
+
+	private ConstantPoolTag(int tagValue) {
+		this.tagValue = tagValue;
+	}
 
 	public boolean compare(int tagValue) {
 		return this.tagValue == tagValue;
 	}
 
-    public int getTagValue() {
-        return tagValue;
-    }
+	public int getTagValue() {
+		return tagValue;
+	}
 
 	public static ConstantPoolTag getValue(int tag) {
 		ConstantPoolTag[] tags = ConstantPoolTag.values();

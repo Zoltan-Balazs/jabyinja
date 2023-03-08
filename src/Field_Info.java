@@ -1,10 +1,11 @@
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 class Field_Helper {
-	public static List<Field_Info> readFields(InputStream in, int count) throws IOException {
+	public static List<Field_Info> readFields(DataInputStream in, int count) throws IOException {
 		List<Field_Info> fields = new ArrayList<Field_Info>(count);
 
 		for (int i = 0; i < count; ++i) {

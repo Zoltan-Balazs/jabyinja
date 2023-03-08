@@ -1,10 +1,11 @@
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 class Method_Helper {
-	public static List<Method_Info> readMethods(InputStream in, int count) throws IOException {
+	public static List<Method_Info> readMethods(DataInputStream in, int count) throws IOException {
 		List<Method_Info> methods = new ArrayList<Method_Info>(count);
 
 		for (int i = 0; i < count; ++i) {
