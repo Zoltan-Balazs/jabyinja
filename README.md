@@ -19,6 +19,11 @@ $ javac *.java
 $ java -Dfile.encoding=UTF-8 Main <optional class file>
 ```
 
+Or with just:
+```sh
+$ just r
+```
+
 ### With creating a jar file
 
 ```sh
@@ -27,6 +32,12 @@ $ javac *.java
 $ mkdir -p com/zoltanbalazs/
 $ mv *.class com/zoltanbalazs/
 $ jar cmvf ../META-INF/MANIFEST.MF jabyinja.jar com/zoltanbalazs/
+$ java -jar jabyinja.jar <optional class file>
+```
+
+Or with just:
+```sh
+$ just p
 $ java -jar jabyinja.jar <optional class file>
 ```
 
