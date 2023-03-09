@@ -4,8 +4,8 @@ My BSc thesis work for [Eötvös Loránd University's Computer Science curriculu
 
 ## Prerequisities
 
-- The code uses *switch* expressions, so at the very least, you should have **JDK 12** installed to be able to build it
-- To use the justfile (not necessary), you need to have **Just** installed
+- [JDK12](https://openjdk.org/projects/jdk/12/)
+- [Just](https://github.com/casey/just) *(optional - for use with justfile)*
 
 ## Building the code
 
