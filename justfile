@@ -10,10 +10,10 @@ clean:
 compile:
     cd src/ && javac *.java && mkdir -p com/zoltanbalazs/ && mv *.class com/zoltanbalazs/ 
 
-run-default:
+run-default: compile
     cd src/ && java -Dfile.encoding=UTF-8 com.zoltanbalazs.Main
 
-run FILE:
+run FILE: compile
     cd src/ && java -Dfile.encoding=UTF-8 com.zoltanbalazs.Main {{FILE}}
 
 package: compile
