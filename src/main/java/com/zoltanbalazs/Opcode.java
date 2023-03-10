@@ -211,9 +211,18 @@ public enum Opcode {
     IMPDEP1(0xFE),
     IMPDEP2(0xFF);
 
-    public final byte opCode;
+    public final byte op_code;
 
     private Opcode(int opCode) {
-        this.opCode = (byte) opCode;
+        this.op_code = (byte) opCode;
+    }
+
+    public static Opcode opcodeRepresentation(int op_code) {
+        for (Opcode OPCODE : Opcode.values()) {
+            if (OPCODE.op_code == op_code) {
+                return OPCODE;
+            }
+        }
+        return NOP;
     }
 }
