@@ -29,7 +29,7 @@ class ClassFile_Helper {
     }
 }
 
-// https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
+// https://docs.oracle.com/javase/specs/jvms/se19/html/jvms-4.html
 // https://en.wikipedia.org/wiki/Java_class_file
 class ClassFile {
     private static final byte[] MAGIC_NUMBER = HexFormat.of().parseHex("CAFEBABE");
