@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
 
@@ -122,27 +123,96 @@ class ClassFile {
     }
 
     public String getNameOfClass(short class_index) {
-        return CONSTANT_POOL.get(CONSTANT_POOL.get(class_index - 1).getNameIndex() - 1).getBytes().toString();
+        return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(class_index - 1).getNameIndex() - 1).getBytes(),
+                StandardCharsets.UTF_8);
     }
 
     public String getNameOfMember(short name_and_type_index) {
-        return CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getNameIndex() - 1).getBytes().toString();
+        return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getNameIndex() - 1).getBytes(),
+                StandardCharsets.UTF_8);
     }
 
     public void executeCode(byte[] code) throws IOException {
+        List<HashMap<String, Object>> stack = new ArrayList<>();
+
         try (InputStream codeStream = new ByteArrayInputStream(code);
                 DataInputStream codeData = new DataInputStream(codeStream)) {
 
-            int counter = 0;
             while (codeData.available() != 0) {
                 byte opCode = ClassFile_Helper.readByte(codeData);
-                System.out.print(String.format("0x%02X ", opCode));
-                if (counter++ == 8) {
-                    System.out.println();
-                    counter = 0;
+
+                switch (Opcode.opcodeRepresentation(opCode)) {
+                    case LDC -> {
+                        byte index = ClassFile_Helper.readByte(codeData);
+                        stack.add(new HashMap<>() {
+                            {
+                                put("type", "Constant");
+                                put("const", CONSTANT_POOL.get(index - 1));
+                            }
+                        });
+                    }
+                    case RETURN -> {
+                        return;
+                    }
+                    case GETSTATIC -> {
+                        short index = ClassFile_Helper.readShort(codeData);
+                        CP_Info fieldRef = CONSTANT_POOL.get(index - 1);
+                        String className = getNameOfClass(fieldRef.getClassIndex());
+                        String memberName = getNameOfMember(fieldRef.getNameAndTypeIndex());
+
+                        if (className.equals("java/lang/System") && memberName.equals("out")) {
+                            stack.add(new HashMap<>() {
+                                {
+                                    put("type", "PrintStream");
+                                }
+                            });
+                        } else {
+                            throw new UnsupportedOperationException(
+                                    "Not supported field: " + className + "/" + memberName + " in getstatic");
+                        }
+                    }
+                    case INVOKVEVIRTUAL -> {
+                        short index = ClassFile_Helper.readShort(codeData);
+                        CP_Info methodRef = CONSTANT_POOL.get(index - 1);
+                        String className = getNameOfClass(methodRef.getClassIndex());
+                        String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
+
+                        if (className.equals("java/io/PrintStream") && memberName.equals("println")) {
+                            int n = stack.size();
+                            if (n < 2) {
+                                throw new UnsupportedOperationException(
+                                        className + "/" + memberName + "expects 2 arguments, but there is only " + n);
+                            }
+                            HashMap<String, Object> obj = stack.get(n - 2);
+                            if (!obj.get("type").equals("PrintStream")) {
+                                System.out.println("Unsupported stream type " + obj.get("type"));
+                            }
+                            HashMap<String, Object> arg = stack.get(n - 1);
+                            if (arg.get("type").equals("Constant")) {
+                                if (arg.get("const") instanceof CONSTANT_String_Info) {
+                                    System.out.println(new String(CONSTANT_POOL
+                                            .get(((CONSTANT_String_Info) arg.get("const")).getStringIndex() - 1)
+                                            .getBytes(), StandardCharsets.UTF_8));
+                                } else {
+                                    throw new UnsupportedOperationException(
+                                            "println for " + arg.get("const").getClass().getSimpleName()
+                                                    + " is not implemented");
+                                }
+                            } else {
+                                throw new UnsupportedOperationException(
+                                        "Support for " + arg.get("type") + " is not implemented");
+                            }
+                        } else {
+                            throw new UnsupportedOperationException(
+                                    "Not supported method: " + className + "/" + memberName + " in getstatic");
+                        }
+                    }
+                    default -> throw new UnsupportedOperationException(
+                            "Not supported opcode: " + Opcode.opcodeRepresentation(opCode) + " ("
+                                    + String.format("0x%02X", opCode)
+                                    + ")");
                 }
             }
-            System.out.println();
         }
     }
 
