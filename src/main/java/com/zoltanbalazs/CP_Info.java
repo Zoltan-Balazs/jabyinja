@@ -123,6 +123,14 @@ class Constant_Pool_Helper {
 public class CP_Info {
 	public ConstantPoolTag tag;
 
+	public byte[] getBytes() {
+		return new byte[] {};
+	}
+
+	public short getNameIndex() {
+		return -1;
+	}
+
 	@Override
 	public String toString() {
 		return "CONSTANT_Pool_Info:\n" +
@@ -132,6 +140,11 @@ public class CP_Info {
 
 class CONSTANT_Class_Info extends CP_Info {
 	public short name_index;
+
+	@Override
+	public short getNameIndex() {
+		return name_index;
+	}
 
 	@Override
 	public String toString() {
@@ -244,6 +257,11 @@ class CONSTANT_NameAndType_Info extends CP_Info {
 	public short descriptor_index;
 
 	@Override
+	public short getNameIndex() {
+		return name_index;
+	}
+
+	@Override
 	public String toString() {
 		return "CONSTANT_NameAndType_Info:\n" +
 				" - name_index = " + name_index + "\n" +
@@ -255,6 +273,10 @@ class CONSTANT_NameAndType_Info extends CP_Info {
 class CONSTANT_Utf8_Info extends CP_Info {
 	public short length;
 	public byte[] bytes;
+
+	public byte[] getBytes() {
+		return new byte[] {};
+	}
 
 	@Override
 	public String toString() {

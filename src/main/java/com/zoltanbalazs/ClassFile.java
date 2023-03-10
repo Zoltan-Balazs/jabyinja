@@ -91,15 +91,12 @@ class ClassFile {
     public Method_Info findMethodsByName(String methodName) {
         for (Method_Info METHOD : METHODS) {
             CP_Info currentItem = CONSTANT_POOL.get(METHOD.name_index - 1);
-            if (currentItem instanceof CONSTANT_Utf8_Info) {
-                CONSTANT_Utf8_Info currentItemUTF8 = (CONSTANT_Utf8_Info) currentItem;
 
-                // TODO: Instead of doing it this way, convert the user input into bytes
-                // FIXME: That doesn't work yet... String.getBytes() doesn't return the correct
-                // byte array, even when forcing the encoding
-                if (new String(currentItemUTF8.bytes, StandardCharsets.UTF_8).equals(methodName)) {
-                    return METHOD;
-                }
+            // TODO: Instead of doing it this way, convert the user input into bytes
+            // FIXME: That doesn't work yet... String.getBytes() doesn't return the correct
+            // byte array, even when forcing the encoding
+            if (new String(currentItem.getBytes(), StandardCharsets.UTF_8).equals(methodName)) {
+                return METHOD;
             }
         }
 
@@ -111,19 +108,24 @@ class ClassFile {
 
         for (Attribute_Info ATTRIBUTE : attributes) {
             CP_Info currentItem = CONSTANT_POOL.get(ATTRIBUTE.attribute_name_index - 1);
-            if (currentItem instanceof CONSTANT_Utf8_Info) {
-                CONSTANT_Utf8_Info currentItemUTF8 = (CONSTANT_Utf8_Info) currentItem;
 
-                // TODO: Instead of doing it this way, convert the user input into bytes
-                // FIXME: That doesn't work yet... String.getBytes() doesn't return the correct
-                // byte array, even when forcing the encoding
-                if (new String(currentItemUTF8.bytes, StandardCharsets.UTF_8).equals(attributeName)) {
-                    attr.add(ATTRIBUTE);
-                }
+            // TODO: Instead of doing it this way, convert the user input into bytes
+            // FIXME: That doesn't work yet... String.getBytes() doesn't return the correct
+            // byte array, even when forcing the encoding
+            if (new String(currentItem.getBytes(), StandardCharsets.UTF_8).equals(attributeName)) {
+                attr.add(ATTRIBUTE);
             }
         }
 
         return attr;
+    }
+
+    public String getNameOfClass(short class_index) {
+        return CONSTANT_POOL.get(CONSTANT_POOL.get(class_index - 1).getNameIndex() - 1).getBytes().toString();
+    }
+
+    public String getNameOfMember(short name_and_type_index) {
+        return CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getNameIndex() - 1).getBytes().toString();
     }
 
     @Override
