@@ -4,7 +4,7 @@ My BSc thesis work for [Eötvös Loránd University's Computer Science curriculu
 
 ## Prerequisities
 
-- [JDK12](https://openjdk.org/projects/jdk/12/)
+- [JDK17](https://openjdk.org/projects/jdk/17/)
 - [Just](https://github.com/casey/just) *(optional - for use with justfile)*
 
 ## Building the code
