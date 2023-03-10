@@ -5,40 +5,22 @@ My BSc thesis work for [Eötvös Loránd University's Computer Science curriculu
 ## Prerequisities
 
 - [JDK17](https://openjdk.org/projects/jdk/17/)
+- [Maven 3.9.0](https://maven.apache.org/download.cgi)
 - [Just](https://github.com/casey/just) *(optional - for use with justfile)*
 
 ## Building the code
 
 - As per the justfile, with a few simple commands you can already start interpreting Java code
 
-### Without creating a jar file
-
 ```sh
-$ cd src
-$ javac *.java
-$ java -Dfile.encoding=UTF-8 Main <optional class file>
+$ mvn package
+$ java -jar target/jabyinja.jar <optional class file>
 ```
 
 Or with just:
 ```sh
-$ just r
-```
-
-### With creating a jar file
-
-```sh
-$ cd src
-$ javac *.java
-$ mkdir -p com/zoltanbalazs/
-$ mv *.class com/zoltanbalazs/
-$ jar cmvf ../META-INF/MANIFEST.MF jabyinja.jar com/zoltanbalazs/
-$ java -jar jabyinja.jar <optional class file>
-```
-
-Or with just:
-```sh
-$ just p
-$ java -jar jabyinja.jar <optional class file>
+$ just co
+$ java -jar target/jabyinja.jar <optional class file>
 ```
 
 ## Usage
