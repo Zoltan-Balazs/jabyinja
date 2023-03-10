@@ -1,10 +1,9 @@
 package com.zoltanbalazs;
 
-import java.io.DataInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 class Code_Attribute_Helper {

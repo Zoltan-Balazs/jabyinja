@@ -1,15 +1,15 @@
 package com.zoltanbalazs;
 
-import java.io.FileNotFoundException;
-import java.io.FileInputStream;
 import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HexFormat;
-import java.util.Arrays;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HexFormat;
+import java.util.List;
 
 class InvalidClassFileException extends RuntimeException {
 }
