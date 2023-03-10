@@ -131,6 +131,18 @@ public class CP_Info {
 		return -1;
 	}
 
+	public short getNameAndTypeIndex() {
+		return -1;
+	}
+
+	public short getClassIndex() {
+		return -1;
+	}
+
+	public short getStringIndex() {
+		return -1;
+	}
+
 	@Override
 	public String toString() {
 		return "CONSTANT_Pool_Info:\n" +
@@ -159,6 +171,16 @@ class CONSTANT_Fieldref_Info extends CP_Info {
 	public short name_and_type_index;
 
 	@Override
+	public short getClassIndex() {
+		return class_index;
+	}
+
+	@Override
+	public short getNameAndTypeIndex() {
+		return name_and_type_index;
+	}
+
+	@Override
 	public String toString() {
 		return "CONSTANT_Fieldref_Info:\n" +
 				" - class_index = " + class_index + "\n" +
@@ -170,6 +192,16 @@ class CONSTANT_Fieldref_Info extends CP_Info {
 class CONSTANT_Methodref_Info extends CP_Info {
 	public short class_index;
 	public short name_and_type_index;
+
+	@Override
+	public short getClassIndex() {
+		return class_index;
+	}
+
+	@Override
+	public short getNameAndTypeIndex() {
+		return name_and_type_index;
+	}
 
 	@Override
 	public String toString() {
@@ -185,6 +217,16 @@ class CONSTANT_InterfaceMethodref_Info extends CP_Info {
 	public short name_and_type_index;
 
 	@Override
+	public short getClassIndex() {
+		return class_index;
+	}
+
+	@Override
+	public short getNameAndTypeIndex() {
+		return name_and_type_index;
+	}
+
+	@Override
 	public String toString() {
 		return "CONSTANT_InterfaceMethodref_Info:\n" +
 				" - class_index = " + class_index + "\n" +
@@ -195,6 +237,11 @@ class CONSTANT_InterfaceMethodref_Info extends CP_Info {
 
 class CONSTANT_String_Info extends CP_Info {
 	public short string_index;
+
+	@Override
+	public short getStringIndex() {
+		return string_index;
+	}
 
 	@Override
 	public String toString() {
@@ -315,6 +362,11 @@ class CONSTANT_MethodType_Info extends CP_Info {
 class CONSTANT_InvokeDynamic_Info extends CP_Info {
 	public short bootstrap_method_attr_index;
 	public short name_and_type_index;
+
+	@Override
+	public short getNameAndTypeIndex() {
+		return name_and_type_index;
+	}
 
 	@Override
 	public String toString() {
