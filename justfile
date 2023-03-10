@@ -5,7 +5,7 @@ alias r := run-default
 version := "0.9.0"
 
 clean:
-    rm -rf target/
+    mvn clean
 
 compile:
     mvn package
