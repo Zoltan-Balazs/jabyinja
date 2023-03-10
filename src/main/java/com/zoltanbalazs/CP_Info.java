@@ -275,7 +275,7 @@ class CONSTANT_Utf8_Info extends CP_Info {
 	public byte[] bytes;
 
 	public byte[] getBytes() {
-		return new byte[] {};
+		return bytes;
 	}
 
 	@Override
