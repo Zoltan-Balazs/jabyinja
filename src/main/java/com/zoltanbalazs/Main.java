@@ -34,7 +34,10 @@ public class Main {
         for (Attribute_Info attribute : attributes) {
             try {
                 Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
-                System.out.println(codeAttribute);
+
+                if (DEBUG) {
+                    System.out.println(codeAttribute);
+                }
 
                 CLASS_FILE.executeCode(codeAttribute.code);
             } catch (Exception e) {
