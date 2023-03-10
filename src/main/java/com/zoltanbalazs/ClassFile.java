@@ -1,5 +1,6 @@
 package com.zoltanbalazs;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -126,6 +127,23 @@ class ClassFile {
 
     public String getNameOfMember(short name_and_type_index) {
         return CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getNameIndex() - 1).getBytes().toString();
+    }
+
+    public void executeCode(byte[] code) throws IOException {
+        try (InputStream codeStream = new ByteArrayInputStream(code);
+                DataInputStream codeData = new DataInputStream(codeStream)) {
+
+            int counter = 0;
+            while (codeData.available() != 0) {
+                byte opCode = ClassFile_Helper.readByte(codeData);
+                System.out.print(String.format("0x%02X ", opCode));
+                if (counter++ == 8) {
+                    System.out.println();
+                    counter = 0;
+                }
+            }
+            System.out.println();
+        }
     }
 
     @Override

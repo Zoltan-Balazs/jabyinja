@@ -1,5 +1,6 @@
 package com.zoltanbalazs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -14,8 +15,15 @@ public class Main {
             CLASS_FILE = new ClassFile(args[0]);
         }
 
-        Method_Info method = CLASS_FILE.findMethodsByName("main");
-        List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
+        Method_Info method = new Method_Info();
+        List<Attribute_Info> attributes = new ArrayList<>();
+
+        try {
+            method = CLASS_FILE.findMethodsByName("main");
+            attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (DEBUG) {
             System.out.println(CLASS_FILE);
@@ -27,6 +35,8 @@ public class Main {
             try {
                 Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
                 System.out.println(codeAttribute);
+
+                CLASS_FILE.executeCode(codeAttribute.code);
             } catch (Exception e) {
                 e.printStackTrace();
             }
