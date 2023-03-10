@@ -14,13 +14,13 @@ My BSc thesis work for [Eötvös Loránd University's Computer Science curriculu
 
 ```sh
 $ mvn package
-$ java -jar target/jabyinja.jar <optional class file>
+$ java -jar target/jabyinja-*.jar <optional class file>
 ```
 
 Or with just:
 ```sh
 $ just co
-$ java -jar target/jabyinja.jar <optional class file>
+$ java -jar target/jabyinja-*.jar <optional class file>
 ```
 
 ## Usage
