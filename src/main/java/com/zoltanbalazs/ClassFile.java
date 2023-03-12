@@ -151,6 +151,29 @@ class ClassFile {
                             }
                         });
                     }
+                    case ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
+                        // TODO
+                    }
+                    case ALOAD_0, ALOAD_1, ALOAD_2, ALOAD_3 -> {
+                        // TODO
+                    }
+                    case AALOAD -> {
+                        // TODO
+                    }
+                    case ASTORE_0, ASTORE_1, ASTORE_2, ASTORE_3 -> {
+                        // TODO
+                    }
+                    case DUP -> {
+                        // TODO
+                    }
+                    case IFNE -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case GOTO -> {
+                        short index = ClassFile_Helper.readShort(codeData);
+                        System.out.println(index);
+                    }
                     case RETURN -> {
                         return;
                     }
@@ -170,6 +193,15 @@ class ClassFile {
                             throw new UnsupportedOperationException(
                                     "Not supported field: " + className + "/" + memberName + " in getstatic");
                         }
+                    }
+                    case PUTSTATIC -> {
+                        short index = ClassFile_Helper.readShort(codeData);
+                        CP_Info fieldRef = CONSTANT_POOL.get(index - 1);
+                        String className = getNameOfClass(fieldRef.getClassIndex());
+                        String memberName = getNameOfMember(fieldRef.getNameAndTypeIndex());
+
+                        System.out.println(className);
+                        System.out.println(memberName);
                     }
                     case INVOKVEVIRTUAL -> {
                         short index = ClassFile_Helper.readShort(codeData);
@@ -206,6 +238,31 @@ class ClassFile {
                             throw new UnsupportedOperationException(
                                     "Not supported method: " + className + "/" + memberName + " in getstatic");
                         }
+                    }
+                    case INVOKESPECIAL -> {
+                        short index = ClassFile_Helper.readShort(codeData);
+                        CP_Info methodRef = CONSTANT_POOL.get(index - 1);
+                        String className = getNameOfClass(methodRef.getClassIndex());
+                        String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
+
+                        System.out.println(className);
+                        System.out.println(memberName);
+                    }
+                    case INVOKESTATIC -> {
+                        short index = ClassFile_Helper.readShort(codeData);
+                        CP_Info methodRef = CONSTANT_POOL.get(index - 1);
+                        String className = getNameOfClass(methodRef.getClassIndex());
+                        String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
+
+                        System.out.println(className);
+                        System.out.println(memberName);
+                    }
+                    case NEW -> {
+                        short index = ClassFile_Helper.readShort(codeData);
+                        System.out.println(index);
+                    }
+                    case ARRAYLENGTH -> {
+                        // TODO
                     }
                     default -> throw new UnsupportedOperationException(
                             "Not supported opcode: " + Opcode.opcodeRepresentation(opCode) + " ("
