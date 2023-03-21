@@ -29,9 +29,6 @@ class Attribute_Info {
 
 	@Override
 	public String toString() {
-		return "Attribute:\n" +
-				" - attribute_name_index = " + attribute_name_index + "\n" +
-				" - attribute_length = " + attribute_length + "\n" +
-				" - info = " + info;
+		return "Attribute: " + attribute_name_index + " - " + attribute_length + " - " + info;
 	}
 }

@@ -48,29 +48,30 @@ class Code_Attribute {
         StringBuilder str = new StringBuilder();
 
         str.append("Code:\n");
-        str.append(" - attribute_name_index = " + attribute_name_index + "\n");
-        str.append(" - attribute_length = " + attribute_length + "\n");
-        str.append(" - max_stack = " + max_stack + "\n");
-        str.append(" - max_locals = " + max_locals + "\n");
-        str.append(" - code_length = " + code_length + "\n");
-        str.append(" - code = " + code + "\n");
-        str.append(" - exception_table_length = " + exception_table_length + "\n");
+        str.append("\tattribute_name_index = " + attribute_name_index + "\n");
+        str.append("\tattribute_length = " + attribute_length + "\n");
+        str.append("\tmax_stack = " + max_stack + "\n");
+        str.append("\tmax_locals = " + max_locals + "\n");
+        str.append("\tcode_length = " + code_length + "\n");
+        str.append("\tcode = " + code + "\n");
+        str.append("\texception_table_length = " + exception_table_length + "\n");
 
         for (Exception_Table EXCEPTION : exception_table) {
             str.append(EXCEPTION + "\n");
         }
-        if (exception_table_length == 0) {
-            str.append("\n");
-        }
 
-        str.append(" - attributes_count = " + attributes_count + "\n");
+        str.append("\tattributes_count = " + attributes_count + "\n");
 
-        for (Attribute_Info ATTRIBUTE : attributes) {
-            str.append(ATTRIBUTE + "\n");
+        if (attributes_count != 0) {
+            str.append("\tattributes: \n");
+            for (Attribute_Info ATTRIBUTE : attributes) {
+                str.append("\t\t" + ATTRIBUTE + "\n");
+            }
         }
         if (attributes_count == 0) {
             str.append("\n");
         }
+        str.deleteCharAt(str.length() - 1);
 
         return str.toString();
     }

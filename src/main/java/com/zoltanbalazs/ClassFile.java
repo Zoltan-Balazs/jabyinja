@@ -52,6 +52,8 @@ class ClassFile {
     private static short ATTRIBUTES_COUNT;
     private static List<Attribute_Info> ATTRIBUTES;
 
+    public Boolean IS_DEBUG = false;
+
     public ClassFile(String fileName) {
         readClassFile(fileName);
     }
@@ -141,7 +143,9 @@ class ClassFile {
             while (codeData.available() != 0) {
                 byte opCode = ClassFile_Helper.readByte(codeData);
 
-                System.out.println("FOUND OPCODE: " + Opcode.opcodeRepresentation(opCode));
+                if (IS_DEBUG) {  
+                    System.out.println("FOUND OPCODE: " + Opcode.opcodeRepresentation(opCode));
+                }
 
                 switch (Opcode.opcodeRepresentation(opCode)) {
                     case LDC -> {
@@ -283,41 +287,35 @@ class ClassFile {
         str.append("Minor version: " + MINOR_VERSION + "\n");
         str.append("Major version: " + MAJOR_VERSION + "\n");
         str.append("Constant pool count: " + CONSTANT_POOL_COUNT + "\n");
-        str.append("Constant pool:\n");
-        for (CP_Info CONSTANT : CONSTANT_POOL) {
-            str.append(CONSTANT + "\n");
-        }
-        if (CONSTANT_POOL_COUNT == 0) {
-            str.append("\n");
+        if (CONSTANT_POOL_COUNT != 0) {
+            str.append("Constant pool:\n");
+            for (CP_Info CONSTANT : CONSTANT_POOL) {
+                str.append("\t" + CONSTANT + "\n");
+            }
         }
         str.append("Access flags: " + ACCESS_FLAGS + "\n");
         str.append("This class: " + THIS_CLASS + "\n");
         str.append("Super class: " + SUPER_CLASS + "\n");
-        str.append("Interfaces count: " + INTERFACES_COUNT);
+        str.append("Interface count: " + INTERFACES_COUNT + "\n");
         for (Interface INTERFACE : INTERFACES) {
-            str.append(INTERFACE + "\n");
+            str.append("\t" + INTERFACE + "\n");
         }
-        if (INTERFACES_COUNT == 0) {
-            str.append("\n");
-        }
-        str.append("Fields count: " + FIELDS_COUNT + "\n");
+        str.append("Field count: " + FIELDS_COUNT + "\n");
         for (Field_Info FIELD : FIELDS) {
-            str.append(FIELD + "\n");
-        }
-        if (FIELDS_COUNT == 0) {
-            str.append("\n");
+            str.append("\t" + FIELD + "\n");
         }
         str.append("Methods count: " + METHODS_COUNT + "\n");
         for (Method_Info METHOD : METHODS) {
-            str.append(METHOD + "\n");
+            str.append("\t" + METHOD + "\n");
         }
-        if (METHODS_COUNT == 0) {
+        str.append("Attribute count: " + ATTRIBUTES_COUNT + "\n");
+        for (Attribute_Info ATTRIBUTE : ATTRIBUTES) {
+            str.append("\t" + ATTRIBUTE + "\n");
+        }
+        if (ATTRIBUTES_COUNT == 0) {
             str.append("\n");
         }
-        str.append("Attributes count: " + ATTRIBUTES_COUNT + "\n");
-        for (Attribute_Info ATTRIBUTE : ATTRIBUTES) {
-            str.append(ATTRIBUTE + "\n");
-        }
+        str.deleteCharAt(str.length() - 1);
 
         return str.toString();
     }

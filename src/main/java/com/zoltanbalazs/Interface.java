@@ -10,8 +10,7 @@ public class Interface {
 
 	@Override
 	public String toString() {
-		return "Interface:\n" +
-				" - interface_index = " + interface_index;
+		return "Interface: " + interface_index;
 	}
 }
 

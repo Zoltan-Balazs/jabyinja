@@ -30,14 +30,6 @@ class Exception_Table {
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder();
-
-        str.append("Exception_table:\n");
-        str.append(" - start_pc = " + start_pc + "\n");
-        str.append(" - end_pc = " + end_pc + "\n");
-        str.append(" - handler_pc = " + handler_pc + "\n");
-        str.append(" - catch_type = " + catch_type);
-
-        return str.toString();
+        return "Exception_table: " + start_pc + " - " + end_pc + " - " + handler_pc + " - " + catch_type;
     }
 }

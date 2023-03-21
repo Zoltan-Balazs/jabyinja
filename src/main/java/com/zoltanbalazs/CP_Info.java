@@ -145,8 +145,7 @@ public class CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Pool_Info:\n" +
-				" - tag = " + tag;
+		return "CONSTANT_Pool_Info: " + tag;
 	}
 }
 
@@ -160,9 +159,7 @@ class CONSTANT_Class_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Class_Info:\n" +
-				" - name_index = " + name_index + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_Class_Info: " + name_index;
 	}
 }
 
@@ -182,10 +179,7 @@ class CONSTANT_Fieldref_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Fieldref_Info:\n" +
-				" - class_index = " + class_index + "\n" +
-				" - name_and_type_index = " + name_and_type_index + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_Fieldref_Info: " + class_index + " - " + name_and_type_index;
 	}
 }
 
@@ -205,10 +199,7 @@ class CONSTANT_Methodref_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Methodref_Info:\n" +
-				" - class_index = " + class_index + "\n" +
-				" - name_and_type_index = " + name_and_type_index + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_Methodref_Info: " + class_index + " - " + name_and_type_index;
 	}
 }
 
@@ -228,10 +219,7 @@ class CONSTANT_InterfaceMethodref_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_InterfaceMethodref_Info:\n" +
-				" - class_index = " + class_index + "\n" +
-				" - name_and_type_index = " + name_and_type_index + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_InterfaceMethodref_Info: " + class_index + " - " + name_and_type_index;
 	}
 }
 
@@ -245,9 +233,7 @@ class CONSTANT_String_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_String_Info:\n" +
-				" - string_index = " + string_index + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_String_Info: " + string_index;
 	}
 }
 
@@ -256,9 +242,7 @@ class CONSTANT_Integer_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Integer_Info:\n" +
-				" - bytes = " + bytes + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_Integer_Info: " + bytes;
 	}
 }
 
@@ -267,9 +251,7 @@ class CONSTANT_Float_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Float_Info:\n" +
-				" - bytes = " + bytes + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_Float_Info: " + bytes;
 	}
 }
 
@@ -279,10 +261,7 @@ class CONSTANT_Long_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Long_Info:\n" +
-				" - high_bytes = " + high_bytes + "\n" +
-				" - low_bytes = " + low_bytes + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_Long_Info: " + high_bytes + " - " + low_bytes;
 	}
 }
 
@@ -292,10 +271,7 @@ class CONSTANT_Double_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Double_Info:\n" +
-				" - high_bytes = " + high_bytes + "\n" +
-				" - low_bytes = " + low_bytes + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_Double_Info: " + high_bytes + " - " + low_bytes;
 	}
 }
 
@@ -310,10 +286,7 @@ class CONSTANT_NameAndType_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_NameAndType_Info:\n" +
-				" - name_index = " + name_index + "\n" +
-				" - descriptor_index = " + descriptor_index + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_NameAndType_Info: " + name_index + " - " + descriptor_index;
 	}
 }
 
@@ -327,11 +300,7 @@ class CONSTANT_Utf8_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Utf8_Info:\n" +
-				" - length = " + length + "\n" +
-				" - bytes = " + bytes + "\n" +
-				" - bytes (as string) = " + new String(bytes, StandardCharsets.UTF_8) + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_Utf8_Info: " + length + " - " + bytes + " - " + new String(bytes, StandardCharsets.UTF_8);
 	}
 }
 
@@ -341,10 +310,7 @@ class CONSTANT_MethodHandle_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_MethodHandle_Info:\n" +
-				" - reference_kind = " + reference_kind + "\n" +
-				" - reference_index = " + reference_index + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_MethodHandle_Info: " + reference_kind + " - " + reference_index;
 	}
 }
 
@@ -353,9 +319,7 @@ class CONSTANT_MethodType_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_MethodType_Info:\n" +
-				" - descriptor_index = " + descriptor_index + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_MethodType_Info: " + descriptor_index;
 	}
 }
 
@@ -370,10 +334,7 @@ class CONSTANT_InvokeDynamic_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_InvokeDynamic_Info:\n" +
-				" - bootstrap_method_attr_index = " + bootstrap_method_attr_index + "\n" +
-				" - name_and_type_index = " + name_and_type_index + "\n" +
-				" - tag = " + tag;
+		return "CONSTANT_InvokeDynamic_Info: " + bootstrap_method_attr_index + " - " + name_and_type_index;
 	}
 }
 

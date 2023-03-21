@@ -34,18 +34,12 @@ class Method_Info {
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 
-		str.append("Method:\n");
-		str.append(" - access_flags = " + access_flags + "\n");
-		str.append(" - name_index = " + name_index + "\n");
-		str.append(" - description_index = " + description_index + "\n");
-		str.append(" - attributes_count = " + attributes_count + "\n");
+		str.append("Method: " + access_flags + " - " + name_index + " - " + description_index + " - " + attributes_count + "\n");
 
 		for (Attribute_Info ATTRIBUTE : attributes) {
-			str.append(ATTRIBUTE + "\n");
+			str.append("\t" + ATTRIBUTE + "\n");
 		}
-		if (attributes_count == 0) {
-			str.append("\n");
-		}
+		str.deleteCharAt(str.length() - 1);
 
 		return str.toString();
 	}
