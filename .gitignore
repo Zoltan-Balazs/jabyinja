@@ -6,6 +6,7 @@ test/
 thesis/*
 thesis/images/*
 !thesis/thesis.tex
+!thesis/thesis.pdf
 !thesis/elteikthesis.*
 !thesis/images/
 !thesis/text/
