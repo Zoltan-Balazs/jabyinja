@@ -1,6 +1,7 @@
 alias cl := clean
 alias co := compile
 alias r := run-default
+alias t := thesis
 
 version := "0.9.0"
 
@@ -15,3 +16,6 @@ run-default: compile
 
 run FILE: compile
     java -jar target/jabyinja-{{version}}.jar {{FILE}}
+
+thesis:
+    cd thesis && pdflatex --interaction nonstopmode -halt-on-error -file-line-error thesis.tex && bibtex thesis && pdflatex --interaction nonstopmode -halt-on-error -file-line-error thesis.tex && pdflatex thesis.tex

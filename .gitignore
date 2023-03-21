@@ -2,3 +2,10 @@
 *.jar
 target/
 .vscode/
+thesis/*
+thesis/images/*
+!thesis/thesis.tex
+!thesis/elteikthesis.*
+!thesis/images/
+!thesis/text/
+!thesis/images/elte_cimer_szines.eps
