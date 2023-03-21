@@ -6,7 +6,7 @@ alias t := thesis
 version := "0.9.0"
 
 clean:
-    mvn clean
+    git clean -d -x -f
 
 compile:
     mvn package
