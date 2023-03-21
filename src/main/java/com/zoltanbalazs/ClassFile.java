@@ -141,6 +141,8 @@ class ClassFile {
             while (codeData.available() != 0) {
                 byte opCode = ClassFile_Helper.readByte(codeData);
 
+                System.out.println("FOUND OPCODE: " + Opcode.opcodeRepresentation(opCode));
+
                 switch (Opcode.opcodeRepresentation(opCode)) {
                     case LDC -> {
                         byte index = ClassFile_Helper.readByte(codeData);
