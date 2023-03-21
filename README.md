@@ -11,6 +11,7 @@ My BSc thesis work for [Eötvös Loránd University's Computer Science curriculu
     - Arch:
         - [biber](https://archlinux.org/packages/community/any/biber/)
         - [ghostscript](https://archlinux.org/packages/extra/x86_64/ghostscript/)
+        - [pgf-umlcd](https://aur.archlinux.org/packages/pgf-umlcd)
         - [texlive-bibtexextra](https://archlinux.org/packages/extra/any/texlive-bibtexextra/)
         - [texlive-full](https://aur.archlinux.org/packages/texlive-full)
     - Debian:
@@ -20,7 +21,12 @@ My BSc thesis work for [Eötvös Loránd University's Computer Science curriculu
         - [texlive-font-utils](https://packages.debian.org/search?keywords=texlive-font-utils)
         - [texlive-lang-european](https://packages.debian.org/search?keywords=texlive-lang-european)
         - [texlive-latex-base](https://packages.debian.org/search?keywords=texlive-latex-base)
+        - [texlive-pictures](https://packages.debian.org/search?keywords=texlive-pictures)
         - [texlive-science](https://packages.debian.org/search?keywords=texlive-science)
+    - MacOS:
+        - [biber](https://formulae.brew.sh/formula/biber)
+        - [ghostscript](https://formulae.brew.sh/formula/ghostscript)
+        - [texlive](https://formulae.brew.sh/formula/texlive)
     - Other distros:
         *Find the closest matching packages, or install the whole of latex from the official source*
         - Remove existing installation:
@@ -50,6 +56,26 @@ My BSc thesis work for [Eötvös Loránd University's Computer Science curriculu
             export INFOPATH="$INFOPATH:/usr/local/texlive/$(date +%Y)/texmf-dist/doc/info"
             export PATH=/usr/local/texlive/$(date +%Y)/bin/x86_64-linux:$PATH
             ```
+    - TeX Packages (Install if on MacOS / Official source didn't have it):
+        - [adjustbox](https://ctan.org/pkg/adjustbox)
+        - [algpseudocode](https://www.ctan.org/pkg/algorithmicx)
+        - [amsfonts](https://ctan.org/pkg/amsfonts)
+        - [amsmath](https://ctan.org/pkg/amsmath)
+        - [amsthm](https://ctan.org/pkg/amsthm)
+        - [array](https://ctan.org/pkg/array)
+        - [listingsutf8](https://ctan.org/pkg/listingsutf8)
+        - [longtable](https://ctan.org/pkg/longtable)
+        - [makecell](https://ctan.org/pkg/makecell)
+        - [minted](https://ctan.org/pkg/minted)
+        - [multirow](https://ctan.org/pkg/multirow)
+        - [paralist](https://ctan.org/pkg/paralist)
+        - [pgf-umlcd](https://www.ctan.org/pkg/pgf-umlcd)
+        - [rotating](https://ctan.org/pkg/rotating)
+        - [subcaption](https://ctan.org/pkg/subcaption)
+        - [todonotes](https://ctan.org/pkg/todonotes)
+        ```sh
+        $ tlmgr install adjustbox algpseudocode amsfonts amsmath amsthm array listingsutf8 longtable makecell minted multirow paralist pgf-umlcd rotating subcaption todonotes
+        ```
 - Other:
     - [Just](https://github.com/casey/just) *(optional - for use with justfile)*
 
