@@ -140,7 +140,8 @@ class ClassFile {
 
     public void executeCode(byte[] code) throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         List<Object> stack = new ArrayList<>();
-        List<String> args = new ArrayList<>();
+        List<Object> args = new ArrayList<>();
+        List<Class> types = new ArrayList<>();
 
         try (InputStream codeStream = new ByteArrayInputStream(code);
                 DataInputStream codeData = new DataInputStream(codeStream)) {
@@ -155,12 +156,12 @@ class ClassFile {
                 switch (Opcode.opcodeRepresentation(opCode)) {
                     case LDC -> {
                         byte index = ClassFile_Helper.readByte(codeData);
-                        stack.add(String.class);
+                        types.add(String.class);
                         args.add(new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(), StandardCharsets.UTF_8));
                     }
                     case ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
-                        stack.add(int.class);
-                        args.add(Integer.toString(opCode - 0x03));
+                        types.add(int.class);
+                        args.add(opCode - 0x03);
                     }
                     case ALOAD_0, ALOAD_1, ALOAD_2, ALOAD_3 -> {
                         // TODO
@@ -212,13 +213,18 @@ class ClassFile {
                         String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
 
                         try {
-                            String arg = args.remove(args.size() - 1);
+                            Object arg = args.remove(args.size() - 1);
                             // TODO: Use type from look-up table, there are only a handful of primitives..
-                            Object type = stack.remove(stack.size() - 1);
+                            Class type = types.remove(types.size() - 1);
                             
                             Class<?> classClass = Class.forName(className.replace("/", "."));
-                            Method method = classClass.getDeclaredMethod(memberName, String.class);              
-                            method.invoke(stack.remove(stack.size() - 1), arg);
+                            Method method = classClass.getDeclaredMethod(memberName, type);              
+                            
+                            if (type == int.class) {
+                                method.invoke(stack.remove(stack.size() - 1), (int)arg);
+                            } else {
+                                method.invoke(stack.remove(stack.size() - 1), type.cast(arg));
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
