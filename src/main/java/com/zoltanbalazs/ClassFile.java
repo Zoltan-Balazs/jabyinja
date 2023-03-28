@@ -6,6 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,7 +90,7 @@ class ClassFile {
         } catch (InvalidClassFileException e) {
             System.err.println("The file '" + fileName + "' is not a valid Java Class file!");
         } catch (InvalidConstantPoolTagException e) {
-            System.err.println("The file '" + fileName + "' contains invalid Constant Pool tag!");
+            System.err.println("The file '" + fileName + "' contains invalid Constant Pool tag! Tag: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -134,8 +138,9 @@ class ClassFile {
                 StandardCharsets.UTF_8);
     }
 
-    public void executeCode(byte[] code) throws IOException {
-        List<HashMap<String, Object>> stack = new ArrayList<>();
+    public void executeCode(byte[] code) throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        List<Object> stack = new ArrayList<>();
+        List<String> args = new ArrayList<>();
 
         try (InputStream codeStream = new ByteArrayInputStream(code);
                 DataInputStream codeData = new DataInputStream(codeStream)) {
@@ -150,15 +155,12 @@ class ClassFile {
                 switch (Opcode.opcodeRepresentation(opCode)) {
                     case LDC -> {
                         byte index = ClassFile_Helper.readByte(codeData);
-                        stack.add(new HashMap<>() {
-                            {
-                                put("type", "Constant");
-                                put("const", CONSTANT_POOL.get(index - 1));
-                            }
-                        });
+                        stack.add(String.class);
+                        args.add(new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(), StandardCharsets.UTF_8));
                     }
                     case ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
-                        // TODO
+                        stack.add(int.class);
+                        args.add(Integer.toString(opCode - 0x03));
                     }
                     case ALOAD_0, ALOAD_1, ALOAD_2, ALOAD_3 -> {
                         // TODO
@@ -189,16 +191,10 @@ class ClassFile {
                         String className = getNameOfClass(fieldRef.getClassIndex());
                         String memberName = getNameOfMember(fieldRef.getNameAndTypeIndex());
 
-                        if (className.equals("java/lang/System") && memberName.equals("out")) {
-                            stack.add(new HashMap<>() {
-                                {
-                                    put("type", "PrintStream");
-                                }
-                            });
-                        } else {
-                            throw new UnsupportedOperationException(
-                                    "Not supported field: " + className + "/" + memberName + " in getstatic");
-                        }
+                        Class<?> systemClass = Class.forName(className.replace("/", "."));
+                        Field outField = systemClass.getField(memberName);
+
+                        stack.add(outField.get(null));
                     }
                     case PUTSTATIC -> {
                         short index = ClassFile_Helper.readShort(codeData);
@@ -215,41 +211,30 @@ class ClassFile {
                         String className = getNameOfClass(methodRef.getClassIndex());
                         String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
 
-                        if (className.equals("java/io/PrintStream") && memberName.equals("println")) {
-                            int n = stack.size();
-                            if (n < 2) {
-                                throw new UnsupportedOperationException(
-                                        className + "/" + memberName + "expects 2 arguments, but there is only " + n);
-                            }
-                            HashMap<String, Object> obj = stack.get(n - 2);
-                            if (!obj.get("type").equals("PrintStream")) {
-                                System.out.println("Unsupported stream type " + obj.get("type"));
-                            }
-                            HashMap<String, Object> arg = stack.get(n - 1);
-                            if (arg.get("type").equals("Constant")) {
-                                if (arg.get("const") instanceof CONSTANT_String_Info) {
-                                    System.out.println(new String(CONSTANT_POOL
-                                            .get(((CONSTANT_String_Info) arg.get("const")).getStringIndex() - 1)
-                                            .getBytes(), StandardCharsets.UTF_8));
-                                } else {
-                                    throw new UnsupportedOperationException(
-                                            "println for " + arg.get("const").getClass().getSimpleName()
-                                                    + " is not implemented");
-                                }
-                            } else {
-                                throw new UnsupportedOperationException(
-                                        "Support for " + arg.get("type") + " is not implemented");
-                            }
-                        } else {
-                            throw new UnsupportedOperationException(
-                                    "Not supported method: " + className + "/" + memberName + " in getstatic");
+                        try {
+                            String arg = args.remove(args.size() - 1);
+                            // TODO: Use type from look-up table, there are only a handful of primitives..
+                            Object type = stack.remove(stack.size() - 1);
+                            
+                            Class<?> classClass = Class.forName(className.replace("/", "."));
+                            Method method = classClass.getDeclaredMethod(memberName, String.class);              
+                            method.invoke(stack.remove(stack.size() - 1), arg);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
+                        
                     }
                     case INVOKESPECIAL -> {
                         short index = ClassFile_Helper.readShort(codeData);
                         CP_Info methodRef = CONSTANT_POOL.get(index - 1);
                         String className = getNameOfClass(methodRef.getClassIndex());
                         String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
+
+                        try {
+                            Class<?> c = Class.forName(className);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
                         System.out.println(className);
                         System.out.println(memberName);

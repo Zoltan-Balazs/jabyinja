@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 class InvalidConstantPoolTagException extends RuntimeException {
+	public InvalidConstantPoolTagException(String message) {
+		super(message);
+	}
 }
 
 class Constant_Pool_Helper {
@@ -110,7 +113,9 @@ class Constant_Pool_Helper {
 					constant_pool.add(tmp);
 				}
 
-				case ERROR -> throw new InvalidConstantPoolTagException();
+				case ERROR -> {
+					throw new InvalidConstantPoolTagException(Byte.toString(tagValue));
+				}
 			}
 
 			constant_pool.get(i).tag = tag;
