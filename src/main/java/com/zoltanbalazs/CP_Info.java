@@ -27,7 +27,6 @@ class Constant_Pool_Helper {
 					tmp.name_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
 				}
-
 				case CONSTANT_Fieldref -> {
 					CONSTANT_Fieldref_Info tmp = new CONSTANT_Fieldref_Info();
 					tmp.class_index = ClassFile_Helper.readShort(in);
@@ -39,7 +38,6 @@ class Constant_Pool_Helper {
 					tmp.class_index = ClassFile_Helper.readShort(in);
 					tmp.name_and_type_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
-					break;
 				}
 				case CONSTANT_InterfaceMethodref -> {
 					CONSTANT_InterfaceMethodref_Info tmp = new CONSTANT_InterfaceMethodref_Info();
@@ -47,13 +45,11 @@ class Constant_Pool_Helper {
 					tmp.name_and_type_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
 				}
-
 				case CONSTANT_String -> {
 					CONSTANT_String_Info tmp = new CONSTANT_String_Info();
 					tmp.string_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
 				}
-
 				case CONSTANT_Integer -> {
 					CONSTANT_Integer_Info tmp = new CONSTANT_Integer_Info();
 					tmp.bytes = ClassFile_Helper.readInt(in);
@@ -64,7 +60,6 @@ class Constant_Pool_Helper {
 					tmp.bytes = ClassFile_Helper.readInt(in);
 					constant_pool.add(tmp);
 				}
-
 				case CONSTANT_Long -> {
 					CONSTANT_Long_Info tmp = new CONSTANT_Long_Info();
 					tmp.high_bytes = ClassFile_Helper.readInt(in);
@@ -77,14 +72,12 @@ class Constant_Pool_Helper {
 					tmp.low_bytes = ClassFile_Helper.readInt(in);
 					constant_pool.add(tmp);
 				}
-
 				case CONSTANT_NameAndType -> {
 					CONSTANT_NameAndType_Info tmp = new CONSTANT_NameAndType_Info();
 					tmp.name_index = ClassFile_Helper.readShort(in);
 					tmp.descriptor_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
 				}
-
 				case CONSTANT_Utf8 -> {
 					CONSTANT_Utf8_Info tmp = new CONSTANT_Utf8_Info();
 					tmp.length = ClassFile_Helper.readShort(in);
@@ -92,27 +85,23 @@ class Constant_Pool_Helper {
 					tmp.bytes = in.readNBytes(tmp.length);
 					constant_pool.add(tmp);
 				}
-
 				case CONSTANT_MethodHandle -> {
 					CONSTANT_MethodHandle_Info tmp = new CONSTANT_MethodHandle_Info();
 					tmp.reference_kind = ClassFile_Helper.readByte(in);
 					tmp.reference_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
 				}
-
 				case CONSTANT_MethodType -> {
 					CONSTANT_MethodType_Info tmp = new CONSTANT_MethodType_Info();
 					tmp.descriptor_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
 				}
-
 				case CONSTANT_InvokeDynamic -> {
 					CONSTANT_InvokeDynamic_Info tmp = new CONSTANT_InvokeDynamic_Info();
 					tmp.bootstrap_method_attr_index = ClassFile_Helper.readShort(in);
 					tmp.name_and_type_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
 				}
-
 				case ERROR -> {
 					throw new InvalidConstantPoolTagException(Byte.toString(tagValue));
 				}
