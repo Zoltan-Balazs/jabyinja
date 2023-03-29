@@ -391,28 +391,28 @@ class ClassFile {
         str.append("Constant pool count: " + CONSTANT_POOL_COUNT + "\n");
         if (CONSTANT_POOL_COUNT != 0) {
             str.append("Constant pool:\n");
-            for (CP_Info CONSTANT : CONSTANT_POOL) {
-                str.append("\t" + CONSTANT + "\n");
+            for (int i = 0; i < CONSTANT_POOL_COUNT - 1; ++i) {
+                str.append("\t #" + i + " " + CONSTANT_POOL.get(i) + "\n");
             }
         }
         str.append("Access flags: " + ACCESS_FLAGS + "\n");
         str.append("This class: " + THIS_CLASS + "\n");
         str.append("Super class: " + SUPER_CLASS + "\n");
         str.append("Interface count: " + INTERFACES_COUNT + "\n");
-        for (Interface INTERFACE : INTERFACES) {
-            str.append("\t" + INTERFACE + "\n");
+        for (int i = 0; i < INTERFACES_COUNT; ++i) {
+            str.append("\t #" + i + " " + INTERFACES.get(i) + "\n");
         }
         str.append("Field count: " + FIELDS_COUNT + "\n");
-        for (Field_Info FIELD : FIELDS) {
-            str.append("\t" + FIELD + "\n");
+        for (int i = 0; i < FIELDS_COUNT; ++i) {
+            str.append("\t #" + i + " " + FIELDS.get(i) + "\n");
         }
         str.append("Methods count: " + METHODS_COUNT + "\n");
-        for (Method_Info METHOD : METHODS) {
-            str.append("\t" + METHOD + "\n");
+        for (int i = 0; i < METHODS_COUNT; ++i) {
+            str.append("\t #" + i + " " + METHODS.get(i) + "\n");
         }
         str.append("Attribute count: " + ATTRIBUTES_COUNT + "\n");
-        for (Attribute_Info ATTRIBUTE : ATTRIBUTES) {
-            str.append("\t" + ATTRIBUTE + "\n");
+        for (int i = 0; i < ATTRIBUTES_COUNT; ++i) {
+            str.append("\t #" + i + " " + ATTRIBUTES.get(i) + "\n");
         }
         if (ATTRIBUTES_COUNT == 0) {
             str.append("\n");
