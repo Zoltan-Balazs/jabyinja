@@ -141,7 +141,7 @@ class ClassFile {
     public void executeCode(byte[] code) throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         List<Object> stack = new ArrayList<>();
         List<Object> args = new ArrayList<>();
-        List<Class> types = new ArrayList<>();
+        List<Class<?>> types = new ArrayList<>();
 
         try (InputStream codeStream = new ByteArrayInputStream(code);
                 DataInputStream codeData = new DataInputStream(codeStream)) {
@@ -215,7 +215,7 @@ class ClassFile {
                         try {
                             Object arg = args.remove(args.size() - 1);
                             // TODO: Use type from look-up table, there are only a handful of primitives..
-                            Class type = types.remove(types.size() - 1);
+                            Class<?> type = types.remove(types.size() - 1);
                             
                             Class<?> classClass = Class.forName(className.replace("/", "."));
                             Method method = classClass.getDeclaredMethod(memberName, type);              
@@ -237,7 +237,7 @@ class ClassFile {
                         String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
 
                         try {
-                            Class<?> c = Class.forName(className);
+                            Class<?> c = Class.forName(className.replace("/", "."));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
