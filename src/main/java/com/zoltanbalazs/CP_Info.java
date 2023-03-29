@@ -150,6 +150,10 @@ public class CP_Info {
 	public long getLongValue() {
 		return 0L;
 	}
+
+	public float getFloatValue() {
+		return 0.0f;
+	}
 	@Override
 	public String toString() {
 		return "CONSTANT_Pool_Info: " + tag;
@@ -260,6 +264,29 @@ class CONSTANT_Integer_Info extends CP_Info {
 
 class CONSTANT_Float_Info extends CP_Info {
 	public int bytes;
+
+	@Override
+	public float getFloatValue() {
+		int bits = bytes;
+
+		if (bits == 0x7F800000) {
+			return Float.POSITIVE_INFINITY;
+		}
+		if (bits == 0xFF800000) {
+			return Float.NEGATIVE_INFINITY;
+		}
+		if ((0x7F800001 <= bits && bits <= 0x7FFFFFFF) || (0xFF800001 <= bits && bits <= 0xFFFFFFFF)) {
+			return Float.NaN;
+		}
+
+		int s = ((bits >> 31) == 0) ? 1 : -1;
+		int e = (bits >> 23) & 0xFF;
+		int m = (e == 0) ?
+			(bits & 0x7FFFFF) << 1 :
+			(bits & 0x7FFFFF) | 0x800000;
+
+		return s * m * (float)Math.pow(2, e - 150);
+	}
 
 	@Override
 	public String toString() {
