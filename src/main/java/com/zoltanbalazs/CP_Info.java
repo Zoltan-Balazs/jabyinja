@@ -151,6 +151,7 @@ public class CP_Info {
 		return 0L;
 	}
 
+	// TODO: Precision for float and double!
 	public float getFloatValue() {
 		return 0.0f;
 	}
