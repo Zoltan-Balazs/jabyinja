@@ -154,6 +154,10 @@ class ClassFile {
                 }
 
                 switch (Opcode.opcodeRepresentation(opCode)) {
+                    case ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
+                        types.add(int.class);
+                        args.add(opCode - 0x03); // ICONST_0 is 0x03, ICONST_5 is 0x08
+                    }
                     case LDC -> {
                         byte index = ClassFile_Helper.readByte(codeData);
                         types.add(String.class);
