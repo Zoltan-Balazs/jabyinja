@@ -241,7 +241,7 @@ class ClassFile {
                         System.out.println(className);
                         System.out.println(memberName);
                     }
-                    case INVOKVEVIRTUAL -> {
+                    case INVOKEVIRTUAL -> {
                         short index = ClassFile_Helper.readShort(codeData);
                         CP_Info methodRef = CONSTANT_POOL.get(index - 1);
                         String className = getNameOfClass(methodRef.getClassIndex());
