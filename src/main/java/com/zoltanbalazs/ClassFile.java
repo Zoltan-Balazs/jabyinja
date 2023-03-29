@@ -6,14 +6,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
 
@@ -176,8 +173,8 @@ class ClassFile {
                         ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
 
                         if (tag == ConstantPoolTag.CONSTANT_String) {
-                        types.add(String.class);
-                        args.add(new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(), StandardCharsets.UTF_8));
+                            types.add(String.class);
+                            args.add(new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(), StandardCharsets.UTF_8));
                         } else if (tag == ConstantPoolTag.CONSTANT_Float) {
                             types.add(float.class);
                             args.add(CONSTANT_POOL.get(index - 1).getFloatValue());
@@ -185,7 +182,7 @@ class ClassFile {
                             types.add(int.class);
                             args.add(CONSTANT_POOL.get(index - 1).getIntValue());
                         }
-                    }
+                    } 
                     case LDC2_W -> {
                         byte indexbyte1 = ClassFile_Helper.readByte(codeData);
                         byte indexbyte2 = ClassFile_Helper.readByte(codeData);
