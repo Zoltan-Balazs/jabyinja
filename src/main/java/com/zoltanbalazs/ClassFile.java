@@ -260,6 +260,12 @@ class ClassFile {
                             
                             if (type == int.class) {
                                 method.invoke(stack.remove(stack.size() - 1), (int)arg);
+                            } else if (type == float.class) {
+                                method.invoke(stack.remove(stack.size() - 1), (float)arg);
+                            } else if (type == double.class) {
+                                method.invoke(stack.remove(stack.size() - 1), (double)arg);
+                            } else if (type == long.class) {
+                                method.invoke(stack.remove(stack.size() - 1), (long)arg);
                             } else {
                                 method.invoke(stack.remove(stack.size() - 1), type.cast(arg));
                             }
