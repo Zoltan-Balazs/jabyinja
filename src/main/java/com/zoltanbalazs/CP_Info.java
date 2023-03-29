@@ -358,6 +358,7 @@ enum ConstantPoolTag {
 	CONSTANT_MethodHandle(15),
 	CONSTANT_MethodType(16),
 	CONSTANT_InvokeDynamic(18),
+	ERROR(-1),
 	POOR_CHOICE(-2);
 
 	private final int tagValue;
