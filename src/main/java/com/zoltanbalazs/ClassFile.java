@@ -151,9 +151,21 @@ class ClassFile {
                 }
 
                 switch (Opcode.opcodeRepresentation(opCode)) {
-                    case ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
+                    case ICONST_M1, ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
                         types.add(int.class);
-                        args.add(opCode - 0x03); // ICONST_0 is 0x03, ICONST_5 is 0x08
+                        args.add(opCode - 0x03); // ICONST_M1 is 0x02 .. ICONST_5 is 0x08
+                    }
+                    case LCONST_0, LCONST_1 -> {
+                        types.add(long.class);
+                        args.add(opCode - 0x09); // LCONST_0 is 0x09, LCONST_1 is 0x0A
+                    }
+                    case FCONST_0, FCONST_1, FCONST_2 -> {
+                        types.add(float.class);
+                        args.add((float)(opCode - 0x0B)); // FCONST_0 is 0x0B .. FCONST_2 is 0x0D
+                    }
+                    case DCONST_0, DCONST_1 -> {
+                        types.add(double.class);
+                        args.add((double)(opCode - 0x0E)); // DCONST_0 is 0x0E, DCONST_1 is 0x0F
                     }
                     case BIPUSH -> {
                         byte value = ClassFile_Helper.readByte(codeData);
