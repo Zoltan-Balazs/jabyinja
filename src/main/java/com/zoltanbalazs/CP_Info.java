@@ -143,6 +143,9 @@ public class CP_Info {
 		return -1;
 	}
 
+	public int getIntValue() {
+		return 0;
+	}
 	@Override
 	public String toString() {
 		return "CONSTANT_Pool_Info: " + tag;
@@ -239,6 +242,11 @@ class CONSTANT_String_Info extends CP_Info {
 
 class CONSTANT_Integer_Info extends CP_Info {
 	public int bytes;
+
+	@Override
+	public int getIntValue() {
+		return bytes;
+	}
 
 	@Override
 	public String toString() {
