@@ -108,6 +108,12 @@ class Constant_Pool_Helper {
 			}
 
 			constant_pool.get(i).tag = tag;
+
+			if (tag == ConstantPoolTag.CONSTANT_Long || tag == ConstantPoolTag.CONSTANT_Double) {
+				i++;
+				constant_pool.add(new CP_Info());
+				constant_pool.get(i).tag = ConstantPoolTag.POOR_CHOICE;
+			}
 		}
 
 		return constant_pool;
