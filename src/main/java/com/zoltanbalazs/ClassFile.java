@@ -156,17 +156,16 @@ class ClassFile {
                         args.add(opCode - 0x03); // ICONST_0 is 0x03, ICONST_5 is 0x08
                     }
                     case BIPUSH -> {
-                        byte byte1 = ClassFile_Helper.readByte(codeData);
+                        byte value = ClassFile_Helper.readByte(codeData);
 
-                        types.add(byte.class);
-                        args.add(byte1);
+                        types.add(int.class);
+                        args.add((int)value);
                     }
                     case SIPUSH -> {
-                        byte byte1 = ClassFile_Helper.readByte(codeData);
-                        byte byte2 = ClassFile_Helper.readByte(codeData);
+                        short value = ClassFile_Helper.readShort(codeData);
 
-                        types.add(short.class);
-                        args.add(byte1 << 4 | byte2);
+                        types.add(int.class);
+                        args.add((int)(value));
                     }
                     case LDC -> {
                         byte index = ClassFile_Helper.readByte(codeData);
