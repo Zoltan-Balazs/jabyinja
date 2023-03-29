@@ -264,7 +264,7 @@ class CONSTANT_Integer_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Integer_Info: " + bytes;
+		return "CONSTANT_Integer_Info: " + getIntValue();
 	}
 }
 
@@ -296,7 +296,7 @@ class CONSTANT_Float_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Float_Info: " + bytes;
+		return "CONSTANT_Float_Info: " + getFloatValue();
 	}
 }
 
@@ -311,7 +311,7 @@ class CONSTANT_Long_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Long_Info: " + high_bytes + " - " + low_bytes;
+		return "CONSTANT_Long_Info: " + getLongValue();
 	}
 }
 
@@ -334,7 +334,7 @@ class CONSTANT_Double_Info extends CP_Info {
 
 	@Override
 	public String toString() {
-		return "CONSTANT_Double_Info: " + high_bytes + " - " + low_bytes;
+		return "CONSTANT_Double_Info: " + getDoubleValue();
 	}
 }
 
