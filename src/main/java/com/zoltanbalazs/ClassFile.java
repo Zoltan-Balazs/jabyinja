@@ -173,8 +173,18 @@ class ClassFile {
                     }
                     case LDC -> {
                         byte index = ClassFile_Helper.readByte(codeData);
+                        ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
+
+                        if (tag == ConstantPoolTag.CONSTANT_String) {
                         types.add(String.class);
                         args.add(new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(), StandardCharsets.UTF_8));
+                        } else if (tag == ConstantPoolTag.CONSTANT_Float) {
+                            types.add(float.class);
+                            args.add(CONSTANT_POOL.get(index - 1).getFloatValue());
+                        } else if (tag == ConstantPoolTag.CONSTANT_Integer) {
+                            types.add(int.class);
+                            args.add(CONSTANT_POOL.get(index - 1).getIntValue());
+                        }
                     }
                     case ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
                         types.add(int.class);
