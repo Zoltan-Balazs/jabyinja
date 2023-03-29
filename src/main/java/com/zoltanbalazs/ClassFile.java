@@ -139,6 +139,7 @@ class ClassFile {
         List<Object> stack = new ArrayList<>();
         List<Object> args = new ArrayList<>();
         List<Class<?>> types = new ArrayList<>();
+        Object[] local = new Object[4];
 
         try (InputStream codeStream = new ByteArrayInputStream(code);
                 DataInputStream codeData = new DataInputStream(codeStream)) {
@@ -226,6 +227,46 @@ class ClassFile {
                             types.add(double.class);
                             args.add(CONSTANT_POOL.get(index - 1).getDoubleValue());
                         }
+                    }
+                    case ILOAD -> {
+                        byte index = ClassFile_Helper.readByte(codeData);
+
+                        types.add(int.class);
+                        args.add((int)local[index]);
+                    }
+                    case LLOAD -> {
+                        byte index = ClassFile_Helper.readByte(codeData);
+
+                        types.add(long.class);
+                        args.add((long)local[index]);
+                    }
+                    case FLOAD -> {
+                        byte index = ClassFile_Helper.readByte(codeData);
+
+                        types.add(float.class);
+                        args.add((float)local[index]);
+                    }
+                    case DLOAD -> {
+                        byte index = ClassFile_Helper.readByte(codeData);
+
+                        types.add(double.class);
+                        args.add((double)local[index]);
+                    }
+                    case ILOAD_0, ILOAD_1, ILOAD_2, ILOAD_3 -> {
+                        types.add(int.class);
+                        args.add((int)local[opCode - 0x1A]); // ILOAD_0 is 0x1A .. ILOAD_3 is 0x1D
+                    }
+                    case LLOAD_0, LLOAD_1, LLOAD_2, LLOAD_3 -> {
+                        types.add(long.class);
+                        args.add((long)local[opCode - 0x1E]); // LLOAD_0 is 0x1E .. ILOAD_3 is 0x21
+                    }
+                    case FLOAD_0, FLOAD_1, FLOAD_2, FLOAD_3 -> {
+                        types.add(float.class);
+                        args.add((float)local[opCode - 0x22]); // FLOAD_0 is 0x22 .. FLOAD_3 is 0x25
+                    }
+                    case DLOAD_0, DLOAD_1, DLOAD_2, DLOAD_3 -> {
+                        types.add(double.class);
+                        args.add((double)local[opCode - 0x26]); // DLOAD_0 is 0x26 .. DLOAD_3 is 0x29
                     }
                     case ALOAD_0, ALOAD_1, ALOAD_2, ALOAD_3 -> {
                         // TODO
