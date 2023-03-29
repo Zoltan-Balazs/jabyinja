@@ -186,9 +186,20 @@ class ClassFile {
                             args.add(CONSTANT_POOL.get(index - 1).getIntValue());
                         }
                     }
-                    case ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
-                        types.add(int.class);
-                        args.add(opCode - 0x03);
+                    case LDC2_W -> {
+                        byte indexbyte1 = ClassFile_Helper.readByte(codeData);
+                        byte indexbyte2 = ClassFile_Helper.readByte(codeData);
+
+                        int index = indexbyte1 << 8 | indexbyte2;
+                        ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
+
+                        if (tag == ConstantPoolTag.CONSTANT_Long) {
+                            types.add(long.class);
+                            args.add(CONSTANT_POOL.get(index - 1).getLongValue());
+                        } else {
+                            types.add(double.class);
+                            args.add(CONSTANT_POOL.get(index - 1).getDoubleValue());
+                        }
                     }
                     case ALOAD_0, ALOAD_1, ALOAD_2, ALOAD_3 -> {
                         // TODO
