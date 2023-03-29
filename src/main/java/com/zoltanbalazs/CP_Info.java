@@ -146,6 +146,10 @@ public class CP_Info {
 	public int getIntValue() {
 		return 0;
 	}
+
+	public long getLongValue() {
+		return 0L;
+	}
 	@Override
 	public String toString() {
 		return "CONSTANT_Pool_Info: " + tag;
@@ -266,6 +270,11 @@ class CONSTANT_Float_Info extends CP_Info {
 class CONSTANT_Long_Info extends CP_Info {
 	public int high_bytes;
 	public int low_bytes;
+
+	@Override
+	public long getLongValue() {
+		return ((long) high_bytes << 32) + low_bytes;
+	}
 
 	@Override
 	public String toString() {
