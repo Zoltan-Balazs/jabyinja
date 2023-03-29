@@ -154,6 +154,11 @@ public class CP_Info {
 	public float getFloatValue() {
 		return 0.0f;
 	}
+
+	public double getDoubleValue() {
+		return 0.0d;
+	}
+
 	@Override
 	public String toString() {
 		return "CONSTANT_Pool_Info: " + tag;
@@ -312,6 +317,19 @@ class CONSTANT_Long_Info extends CP_Info {
 class CONSTANT_Double_Info extends CP_Info {
 	public int high_bytes;
 	public int low_bytes;
+
+	@Override
+	public double getDoubleValue() {
+		long bits = ((long) high_bytes << 32) + low_bytes;
+
+		int s = ((bits >> 63) == 0) ? 1 : -1;
+		int e = (int)((bits >> 52) & 0x7ffL);
+		long m = (e == 0) ?
+				(bits & 0xfffffffffffffL) << 1 :
+				(bits & 0xfffffffffffffL) | 0x10000000000000L;
+
+		return s * m * Math.pow(2, e - 1075);
+	}
 
 	@Override
 	public String toString() {
