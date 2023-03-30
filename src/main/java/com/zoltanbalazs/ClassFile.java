@@ -147,120 +147,73 @@ class ClassFile {
 
                 switch (Opcode.opcodeRepresentation(opCode)) {
                     case ICONST_M1, ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
-                        types.add(int.class);
-                        args.add(opCode - 0x03); // ICONST_M1 is 0x02 .. ICONST_5 is 0x08
+                        Instructions.ICONST(args, types, opCode - 0x03); // ICONST_M1 is 0x02 .. ICONST_5 is 0x08
                     }
                     case LCONST_0, LCONST_1 -> {
-                        types.add(long.class);
-                        args.add(opCode - 0x09); // LCONST_0 is 0x09, LCONST_1 is 0x0A
+                        Instructions.LCONST(args, types, opCode - 0x09); // LCONST_0 is 0x09, LCONST_1 is 0x0A
                     }
                     case FCONST_0, FCONST_1, FCONST_2 -> {
-                        types.add(float.class);
-                        args.add((float)(opCode - 0x0B)); // FCONST_0 is 0x0B .. FCONST_2 is 0x0D
+                        Instructions.FCONST(args, types, (float)(opCode - 0x0B)); // FCONST_0 is 0x0B .. FCONST_2 is 0x0D
                     }
                     case DCONST_0, DCONST_1 -> {
-                        types.add(double.class);
-                        args.add((double)(opCode - 0x0E)); // DCONST_0 is 0x0E, DCONST_1 is 0x0F
+                        Instructions.DCONST(args, types, (double)(opCode - 0x0E)); // DCONST_0 is 0x0E, DCONST_1 is 0x0F
                     }
                     case BIPUSH -> {
-                        byte value = ClassFile_Helper.readByte(codeData);
-
-                        types.add(int.class);
-                        args.add((int)value);
+                        Instructions.BIPUSH(args, types, (int)ClassFile_Helper.readByte(codeData));
                     }
                     case SIPUSH -> {
-                        short value = ClassFile_Helper.readShort(codeData);
-
-                        types.add(int.class);
-                        args.add((int)(value));
+                        Instructions.BIPUSH(args, types, (int)ClassFile_Helper.readShort(codeData));
                     }
                     case LDC -> {
                         byte index = ClassFile_Helper.readByte(codeData);
                         ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
 
-                        if (tag == ConstantPoolTag.CONSTANT_String) {
-                            types.add(String.class);
-                            args.add(new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(), StandardCharsets.UTF_8));
-                        } else if (tag == ConstantPoolTag.CONSTANT_Float) {
-                            types.add(float.class);
-                            args.add(CONSTANT_POOL.get(index - 1).getFloatValue());
-                        } else if (tag == ConstantPoolTag.CONSTANT_Integer) {
-                            types.add(int.class);
-                            args.add(CONSTANT_POOL.get(index - 1).getIntValue());
-                        }
+                        Class<?> type = Instructions_Helper.tagSwitchType(CONSTANT_POOL, tag);
+                        Object value = Instructions_Helper.tagSwitchValue(CONSTANT_POOL, tag, index);
+
+                        Instructions.LDC(args, types, type, value);
                     } 
                     case LDC_W -> {
-                        byte indexbyte1 = ClassFile_Helper.readByte(codeData);
-                        byte indexbyte2 = ClassFile_Helper.readByte(codeData);
-
-                        int index = indexbyte1 << 8 | indexbyte2;
+                        short index = ClassFile_Helper.readShort(codeData);
                         ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
 
-                        if (tag == ConstantPoolTag.CONSTANT_String) {
-                            types.add(String.class);
-                            args.add(new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(), StandardCharsets.UTF_8));
-                        } else if (tag == ConstantPoolTag.CONSTANT_Float) {
-                            types.add(float.class);
-                            args.add(CONSTANT_POOL.get(index - 1).getFloatValue());
-                        } else if (tag == ConstantPoolTag.CONSTANT_Integer) {
-                            types.add(int.class);
-                            args.add(CONSTANT_POOL.get(index - 1).getIntValue());
-                        }
+                        Class<?> type = Instructions_Helper.tagSwitchType(CONSTANT_POOL, tag);
+                        Object value = Instructions_Helper.tagSwitchValue(CONSTANT_POOL, tag, index);
+
+                        Instructions.LDC(args, types, type, value);
                     }
                     case LDC2_W -> {
-                        byte indexbyte1 = ClassFile_Helper.readByte(codeData);
-                        byte indexbyte2 = ClassFile_Helper.readByte(codeData);
-
-                        int index = indexbyte1 << 8 | indexbyte2;
+                        short index = ClassFile_Helper.readShort(codeData);
                         ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
 
-                        if (tag == ConstantPoolTag.CONSTANT_Long) {
-                            types.add(long.class);
-                            args.add(CONSTANT_POOL.get(index - 1).getLongValue());
-                        } else {
-                            types.add(double.class);
-                            args.add(CONSTANT_POOL.get(index - 1).getDoubleValue());
-                        }
+                        Class<?> type = Instructions_Helper.tagSwitchType(CONSTANT_POOL, tag);
+                        Object value = Instructions_Helper.tagSwitchValue(CONSTANT_POOL, tag, index);
+
+                        Instructions.LDC(args, types, type, value);
                     }
                     case ILOAD -> {
-                        byte index = ClassFile_Helper.readByte(codeData);
-
-                        types.add(int.class);
-                        args.add((int)local[index]);
+                        Instructions.ILOAD(args, types, (int)local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case LLOAD -> {
-                        byte index = ClassFile_Helper.readByte(codeData);
-
-                        types.add(long.class);
-                        args.add((long)local[index]);
+                        Instructions.LLOAD(args, types, (long)local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case FLOAD -> {
-                        byte index = ClassFile_Helper.readByte(codeData);
-
-                        types.add(float.class);
-                        args.add((float)local[index]);
+                        Instructions.FLOAD(args, types, (float)local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case DLOAD -> {
-                        byte index = ClassFile_Helper.readByte(codeData);
-
-                        types.add(double.class);
-                        args.add((double)local[index]);
+                        Instructions.DLOAD(args, types, (double)local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case ILOAD_0, ILOAD_1, ILOAD_2, ILOAD_3 -> {
-                        types.add(int.class);
-                        args.add((int)local[opCode - 0x1A]); // ILOAD_0 is 0x1A .. ILOAD_3 is 0x1D
+                        Instructions.ILOAD(args, types, (int)local[opCode - 0x1A]); // ILOAD_0 is 0x1A .. ILOAD_3 is 0x1D
                     }
                     case LLOAD_0, LLOAD_1, LLOAD_2, LLOAD_3 -> {
-                        types.add(long.class);
-                        args.add((long)local[opCode - 0x1E]); // LLOAD_0 is 0x1E .. ILOAD_3 is 0x21
+                        Instructions.LLOAD(args, types, (long)local[opCode - 0x1E]); // LLOAD_0 is 0x1E .. ILOAD_3 is 0x21
                     }
                     case FLOAD_0, FLOAD_1, FLOAD_2, FLOAD_3 -> {
-                        types.add(float.class);
-                        args.add((float)local[opCode - 0x22]); // FLOAD_0 is 0x22 .. FLOAD_3 is 0x25
+                        Instructions.FLOAD(args, types, (float)local[opCode - 0x22]); // FLOAD_0 is 0x22 .. FLOAD_3 is 0x25
                     }
                     case DLOAD_0, DLOAD_1, DLOAD_2, DLOAD_3 -> {
-                        types.add(double.class);
-                        args.add((double)local[opCode - 0x26]); // DLOAD_0 is 0x26 .. DLOAD_3 is 0x29
+                        Instructions.DLOAD(args, types, (float)local[opCode - 0x26]); // DLOAD_0 is 0x26 .. DLOAD_3 is 0x29
                     }
                     case ALOAD_0, ALOAD_1, ALOAD_2, ALOAD_3 -> {
                         // TODO
