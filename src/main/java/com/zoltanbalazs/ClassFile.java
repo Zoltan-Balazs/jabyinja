@@ -379,19 +379,23 @@ class ClassFile {
                             Class<?> type = types.remove(types.size() - 1);
                             
                             Class<?> classClass = Class.forName(className.replace("/", "."));
-                            Method method = classClass.getDeclaredMethod(memberName, type);              
+                            Method method = classClass.getDeclaredMethod(memberName, type);     
+                            
+                            Object result;
                             
                             if (type == int.class) {
-                                method.invoke(stack.remove(stack.size() - 1), (int)arg);
+                                result = method.invoke(stack.remove(stack.size() - 1), (int)arg);
                             } else if (type == float.class) {
-                                method.invoke(stack.remove(stack.size() - 1), (float)arg);
+                                result = method.invoke(stack.remove(stack.size() - 1), (float)arg);
                             } else if (type == double.class) {
-                                method.invoke(stack.remove(stack.size() - 1), (double)arg);
+                                result = method.invoke(stack.remove(stack.size() - 1), (double)arg);
                             } else if (type == long.class) {
-                                method.invoke(stack.remove(stack.size() - 1), (long)arg);
+                                result = method.invoke(stack.remove(stack.size() - 1), (long)arg);
                             } else {
-                                method.invoke(stack.remove(stack.size() - 1), type.cast(arg));
+                                result = method.invoke(stack.remove(stack.size() - 1), type.cast(arg));
                             }
+                            
+                            stack.add(result);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
