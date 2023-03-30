@@ -148,7 +148,7 @@ class ClassFile {
                 byte opCode = ClassFile_Helper.readByte(codeData);
 
                 if (IS_DEBUG) {  
-                    System.out.println("FOUND OPCODE: " + Opcode.opcodeRepresentation(opCode));
+                    System.out.println(Opcode.opcodeRepresentation(opCode));
                 }
 
                 switch (Opcode.opcodeRepresentation(opCode)) {
