@@ -418,8 +418,50 @@ class ClassFile {
                         String className = getNameOfClass(methodRef.getClassIndex());
                         String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
 
-                        System.out.println(className);
-                        System.out.println(memberName);
+                        try {
+                            Object arg = args.remove(args.size() - 1);
+                            // TODO: Use type from look-up table, there are only a handful of primitives..
+                            Class<?> type = types.remove(types.size() - 1);
+
+                            // File f = new File ("Test/Main.class");
+                            // URL[] cp = { f.toURI().toURL() };
+                            // URLClassLoader urlcl = new URLClassLoader(cp);
+                            // Class<?> dd = urlcl.loadClass("main.Main");
+                            
+                            Class<?> classClass = Class.forName(className.replace("/", "."));
+                            Method method = classClass.getDeclaredMethod(memberName, type);              
+
+                            if (type == int.class) {
+                                method.invoke(stack.remove(stack.size() - 1), (int)arg);
+                            } else if (type == float.class) {
+                                method.invoke(stack.remove(stack.size() - 1), (float)arg);
+                            } else if (type == double.class) {
+                                method.invoke(stack.remove(stack.size() - 1), (double)arg);
+                            } else if (type == long.class) {
+                                method.invoke(stack.remove(stack.size() - 1), (long)arg);
+                            } else {
+                                method.invoke(stack.remove(stack.size() - 1), type.cast(arg));
+                            }
+                        } catch (ClassNotFoundException e) {
+                            Method_Info method = findMethodsByName(memberName);
+                            List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");
+
+                            for (Attribute_Info attribute : attributes) {
+                                try {
+                                    Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+                    
+                                    if (IS_DEBUG) {
+                                        System.out.println(codeAttribute + "\n");
+                                    }
+                    
+                                    executeCode(codeAttribute.code);
+                                } catch (Exception ee) {
+                                    ee.printStackTrace();
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     case NEW -> {
                         short index = ClassFile_Helper.readShort(codeData);
