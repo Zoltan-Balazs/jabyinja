@@ -274,6 +274,10 @@ class ClassFile {
                     case AALOAD -> {
                         // TODO
                     }
+                    case ISTORE_0, ISTORE_1, ISTORE_2, ISTORE_3 -> {
+                        Object value = args.remove(args.size() - 1);
+                        local[opCode - 0x3B] = (int)value; // ISTORE_0 is 0x3B .. ISTORE_3 is 0x3E
+                    }
                     case ASTORE_0, ASTORE_1, ASTORE_2, ASTORE_3 -> {
                         // TODO
                     }
