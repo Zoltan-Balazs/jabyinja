@@ -41,7 +41,7 @@ class ClassFile {
     private static short MAJOR_VERSION;
     private static short CONSTANT_POOL_COUNT;
     private static List<CP_Info> CONSTANT_POOL;
-    private static List<Class_Access_Flags> ACCESS_FLAGS;
+    private static List<Access_Flags> ACCESS_FLAGS;
     private static short THIS_CLASS;
     private static short SUPER_CLASS;
     private static short INTERFACES_COUNT;
@@ -52,8 +52,6 @@ class ClassFile {
     private static List<Method_Info> METHODS;
     private static short ATTRIBUTES_COUNT;
     private static List<Attribute_Info> ATTRIBUTES;
-
-    public Boolean IS_DEBUG = false;
 
     public ClassFile(String fileName) {
         readClassFile(fileName);
@@ -71,7 +69,7 @@ class ClassFile {
             MAJOR_VERSION = ClassFile_Helper.readShort(classFileData);
             CONSTANT_POOL_COUNT = ClassFile_Helper.readShort(classFileData);
             CONSTANT_POOL = Constant_Pool_Helper.readConstantPool(classFileData, CONSTANT_POOL_COUNT);
-            ACCESS_FLAGS = Class_Access_Flags.parseFlags(ClassFile_Helper.readShort(classFileData));
+            ACCESS_FLAGS = Access_Flags.parseFlags(ClassFile_Helper.readShort(classFileData));
             THIS_CLASS = ClassFile_Helper.readShort(classFileData);
             SUPER_CLASS = ClassFile_Helper.readShort(classFileData);
             INTERFACES_COUNT = ClassFile_Helper.readShort(classFileData);
@@ -146,10 +144,6 @@ class ClassFile {
 
             while (codeData.available() != 0) {
                 byte opCode = ClassFile_Helper.readByte(codeData);
-
-                if (IS_DEBUG) {  
-                    System.out.println(Opcode.opcodeRepresentation(opCode));
-                }
 
                 switch (Opcode.opcodeRepresentation(opCode)) {
                     case ICONST_M1, ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
@@ -453,10 +447,6 @@ class ClassFile {
                             for (Attribute_Info attribute : attributes) {
                                 try {
                                     Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
-                    
-                                    if (IS_DEBUG) {
-                                        System.out.println(codeAttribute + "\n");
-                                    }
                     
                                     executeCode(codeAttribute.code);
                                 } catch (Exception ee) {
