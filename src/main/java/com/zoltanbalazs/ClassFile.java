@@ -280,6 +280,46 @@ class ClassFile {
                     case DUP -> {
                         // TODO
                     }
+                    case IADD -> {
+                        int value2 = (int)args.remove(args.size() - 1);
+                        int value1 = (int)args.remove(args.size() - 1);
+
+                        types.remove(types.size() - 1);
+                        types.remove(types.size() - 1);
+
+                        types.add(int.class);
+                        args.add(value1 + value2);
+                    }
+                    case ISUB -> {
+                        int value2 = (int)args.remove(args.size() - 1);
+                        int value1 = (int)args.remove(args.size() - 1);
+
+                        types.remove(types.size() - 1);
+                        types.remove(types.size() - 1);
+
+                        types.add(int.class);
+                        args.add(value1 - value2);
+                    }
+                    case IMUL -> {
+                        int value2 = (int)args.remove(args.size() - 1);
+                        int value1 = (int)args.remove(args.size() - 1);
+
+                        types.remove(types.size() - 1);
+                        types.remove(types.size() - 1);
+
+                        types.add(int.class);
+                        args.add(value1 * value2);
+                    }
+                    case IDIV -> {
+                        int value2 = (int)args.remove(args.size() - 1);
+                        int value1 = (int)args.remove(args.size() - 1);
+
+                        types.remove(types.size() - 1);
+                        types.remove(types.size() - 1);
+
+                        types.add(int.class);
+                        args.add(value1 / value2);
+                    }
                     case IFNE -> {
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
