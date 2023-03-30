@@ -284,6 +284,18 @@ class ClassFile {
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
+                    case IF_ICMPNE -> {
+                        byte branchbyte1 = ClassFile_Helper.readByte(codeData);
+                        byte branchbyte2 = ClassFile_Helper.readByte(codeData);
+
+                        int value1 = (int)args.get(args.size() - 2);
+                        int value2 = (int)args.get(args.size() - 1);
+
+                        if (value1 == value2) {
+                            int branch = branchbyte1 << 8 | branchbyte2;
+                            System.out.println(branch);
+                        }
+                    }
                     case GOTO -> {
                         short index = ClassFile_Helper.readShort(codeData);
                         System.out.println(index);
