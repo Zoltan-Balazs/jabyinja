@@ -139,5 +139,5 @@ $ just t
 
 ## Usage
 
-Without specifying any files, the program will try to interpret `Main.class`, located in the same directory as from where you ran the program from
-If you do intend to specifcy a given file, do it with a single argumentum, where you name the .class file (i.e. if your file is named Example.class, you write `Example.class` **NOT** `Example`)
+Without specifying any files, the program will try to interpret `Main.class`, located in the same directory as from where you ran the program from.
+If you do intend to specifcy a given file, do it with a single argument, where you name the .class file (i.e. if your file is named Example.class, you write `Example.class` **NOT** `Example`)
