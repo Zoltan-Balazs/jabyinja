@@ -58,6 +58,46 @@ public class Instructions {
         types.add(double.class);
         args.add(value);
     }
+
+    public static Pair<Integer, Integer> IARIT(List<Object> args, List<Class<?>> types) {
+        int value2 = (int) args.remove(args.size() - 1);
+        int value1 = (int) args.remove(args.size() - 1);
+
+        types.remove(types.size() - 1);
+        types.remove(types.size() - 1);
+
+        return new Pair<Integer, Integer>(value1, value2);
+    }
+
+    public static Pair<Long, Long> LARIT(List<Object> args, List<Class<?>> types) {
+        long value2 = (long) args.remove(args.size() - 1);
+        long value1 = (long) args.remove(args.size() - 1);
+
+        types.remove(types.size() - 1);
+        types.remove(types.size() - 1);
+
+        return new Pair<Long, Long>(value1, value2);
+    }
+
+    public static Pair<Float, Float> FARIT(List<Object> args, List<Class<?>> types) {
+        float value2 = (float) args.remove(args.size() - 1);
+        float value1 = (float) args.remove(args.size() - 1);
+
+        types.remove(types.size() - 1);
+        types.remove(types.size() - 1);
+
+        return new Pair<Float, Float>(value1, value2);
+    }
+
+    public static Pair<Double, Double> DARIT(List<Object> args, List<Class<?>> types) {
+        double value2 = (double) args.remove(args.size() - 1);
+        double value1 = (double) args.remove(args.size() - 1);
+
+        types.remove(types.size() - 1);
+        types.remove(types.size() - 1);
+
+        return new Pair<Double, Double>(value1, value2);
+    }
 }
 
 class Instructions_Helper {

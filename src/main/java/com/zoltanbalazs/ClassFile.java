@@ -232,45 +232,214 @@ class ClassFile {
                         // TODO
                     }
                     case IADD -> {
-                        int value2 = (int)args.remove(args.size() - 1);
-                        int value1 = (int)args.remove(args.size() - 1);
-
-                        types.remove(types.size() - 1);
-                        types.remove(types.size() - 1);
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
 
                         types.add(int.class);
-                        args.add(value1 + value2);
+                        args.add(values.first + values.second);
+                    }
+                    case LADD -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first + values.second);
+                    }
+                    case FADD -> {
+                        Pair<Float, Float> values = Instructions.FARIT(args, types);
+
+                        types.add(float.class);
+                        args.add(values.first + values.second);
+                    }
+                    case DADD -> {
+                        Pair<Double, Double> values = Instructions.DARIT(args, types);
+
+                        types.add(Double.class);
+                        args.add(values.first + values.second);
                     }
                     case ISUB -> {
-                        int value2 = (int)args.remove(args.size() - 1);
-                        int value1 = (int)args.remove(args.size() - 1);
-
-                        types.remove(types.size() - 1);
-                        types.remove(types.size() - 1);
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
 
                         types.add(int.class);
-                        args.add(value1 - value2);
+                        args.add(values.first - values.second);
+                    }
+                    case LSUB -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first - values.second);
+                    }
+                    case FSUB -> {
+                        Pair<Float, Float> values = Instructions.FARIT(args, types);
+
+                        types.add(float.class);
+                        args.add(values.first - values.second);
+                    }
+                    case DSUB -> {
+                        Pair<Double, Double> values = Instructions.DARIT(args, types);
+
+                        types.add(Double.class);
+                        args.add(values.first - values.second);
                     }
                     case IMUL -> {
-                        int value2 = (int)args.remove(args.size() - 1);
-                        int value1 = (int)args.remove(args.size() - 1);
-
-                        types.remove(types.size() - 1);
-                        types.remove(types.size() - 1);
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
 
                         types.add(int.class);
-                        args.add(value1 * value2);
+                        args.add(values.first * values.second);
+                    }
+                    case LMUL -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first * values.second);
+                    }
+                    case FMUL -> {
+                        Pair<Float, Float> values = Instructions.FARIT(args, types);
+
+                        types.add(float.class);
+                        args.add(values.first * values.second);
+                    }
+                    case DMUL -> {
+                        Pair<Double, Double> values = Instructions.DARIT(args, types);
+
+                        types.add(Double.class);
+                        args.add(values.first * values.second);
                     }
                     case IDIV -> {
-                        int value2 = (int)args.remove(args.size() - 1);
-                        int value1 = (int)args.remove(args.size() - 1);
-
-                        types.remove(types.size() - 1);
-                        types.remove(types.size() - 1);
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
 
                         types.add(int.class);
-                        args.add(value1 / value2);
+                        args.add(values.first / values.second);
                     }
+                    case LDIV -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first / values.second);
+                    }
+                    case FDIV -> {
+                        Pair<Float, Float> values = Instructions.FARIT(args, types);
+
+                        types.add(float.class);
+                        args.add(values.first / values.second);
+                    }
+                    case DDIV -> {
+                        Pair<Double, Double> values = Instructions.DARIT(args, types);
+
+                        types.add(Double.class);
+                        args.add(values.first / values.second);
+                    }
+                    case IREM -> {
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
+
+                        types.add(int.class);
+                        args.add(values.first % values.second);
+                    }
+                    case LREM -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first % values.second);
+                    }
+                    case FREM -> {
+                        Pair<Float, Float> values = Instructions.FARIT(args, types);
+
+                        types.add(float.class);
+                        args.add(values.first % values.second);
+                    }
+                    case DREM -> {
+                        Pair<Double, Double> values = Instructions.DARIT(args, types);
+
+                        types.add(Double.class);
+                        args.add(values.first % values.second);
+                    }
+                    case INEG -> {
+                        int value = (int) args.remove(args.size() - 1);
+                        args.add(value * -1);
+                    }
+                    case LNEG -> {
+                        long value = (long) args.remove(args.size() - 1);
+                        args.add(value * -1);
+                    }
+                    case FNEG -> {
+                        float value = (float) args.remove(args.size() - 1);
+                        args.add(value * -1);
+                    }
+                    case DNEG -> {
+                        double value = (double) args.remove(args.size() - 1);
+                        args.add(value * -1);
+                    }
+                    case ISHL -> {
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
+
+                        types.add(int.class);
+                        args.add(values.first << values.second);
+                    }
+                    case LSHL -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first << values.second);
+                    }
+                    case ISHR -> {
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
+
+                        types.add(int.class);
+                        args.add(values.first >> values.second);
+                    }
+                    case LSHR -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first >> values.second);
+                    }
+                    case IUSHR -> {
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
+
+                        types.add(int.class);
+                        args.add(values.first >>> values.second);
+                    }
+                    case LUSHR -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first >>> values.second);
+                    }
+                    case IAND -> {
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
+
+                        types.add(int.class);
+                        args.add(values.first & values.second);
+                    }
+                    case LAND -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first & values.second);
+                    }
+                    case IOR -> {
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
+
+                        types.add(int.class);
+                        args.add(values.first | values.second);
+                    }
+                    case LOR -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first | values.second);
+                    }
+                    case IXOR -> {
+                        Pair<Integer, Integer> values = Instructions.IARIT(args, types);
+
+                        types.add(int.class);
+                        args.add(values.first ^ values.second);
+                    }
+                    case LXOR -> {
+                        Pair<Long, Long> values = Instructions.LARIT(args, types);
+
+                        types.add(long.class);
+                        args.add(values.first ^ values.second);
+                    }
+
                     case IFNE -> {
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
