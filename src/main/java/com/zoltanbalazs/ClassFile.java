@@ -214,7 +214,8 @@ class ClassFile {
                         Instructions.FLOAD(args, types, (float)local[opCode - 0x22]); // FLOAD_0 is 0x22 .. FLOAD_3 is 0x25
                     }
                     case DLOAD_0, DLOAD_1, DLOAD_2, DLOAD_3 -> {
-                        Instructions.DLOAD(args, types, (float)local[opCode - 0x26]); // DLOAD_0 is 0x26 .. DLOAD_3 is 0x29
+                        // DLOAD_0 is 0x26 .. DLOAD_3 is 0x29
+                        Instructions.DLOAD(args, types, (double) local[opCode - 0x26]);
                     }
                     case ALOAD_0, ALOAD_1, ALOAD_2, ALOAD_3 -> {
                         // ALOAD_0 is 0x2A .. ALOAD_3 is 0x2D
