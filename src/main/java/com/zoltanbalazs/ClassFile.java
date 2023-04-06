@@ -85,7 +85,8 @@ class ClassFile {
         } catch (InvalidClassFileException e) {
             System.err.println("The file '" + fileName + "' is not a valid Java Class file!");
         } catch (InvalidConstantPoolTagException e) {
-            System.err.println("The file '" + fileName + "' contains invalid Constant Pool tag! Tag: " + e.getMessage());
+            System.err
+                    .println("The file '" + fileName + "' contains invalid Constant Pool tag! Tag: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,7 +134,8 @@ class ClassFile {
                 StandardCharsets.UTF_8);
     }
 
-    public void executeCode(byte[] code) throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+    public void executeCode(byte[] code)
+            throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         List<Object> stack = new ArrayList<>();
         List<Object> args = new ArrayList<>();
         List<Class<?>> types = new ArrayList<>();
@@ -147,22 +149,26 @@ class ClassFile {
 
                 switch (Opcode.opcodeRepresentation(opCode)) {
                     case ICONST_M1, ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
-                        Instructions.ICONST(args, types, opCode - 0x03); // ICONST_M1 is 0x02 .. ICONST_5 is 0x08
+                        // ICONST_M1 is 0x02 .. ICONST_5 is 0x08
+                        Instructions.ICONST(args, types, opCode - 0x03);
                     }
                     case LCONST_0, LCONST_1 -> {
-                        Instructions.LCONST(args, types, opCode - 0x09); // LCONST_0 is 0x09, LCONST_1 is 0x0A
+                        // LCONST_0 is 0x09, LCONST_1 is 0x0A
+                        Instructions.LCONST(args, types, opCode - 0x09);
                     }
                     case FCONST_0, FCONST_1, FCONST_2 -> {
-                        Instructions.FCONST(args, types, (float)(opCode - 0x0B)); // FCONST_0 is 0x0B .. FCONST_2 is 0x0D
+                        // FCONST_0 is 0x0B .. FCONST_2 is 0x0D
+                        Instructions.FCONST(args, types, (float) (opCode - 0x0B));
                     }
                     case DCONST_0, DCONST_1 -> {
-                        Instructions.DCONST(args, types, (double)(opCode - 0x0E)); // DCONST_0 is 0x0E, DCONST_1 is 0x0F
+                        // DCONST_0 is 0x0E, DCONST_1 is 0x0F
+                        Instructions.DCONST(args, types, (double) (opCode - 0x0E));
                     }
                     case BIPUSH -> {
-                        Instructions.BIPUSH(args, types, (int)ClassFile_Helper.readByte(codeData));
+                        Instructions.BIPUSH(args, types, (int) ClassFile_Helper.readByte(codeData));
                     }
                     case SIPUSH -> {
-                        Instructions.BIPUSH(args, types, (int)ClassFile_Helper.readShort(codeData));
+                        Instructions.BIPUSH(args, types, (int) ClassFile_Helper.readShort(codeData));
                     }
                     case LDC -> {
                         byte index = ClassFile_Helper.readByte(codeData);
@@ -172,7 +178,7 @@ class ClassFile {
                         Object value = Instructions_Helper.tagSwitchValue(CONSTANT_POOL, tag, index);
 
                         Instructions.LDC(args, types, type, value);
-                    } 
+                    }
                     case LDC_W -> {
                         short index = ClassFile_Helper.readShort(codeData);
                         ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
@@ -192,26 +198,31 @@ class ClassFile {
                         Instructions.LDC(args, types, type, value);
                     }
                     case ILOAD -> {
-                        Instructions.ILOAD(args, types, (int)local[ClassFile_Helper.readByte(codeData)]);
+                        Instructions.ILOAD(args, types, (int) local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case LLOAD -> {
-                        Instructions.LLOAD(args, types, (long)local[ClassFile_Helper.readByte(codeData)]);
+                        Instructions.LLOAD(args, types, (long) local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case FLOAD -> {
-                        Instructions.FLOAD(args, types, (float)local[ClassFile_Helper.readByte(codeData)]);
+                        Instructions.FLOAD(args, types, (float) local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case DLOAD -> {
+                        Instructions.DLOAD(args, types, (double) local[ClassFile_Helper.readByte(codeData)]);
+                    }
                     case ALOAD -> {
                         Instructions.ALOAD(args, types, local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case ILOAD_0, ILOAD_1, ILOAD_2, ILOAD_3 -> {
-                        Instructions.ILOAD(args, types, (int)local[opCode - 0x1A]); // ILOAD_0 is 0x1A .. ILOAD_3 is 0x1D
+                        // ILOAD_0 is 0x1A .. ILOAD_3 is 0x1D
+                        Instructions.ILOAD(args, types, (int) local[opCode - 0x1A]);
                     }
                     case LLOAD_0, LLOAD_1, LLOAD_2, LLOAD_3 -> {
-                        Instructions.LLOAD(args, types, (long)local[opCode - 0x1E]); // LLOAD_0 is 0x1E .. ILOAD_3 is 0x21
+                        // LLOAD_0 is 0x1E .. ILOAD_3 is 0x21
+                        Instructions.LLOAD(args, types, (long) local[opCode - 0x1E]);
                     }
                     case FLOAD_0, FLOAD_1, FLOAD_2, FLOAD_3 -> {
-                        Instructions.FLOAD(args, types, (float)local[opCode - 0x22]); // FLOAD_0 is 0x22 .. FLOAD_3 is 0x25
+                        // FLOAD_0 is 0x22 .. FLOAD_3 is 0x25
+                        Instructions.FLOAD(args, types, (float) local[opCode - 0x22]);
                     }
                     case DLOAD_0, DLOAD_1, DLOAD_2, DLOAD_3 -> {
                         // DLOAD_0 is 0x26 .. DLOAD_3 is 0x29
@@ -228,7 +239,7 @@ class ClassFile {
                     }
                     case ISTORE_0, ISTORE_1, ISTORE_2, ISTORE_3 -> {
                         Object value = args.remove(args.size() - 1);
-                        local[opCode - 0x3B] = (int)value; // ISTORE_0 is 0x3B .. ISTORE_3 is 0x3E
+                        local[opCode - 0x3B] = (int) value; // ISTORE_0 is 0x3B .. ISTORE_3 is 0x3E
                     }
                     case ASTORE_0, ASTORE_1, ASTORE_2, ASTORE_3 -> {
                         // TODO
@@ -453,8 +464,8 @@ class ClassFile {
                         byte branchbyte1 = ClassFile_Helper.readByte(codeData);
                         byte branchbyte2 = ClassFile_Helper.readByte(codeData);
 
-                        int value1 = (int)args.get(args.size() - 2);
-                        int value2 = (int)args.get(args.size() - 1);
+                        int value1 = (int) args.get(args.size() - 2);
+                        int value2 = (int) args.get(args.size() - 1);
 
                         if (value1 == value2) {
                             int branch = branchbyte1 << 8 | branchbyte2;
@@ -498,29 +509,29 @@ class ClassFile {
                             Object arg = args.remove(args.size() - 1);
                             // TODO: Use type from look-up table, there are only a handful of primitives..
                             Class<?> type = types.remove(types.size() - 1);
-                            
+
                             Class<?> classClass = Class.forName(className.replace("/", "."));
-                            Method method = classClass.getDeclaredMethod(memberName, type);     
-                            
+                            Method method = classClass.getDeclaredMethod(memberName, type);
+
                             Object result;
-                            
+
                             if (type == int.class) {
-                                result = method.invoke(stack.remove(stack.size() - 1), (int)arg);
+                                result = method.invoke(stack.remove(stack.size() - 1), (int) arg);
                             } else if (type == float.class) {
-                                result = method.invoke(stack.remove(stack.size() - 1), (float)arg);
+                                result = method.invoke(stack.remove(stack.size() - 1), (float) arg);
                             } else if (type == double.class) {
-                                result = method.invoke(stack.remove(stack.size() - 1), (double)arg);
+                                result = method.invoke(stack.remove(stack.size() - 1), (double) arg);
                             } else if (type == long.class) {
-                                result = method.invoke(stack.remove(stack.size() - 1), (long)arg);
+                                result = method.invoke(stack.remove(stack.size() - 1), (long) arg);
                             } else {
                                 result = method.invoke(stack.remove(stack.size() - 1), type.cast(arg));
                             }
-                            
+
                             stack.add(result);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        
+
                     }
                     case INVOKESPECIAL -> {
                         short index = ClassFile_Helper.readShort(codeData);
@@ -552,18 +563,18 @@ class ClassFile {
                             // URL[] cp = { f.toURI().toURL() };
                             // URLClassLoader urlcl = new URLClassLoader(cp);
                             // Class<?> dd = urlcl.loadClass("main.Main");
-                            
+
                             Class<?> classClass = Class.forName(className.replace("/", "."));
-                            Method method = classClass.getDeclaredMethod(memberName, type);              
+                            Method method = classClass.getDeclaredMethod(memberName, type);
 
                             if (type == int.class) {
-                                method.invoke(stack.remove(stack.size() - 1), (int)arg);
+                                method.invoke(stack.remove(stack.size() - 1), (int) arg);
                             } else if (type == float.class) {
-                                method.invoke(stack.remove(stack.size() - 1), (float)arg);
+                                method.invoke(stack.remove(stack.size() - 1), (float) arg);
                             } else if (type == double.class) {
-                                method.invoke(stack.remove(stack.size() - 1), (double)arg);
+                                method.invoke(stack.remove(stack.size() - 1), (double) arg);
                             } else if (type == long.class) {
-                                method.invoke(stack.remove(stack.size() - 1), (long)arg);
+                                method.invoke(stack.remove(stack.size() - 1), (long) arg);
                             } else {
                                 method.invoke(stack.remove(stack.size() - 1), type.cast(arg));
                             }
@@ -574,7 +585,7 @@ class ClassFile {
                             for (Attribute_Info attribute : attributes) {
                                 try {
                                     Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
-                    
+
                                     executeCode(codeAttribute.code);
                                 } catch (Exception ee) {
                                     ee.printStackTrace();

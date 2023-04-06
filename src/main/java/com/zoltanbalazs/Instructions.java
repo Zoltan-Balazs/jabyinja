@@ -109,7 +109,8 @@ class Instructions_Helper {
     public static Object tagSwitchValue(List<CP_Info> CONSTANT_POOL, ConstantPoolTag tag, int index) {
         switch (tag) {
             case CONSTANT_String -> {
-                return new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(), StandardCharsets.UTF_8);
+                return new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(),
+                        StandardCharsets.UTF_8);
             }
             case CONSTANT_Float -> {
                 return CONSTANT_POOL.get(index - 1).getFloatValue();
