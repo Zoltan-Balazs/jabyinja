@@ -232,9 +232,43 @@ class ClassFile {
                         // ALOAD_0 is 0x2A .. ALOAD_3 is 0x2D
                         Instructions.ALOAD(args, types, local[opCode - 0x2A]);
                     }
+                    case IALOAD -> {
+                        // TODO
+                    }
+                    case LALOAD -> {
+                        // TODO
+                    }
+                    case FALOAD -> {
+                        // TODO
+                    }
+                    case DALOAD -> {
                         // TODO
                     }
                     case AALOAD -> {
+                        // TODO
+                    }
+                    case BALOAD -> {
+                        // TODO
+                    }
+                    case CALOAD -> {
+                        // TODO
+                    }
+                    case SALOAD -> {
+                        // TODO
+                    }
+                    case ISTORE -> {
+                        // TODO
+                    }
+                    case LSTORE -> {
+                        // TODO
+                    }
+                    case FSTORE -> {
+                        // TODO
+                    }
+                    case DSTORE -> {
+                        // TODO
+                    }
+                    case ASTORE -> {
                         // TODO
                     }
                     case ISTORE_0, ISTORE_1, ISTORE_2, ISTORE_3 -> {
