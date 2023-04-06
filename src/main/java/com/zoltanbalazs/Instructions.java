@@ -59,6 +59,11 @@ public class Instructions {
         args.add(value);
     }
 
+    public static void ALOAD(List<Object> args, List<Class<?>> types, Object value) {
+        types.add(value.getClass());
+        args.add(value);
+    }
+
     public static Pair<Integer, Integer> IARIT(List<Object> args, List<Class<?>> types) {
         int value2 = (int) args.remove(args.size() - 1);
         int value1 = (int) args.remove(args.size() - 1);

@@ -201,7 +201,8 @@ class ClassFile {
                         Instructions.FLOAD(args, types, (float)local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case DLOAD -> {
-                        Instructions.DLOAD(args, types, (double)local[ClassFile_Helper.readByte(codeData)]);
+                    case ALOAD -> {
+                        Instructions.ALOAD(args, types, local[ClassFile_Helper.readByte(codeData)]);
                     }
                     case ILOAD_0, ILOAD_1, ILOAD_2, ILOAD_3 -> {
                         Instructions.ILOAD(args, types, (int)local[opCode - 0x1A]); // ILOAD_0 is 0x1A .. ILOAD_3 is 0x1D
@@ -216,6 +217,9 @@ class ClassFile {
                         Instructions.DLOAD(args, types, (float)local[opCode - 0x26]); // DLOAD_0 is 0x26 .. DLOAD_3 is 0x29
                     }
                     case ALOAD_0, ALOAD_1, ALOAD_2, ALOAD_3 -> {
+                        // ALOAD_0 is 0x2A .. ALOAD_3 is 0x2D
+                        Instructions.ALOAD(args, types, local[opCode - 0x2A]);
+                    }
                         // TODO
                     }
                     case AALOAD -> {
