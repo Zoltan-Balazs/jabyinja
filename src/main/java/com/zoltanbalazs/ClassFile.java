@@ -136,11 +136,13 @@ class ClassFile {
 
     public void executeCode(byte[] code)
             throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        // TODO: Change from stack - args & types to just a single stack
         List<Object> stack = new ArrayList<>();
         List<Object> args = new ArrayList<>();
         List<Class<?>> types = new ArrayList<>();
         Object[] local = new Object[4];
 
+        // TODO: Change from this to for loop
         try (InputStream codeStream = new ByteArrayInputStream(code);
                 DataInputStream codeData = new DataInputStream(codeStream)) {
 
