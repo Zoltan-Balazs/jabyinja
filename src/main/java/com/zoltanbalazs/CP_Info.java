@@ -13,6 +13,16 @@ class InvalidConstantPoolTagException extends RuntimeException {
 }
 
 class Constant_Pool_Helper {
+	public static long convertToLong(byte[] bytes) {
+		long value = 0L;
+
+		for (byte b : bytes) {
+			value = (value << 8) + (b & 255);
+		}
+
+		return value;
+	}
+
 	public static List<CP_Info> readConstantPool(DataInputStream in, int count)
 			throws IOException, InvalidConstantPoolTagException {
 		List<CP_Info> constant_pool = new ArrayList<CP_Info>(count - 1);
@@ -76,8 +86,16 @@ class Constant_Pool_Helper {
 				}
 				case CONSTANT_Double -> {
 					CONSTANT_Double_Info tmp = new CONSTANT_Double_Info();
-					tmp.high_bytes = ClassFile_Helper.readInt(in);
-					tmp.low_bytes = ClassFile_Helper.readInt(in);
+					byte[] high_bytes = new byte[4];
+					byte[] low_bytes = new byte[4];
+					for (int idx = 0; idx < 4; idx++) {
+						high_bytes[idx] = ClassFile_Helper.readByte(in);
+					}
+					for (int idx = 0; idx < 4; idx++) {
+						low_bytes[idx] = ClassFile_Helper.readByte(in);
+					}
+					tmp.high_bytes = convertToLong(high_bytes);
+					tmp.low_bytes = convertToLong(low_bytes);
 					constant_pool.add(tmp);
 				}
 				case CONSTANT_NameAndType -> {
@@ -324,8 +342,8 @@ class CONSTANT_Long_Info extends CP_Info {
 }
 
 class CONSTANT_Double_Info extends CP_Info {
-	public int high_bytes;
-	public int low_bytes;
+	public long high_bytes;
+	public long low_bytes;
 
 	@Override
 	public double getDoubleValue() {
