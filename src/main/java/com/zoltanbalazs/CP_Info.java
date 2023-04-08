@@ -2,6 +2,8 @@ package com.zoltanbalazs;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -177,7 +179,6 @@ public class CP_Info {
 		return 0L;
 	}
 
-	// TODO: Precision for float and double!
 	public float getFloatValue() {
 		return 0.0f;
 	}
@@ -311,13 +312,14 @@ class CONSTANT_Float_Info extends CP_Info {
 			return Float.NaN;
 		}
 
-		int s = ((bits >> 31) == 0) ? 1 : -1;
+		BigDecimal base = new BigDecimal(2);
+		int tmp_s = ((bits >> 31) == 0) ? 1 : -1;
+		BigDecimal s = new BigDecimal(tmp_s);
 		int e = (bits >> 23) & 0xFF;
-		int m = (e == 0) ?
-			(bits & 0x7FFFFF) << 1 :
-			(bits & 0x7FFFFF) | 0x800000;
+		int tmp_m = (e == 0) ? (bits & 0x7FFFFF) << 1 : (bits & 0x7FFFFF) | 0x800000;
+		BigDecimal m = new BigDecimal(tmp_m);
 
-		return s * m * (float)Math.pow(2, e - 150);
+		return s.multiply(m).multiply(base.pow(e - 150, MathContext.DECIMAL128)).floatValue();
 	}
 
 	@Override
@@ -362,7 +364,14 @@ class CONSTANT_Double_Info extends CP_Info {
 			return Double.NaN;
 		}
 
-		return s * m * Math.pow(2, e - 1075);
+		BigDecimal base = new BigDecimal(2);
+		int tmp_s = ((bits >> 63) == 0) ? 1 : -1;
+		BigDecimal s = new BigDecimal(tmp_s);
+		int e = (int) ((bits >> 52) & 0x7FFL);
+		long tmp_m = (e == 0) ? (bits & 0xFFFFFFFFFFFFFL) << 1 : (bits & 0xFFFFFFFFFFFFFL) | 0x10000000000000L;
+		BigDecimal m = new BigDecimal(tmp_m);
+
+		return s.multiply(m).multiply(base.pow(e - 1075, MathContext.DECIMAL128)).doubleValue();
 	}
 
 	@Override
