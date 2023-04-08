@@ -349,11 +349,18 @@ class CONSTANT_Double_Info extends CP_Info {
 	public double getDoubleValue() {
 		long bits = ((long) high_bytes << 32) + low_bytes;
 
-		int s = ((bits >> 63) == 0) ? 1 : -1;
-		int e = (int)((bits >> 52) & 0x7ffL);
-		long m = (e == 0) ?
-				(bits & 0xfffffffffffffL) << 1 :
-				(bits & 0xfffffffffffffL) | 0x10000000000000L;
+		if (bits == 0x7FF0000000000000L) {
+			return Double.POSITIVE_INFINITY;
+		}
+
+		if (bits == 0xFFF0000000000000L) {
+			return Double.NEGATIVE_INFINITY;
+		}
+
+		if ((0x7FF0000000000001L <= bits && bits <= 0x7FFFFFFFFFFFFFFFL)
+				|| (0xFFF0000000000001L <= bits && bits <= 0xFFFFFFFFFFFFFFFFL)) {
+			return Double.NaN;
+		}
 
 		return s * m * Math.pow(2, e - 1075);
 	}
