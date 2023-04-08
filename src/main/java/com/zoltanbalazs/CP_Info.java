@@ -62,8 +62,16 @@ class Constant_Pool_Helper {
 				}
 				case CONSTANT_Long -> {
 					CONSTANT_Long_Info tmp = new CONSTANT_Long_Info();
-					tmp.high_bytes = ClassFile_Helper.readInt(in);
-					tmp.low_bytes = ClassFile_Helper.readInt(in);
+					byte[] high_bytes = new byte[4];
+					byte[] low_bytes = new byte[4];
+					for (int idx = 0; idx < 4; idx++) {
+						high_bytes[idx] = ClassFile_Helper.readByte(in);
+					}
+					for (int idx = 0; idx < 4; idx++) {
+						low_bytes[idx] = ClassFile_Helper.readByte(in);
+					}
+					tmp.high_bytes = convertToLong(high_bytes);
+					tmp.low_bytes = convertToLong(low_bytes);
 					constant_pool.add(tmp);
 				}
 				case CONSTANT_Double -> {
@@ -301,8 +309,8 @@ class CONSTANT_Float_Info extends CP_Info {
 }
 
 class CONSTANT_Long_Info extends CP_Info {
-	public int high_bytes;
-	public int low_bytes;
+	public long high_bytes;
+	public long low_bytes;
 
 	@Override
 	public long getLongValue() {
