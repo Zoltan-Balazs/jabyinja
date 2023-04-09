@@ -4,6 +4,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class Instructions {
+    public static void ACONST(List<Pair<Class<?>, Object>> stack) {
+        stack.add(new Pair<Class<?>, Object>(void.class, null));
+    }
+
     public static void ICONST(List<Pair<Class<?>, Object>> stack, int value) {
         stack.add(new Pair<Class<?>, Object>(int.class, value));
     }

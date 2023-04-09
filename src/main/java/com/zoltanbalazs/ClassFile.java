@@ -152,6 +152,9 @@ class ClassFile {
                 byte opCode = ClassFile_Helper.readByte(codeData);
 
                 switch (Opcode.opcodeRepresentation(opCode)) {
+                    case ACONST_NULL -> {
+                        Instructions.ACONST(stack);
+                    }
                     case ICONST_M1, ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5 -> {
                         // ICONST_M1 is 0x02 .. ICONST_5 is 0x08
                         Instructions.ICONST(stack, opCode - 0x03);
