@@ -179,30 +179,15 @@ class ClassFile {
                     }
                     case LDC -> {
                         byte index = ClassFile_Helper.readByte(codeData);
-                        ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
-
-                        Class<?> type = Instructions_Helper.tagSwitchType(CONSTANT_POOL, tag);
-                        Object value = Instructions_Helper.tagSwitchValue(CONSTANT_POOL, tag, index);
-
-                        Instructions.LDC(stack, type, value);
+                        Instructions.LDC(stack, CONSTANT_POOL, index);
                     }
                     case LDC_W -> {
                         short index = ClassFile_Helper.readShort(codeData);
-                        ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
-
-                        Class<?> type = Instructions_Helper.tagSwitchType(CONSTANT_POOL, tag);
-                        Object value = Instructions_Helper.tagSwitchValue(CONSTANT_POOL, tag, index);
-
-                        Instructions.LDC(stack, type, value);
+                        Instructions.LDC(stack, CONSTANT_POOL, index);
                     }
                     case LDC2_W -> {
                         short index = ClassFile_Helper.readShort(codeData);
-                        ConstantPoolTag tag = CONSTANT_POOL.get(index - 1).tag;
-
-                        Class<?> type = Instructions_Helper.tagSwitchType(CONSTANT_POOL, tag);
-                        Object value = Instructions_Helper.tagSwitchValue(CONSTANT_POOL, tag, index);
-
-                        Instructions.LDC(stack, type, value);
+                        Instructions.LDC(stack, CONSTANT_POOL, index);
                     }
                     case ILOAD -> {
                         Instructions.ILOAD(stack, (int) local[ClassFile_Helper.readByte(codeData)]);
