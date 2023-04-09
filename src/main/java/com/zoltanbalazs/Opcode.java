@@ -204,12 +204,12 @@ public enum Opcode {
     IFNULL(0xC6),
     IFNONNULL(0xC7),
     GOTO_W(0xC8),
-    JSR_W(0xC9), // Deprecated in Java 7
+    JSR_W(0xC9); // Deprecated in Java 7
 
     // The next 3 shouldn't be in class files
-    BREAKPOINT(0xCA),
-    IMPDEP1(0xFE),
-    IMPDEP2(0xFF);
+    // BREAKPOINT(0xCA),
+    // IMPDEP1(0xFE),
+    // IMPDEP2(0xFF);
 
     public final byte op_code;
 
