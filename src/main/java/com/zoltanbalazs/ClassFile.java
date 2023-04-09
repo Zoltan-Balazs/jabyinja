@@ -484,16 +484,17 @@ class ClassFile {
                         Instructions.LCMP(stack);
                     }
                     case FCMPL -> {
-                        Instructions.FCMP(stack, true);
+                        Instructions.FCMP(stack, Opcode.FCMPL);
                     }
                     case FCMPG -> {
-                        Instructions.FCMP(stack, false);
+                        Instructions.FCMP(stack, Opcode.FCMPG);
                     }
                     case DCMPL -> {
-                        Instructions.DCMP(stack, true);
+                        Instructions.DCMP(stack, Opcode.DCMPL);
                     }
                     case DCMPG -> {
-                        Instructions.DCMP(stack, false);
+                        Instructions.DCMP(stack, Opcode.DCMPG);
+                    }
                     }
                     case IFNE -> {
                         short offset = ClassFile_Helper.readShort(codeData);

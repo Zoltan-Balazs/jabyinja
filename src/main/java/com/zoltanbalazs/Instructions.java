@@ -153,12 +153,15 @@ public class Instructions {
             stack.add(new Pair<Class<?>, Object>(int.class, 0));
         } else if (l_value1 < l_value2) {
             stack.add(new Pair<Class<?>, Object>(int.class, -1));
-        } else {
+        } else if (l_value1 > l_value2) {
             stack.add(new Pair<Class<?>, Object>(int.class, 1));
+        } else {
+            throw new UnsupportedOperationException(
+                    "Long comparison failed, first value: " + l_value1 + ", second value: " + l_value2);
         }
     }
 
-    public static void FCMP(List<Pair<Class<?>, Object>> stack, boolean lessThan) {
+    public static void FCMP(List<Pair<Class<?>, Object>> stack, Opcode type) {
         Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
         Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);
 
@@ -166,21 +169,27 @@ public class Instructions {
         float f_value2 = (float) value2.second;
 
         if (Float.isNaN(f_value1) || Float.isNaN(f_value2)) {
-            if (lessThan) {
+            if (type == Opcode.FCMPL) {
                 stack.add(new Pair<Class<?>, Object>(int.class, -1));
-            } else {
+            } else if (type == Opcode.FCMPG) {
                 stack.add(new Pair<Class<?>, Object>(int.class, 1));
+            } else {
+                throw new UnsupportedOperationException(
+                        "Float comparison for " + type + " is not supported!");
             }
         } else if (f_value1 == f_value2) {
             stack.add(new Pair<Class<?>, Object>(int.class, 0));
         } else if (f_value1 < f_value2) {
             stack.add(new Pair<Class<?>, Object>(int.class, -1));
-        } else {
+        } else if (f_value1 > f_value2) {
             stack.add(new Pair<Class<?>, Object>(int.class, 1));
+        } else {
+            throw new UnsupportedOperationException(
+                    "Float comparison failed, first value: " + f_value1 + ", second value: " + f_value2);
         }
     }
 
-    public static void DCMP(List<Pair<Class<?>, Object>> stack, boolean lessThan) {
+    public static void DCMP(List<Pair<Class<?>, Object>> stack, Opcode type) {
         Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
         Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);
 
@@ -188,17 +197,23 @@ public class Instructions {
         double d_value2 = (double) value2.second;
 
         if (Double.isNaN(d_value1) || Double.isNaN(d_value2)) {
-            if (lessThan) {
+            if (type == Opcode.DCMPL) {
                 stack.add(new Pair<Class<?>, Object>(int.class, -1));
-            } else {
+            } else if (type == Opcode.DCMPG) {
                 stack.add(new Pair<Class<?>, Object>(int.class, 1));
+            } else {
+                throw new UnsupportedOperationException(
+                        "Double comparison for " + type + " is not supported!");
             }
         } else if (d_value1 == d_value2) {
             stack.add(new Pair<Class<?>, Object>(int.class, 0));
         } else if (d_value1 < d_value2) {
             stack.add(new Pair<Class<?>, Object>(int.class, -1));
-        } else {
+        } else if (d_value1 > d_value2) {
             stack.add(new Pair<Class<?>, Object>(int.class, 1));
+        } else {
+            throw new UnsupportedOperationException(
+                    "Double comparison failed, first value: " + d_value1 + ", second value: " + d_value2);
         }
     }
 }
