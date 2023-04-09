@@ -290,6 +290,28 @@ class ClassFile {
                         // ASTORE_0 is 0x4B .. ASTORE_3 is 0x4E
                         Instructions.ASTORE(stack, local, opCode - 0x4B);
                     }
+                    case IASTORE -> {
+                        // TODO
+                    }
+                    case LASTORE -> {
+                        // TODO
+                    }
+                    case FASTORE -> {
+                        // TODO
+                    }
+                    case DASTORE -> {
+                        // TODO
+                    }
+                    case AASTORE -> {
+                        // TODO
+                    }
+                    case BASTORE -> {
+                        // TODO
+                    }
+                    case CASTORE -> {
+                        // TODO
+                    }
+                    case SASTORE -> {
                         // TODO
                     }
                     case POP -> {
@@ -529,7 +551,31 @@ class ClassFile {
                     case SWAP -> {
                         Instructions.SWAP(stack);
                     }
+                    case IFEQ -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
                     case IFNE -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IFLT -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IFGE -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IFGT -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IFLE -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IF_ICMPEQ -> {
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
@@ -545,9 +591,60 @@ class ClassFile {
                             System.out.println(branch);
                         }
                     }
+                    case IF_ICMPLT -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IF_ICMPGE -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IF_ICMPGT -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IF_ICMPLE -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IF_ACMPEQ -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
+                    case IF_ACMPNE -> {
+                        short offset = ClassFile_Helper.readShort(codeData);
+                        System.out.println(offset);
+                    }
                     case GOTO -> {
                         short index = ClassFile_Helper.readShort(codeData);
                         System.out.println(index);
+                    }
+                    case JSR -> {
+                        // WILL NOT IMPLEMENT
+                    }
+                    case RET -> {
+                        // WILL NOT IMPLEMENT
+                    }
+                    case TABLESWITCH -> {
+                        // TODO ?
+                    }
+                    case LOOKUPSWITCH -> {
+                        // TODO ?
+                    }
+                    case IRETURN -> {
+                        // TODO
+                    }
+                    case LRETURN -> {
+                        // TODO
+                    }
+                    case FRETURN -> {
+                        // TODO
+                    }
+                    case DRETURN -> {
+                        // TODO
+                    }
+                    case ARETURN -> {
+                        // TODO
                     }
                     case RETURN -> {
                         return;
@@ -571,6 +668,12 @@ class ClassFile {
 
                         System.out.println(className);
                         System.out.println(memberName);
+                    }
+                    case GETFIELD -> {
+                        // TODO
+                    }
+                    case PUTFIELD -> {
+                        // TODO
                     }
                     case INVOKEVIRTUAL -> {
                         short index = ClassFile_Helper.readShort(codeData);
@@ -706,6 +809,12 @@ class ClassFile {
                             e.printStackTrace();
                         }
                     }
+                    case INVOKEINTERFACE -> {
+                        // TODO
+                    }
+                    case INVOKEDYNAMIC -> {
+                        // TODO
+                    }
                     case NEW -> {
                         short index = ClassFile_Helper.readShort(codeData);
                         CP_Info classRef = (CONSTANT_Class_Info) CONSTANT_POOL.get(index - 1);
@@ -716,13 +825,48 @@ class ClassFile {
                         Constructor<?> conEmpty = classClass.getConstructor(InputStream.class);
                         stack.add(new Pair<Class<?>, Object>(classClass, conEmpty.newInstance(System.in)));
                     }
+                    case NEWARRAY -> {
+                        // TODO
+                    }
+                    case ANEWARRAY -> {
+                        // TODO
+                    }
                     case ARRAYLENGTH -> {
                         // TODO
                     }
-                    default -> throw new UnsupportedOperationException(
-                            "Not supported opcode: " + Opcode.opcodeRepresentation(opCode) + " ("
-                                    + String.format("0x%02X", opCode)
-                                    + ")");
+                    case ATHROW -> {
+                        // TODO
+                    }
+                    case CHECKCAST -> {
+                        // TODO
+                    }
+                    case INSTANCEOF -> {
+                        // TODO
+                    }
+                    case MONITORENTER -> {
+                        // TODO
+                    }
+                    case MONITOREXIT -> {
+                        // TODO
+                    }
+                    case WIDE -> {
+                        // TODO
+                    }
+                    case MULTIANEWARRAY -> {
+                        // TODO
+                    }
+                    case IFNULL -> {
+                        // TODO
+                    }
+                    case IFNONNULL -> {
+                        // TODO
+                    }
+                    case GOTO_W -> {
+                        // TODO
+                    }
+                    case JSR_W -> {
+                        // WILL NOT IMPLEMENT
+                    }
                 }
             }
         }
