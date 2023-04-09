@@ -257,8 +257,8 @@ Thankfully, they are the exact same
 | DCMP*          	| <ul><li>[x] </li></ul> 	|
 | IF*            	| <ul><li>[ ] </li></ul> 	|
 | GOTO           	| <ul><li>[ ] </li></ul> 	|
-| JSR            	| <ul><li>[ ] </li></ul> 	|
-| RET            	| <ul><li>[ ] </li></ul> 	|
+| ~~JSR~~          	| <ul><li>[x] </li></ul> 	|
+| ~~RET~~           | <ul><li>[x] </li></ul> 	|
 | TABLESWITCH    	| <ul><li>[ ] </li></ul> 	|
 | LOOKUPSWITCH   	| <ul><li>[ ] </li></ul> 	|
 | *RETURN        	| <ul><li>[ ] </li></ul> 	|
@@ -276,4 +276,4 @@ Thankfully, they are the exact same
 | MULTIANEWARRAY 	| <ul><li>[ ] </li></ul> 	|
 | IF*NULL        	| <ul><li>[ ] </li></ul> 	|
 | GOTO_W         	| <ul><li>[ ] </li></ul> 	|
-| JSR_W          	| <ul><li>[ ] </li></ul> 	|
+| ~~JSR_W~~         | <ul><li>[x] </li></ul> 	|
