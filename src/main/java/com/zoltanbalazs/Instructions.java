@@ -127,6 +127,23 @@ public class Instructions {
         types.add(result);
     }
 
+    public static void LCONV(List<Object> args, List<Class<?>> types, Class<?> result) {
+        long value = (long) args.remove(args.size() - 1);
+        types.remove(types.size() - 1);
+
+        if (result == int.class) {
+            args.add((int) value);
+        } else if (result == float.class) {
+            args.add((float) value);
+        } else if (result == double.class) {
+            args.add((double) value);
+        } else {
+            throw new UnsupportedOperationException("Long to " + result + " conversion is not supported!");
+        }
+
+        types.add(result);
+    }
+
 }
 
 class Instructions_Helper {

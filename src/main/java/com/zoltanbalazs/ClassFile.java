@@ -501,6 +501,15 @@ class ClassFile {
                     case I2D -> {
                         Instructions.ICONV(args, types, double.class);
                     }
+                    case L2I -> {
+                        Instructions.LCONV(args, types, int.class);
+                    }
+                    case L2F -> {
+                        Instructions.LCONV(args, types, float.class);
+                    }
+                    case L2D -> {
+                        Instructions.LCONV(args, types, double.class);
+                    }
                     case I2B -> {
                         Instructions.ICONV(args, types, Byte.class);
                     }
