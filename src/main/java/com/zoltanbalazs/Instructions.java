@@ -72,6 +72,10 @@ public class Instructions {
     public static void FSTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
         local[index] = (float) stack.remove(stack.size() - 1).second;
     }
+
+    public static void DSTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
+        local[index] = (double) stack.remove(stack.size() - 1).second;
+    }
     public static void POP(List<Pair<Class<?>, Object>> stack, Opcode type) {
         int idx = stack.size() - 1;
         if (type == Opcode.POP) {
