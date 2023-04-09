@@ -491,7 +491,12 @@ class ClassFile {
                         types.add(long.class);
                         args.add(values.first ^ values.second);
                     }
+                    case IINC -> {
+                        byte index = ClassFile_Helper.readByte(codeData);
+                        byte constVal = ClassFile_Helper.readByte(codeData); // Potential bug, constVal is a signed byte
 
+                        local[index] = (int) local[index] + constVal;
+                    }
                     case I2L -> {
                         Instructions.ICONV(args, types, long.class);
                     }
