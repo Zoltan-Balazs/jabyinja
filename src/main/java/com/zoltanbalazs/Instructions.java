@@ -114,6 +114,20 @@ public class Instructions {
             throw new UnsupportedOperationException("DUP2 for " + type + " is not implemented!");
         }
     }
+
+    public static void SWAP(List<Pair<Class<?>, Object>> stack) {
+        Pair<Class<?>, Object> value1 = stack.get(stack.size() - 1);
+        Pair<Class<?>, Object> value2 = stack.get(stack.size() - 2);
+
+        if (value1.first == long.class || value1.first == double.class || value2.first == long.class
+                || value2.first == double.class) {
+            throw new UnsupportedOperationException("SWAP for long/double is not supported!");
+        }
+
+        stack.set(stack.size() - 1, value2);
+        stack.set(stack.size() - 2, value1);
+    }
+
     public static Pair<Integer, Integer> IARIT(List<Pair<Class<?>, Object>> stack) {
         Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
         Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);

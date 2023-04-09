@@ -516,6 +516,8 @@ class ClassFile {
                     case DCMPG -> {
                         Instructions.DCMP(stack, Opcode.DCMPG);
                     }
+                    case SWAP -> {
+                        Instructions.SWAP(stack);
                     }
                     case IFNE -> {
                         short offset = ClassFile_Helper.readShort(codeData);
