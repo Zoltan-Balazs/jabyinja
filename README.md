@@ -227,6 +227,7 @@ Thankfully, they are the exact same
 | LASTORE        	| <ul><li>[ ] </li></ul> 	|
 | FASTORE        	| <ul><li>[ ] </li></ul> 	|
 | DASTORE        	| <ul><li>[ ] </li></ul> 	|
+| AASTORE        	| <ul><li>[ ] </li></ul> 	|
 | BASTORE        	| <ul><li>[ ] </li></ul> 	|
 | CASTORE        	| <ul><li>[ ] </li></ul> 	|
 | SASTORE        	| <ul><li>[ ] </li></ul> 	|
