@@ -152,6 +152,8 @@ class ClassFile {
                 byte opCode = ClassFile_Helper.readByte(codeData);
 
                 switch (Opcode.opcodeRepresentation(opCode)) {
+                    case NOP -> {
+                    }
                     case ACONST_NULL -> {
                         Instructions.ACONST(stack);
                     }
