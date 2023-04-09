@@ -289,7 +289,22 @@ class ClassFile {
                         Instructions.POP(stack, Opcode.POP2);
                     }
                     case DUP -> {
-                        // TODO
+                        Instructions.DUP(stack, Opcode.DUP);
+                    }
+                    case DUP_X1 -> {
+                        Instructions.DUP(stack, Opcode.DUP_X1);
+                    }
+                    case DUP_X2 -> {
+                        Instructions.DUP(stack, Opcode.DUP_X2);
+                    }
+                    case DUP2 -> {
+                        Instructions.DUP2(stack, Opcode.DUP2);
+                    }
+                    case DUP2_X1 -> {
+                        Instructions.DUP2(stack, Opcode.DUP2_X1);
+                    }
+                    case DUP2_X2 -> {
+                        Instructions.DUP2(stack, Opcode.DUP2_X2);
                     }
                     case IADD -> {
                         Pair<Integer, Integer> values = Instructions.IARIT(stack);
