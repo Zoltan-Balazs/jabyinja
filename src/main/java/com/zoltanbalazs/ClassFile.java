@@ -674,7 +674,13 @@ class ClassFile {
                     }
                     case NEW -> {
                         short index = ClassFile_Helper.readShort(codeData);
-                        System.out.println(index);
+                        CP_Info classRef = (CONSTANT_Class_Info) CONSTANT_POOL.get(index - 1);
+                        String memberName = getNameOfMember(index);
+
+                        Class<?> classClass = Class.forName(memberName.replace("/", "."));
+                        // TODO: Fix, for general usage..
+                        Constructor<?> conEmpty = classClass.getConstructor(InputStream.class);
+                        stack.add(new Pair<Class<?>, Object>(classClass, conEmpty.newInstance(System.in)));
                     }
                     case ARRAYLENGTH -> {
                         // TODO
