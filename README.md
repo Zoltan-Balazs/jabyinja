@@ -191,3 +191,88 @@ If you do intend to specifcy a given file, do it with a single argument, where y
 | PI (15) ^ 3        	|      	|        	|             	|                      	| 31.006279    	| 31.006276680299816     	|
 
 Thankfully, they are the exact same
+
+## JVM Instructions checklist
+
+| OPCODE         	| IMPLEMENTED?           	|
+|----------------	|------------------------	|
+| NOP            	| <ul><li>[ ] </li></ul> 	|
+| ACONST_NULL    	| <ul><li>[ ] </li></ul> 	|
+| ICONST_*       	| <ul><li>[x] </li></ul> 	|
+| LCONST_*       	| <ul><li>[x] </li></ul> 	|
+| FCONST_*       	| <ul><li>[x] </li></ul> 	|
+| DCONST_*       	| <ul><li>[x] </li></ul> 	|
+| BIPUSH         	| <ul><li>[x] </li></ul> 	|
+| SIPUSH         	| <ul><li>[x] </li></ul> 	|
+| LDC*           	| <ul><li>[x] </li></ul> 	|
+| ILOAD*         	| <ul><li>[x] </li></ul> 	|
+| LLOAD*         	| <ul><li>[x] </li></ul> 	|
+| FLOAD*         	| <ul><li>[x] </li></ul> 	|
+| DLOAD*         	| <ul><li>[x] </li></ul> 	|
+| ALOAD*         	| <ul><li>[x] </li></ul> 	|
+| IALOAD         	| <ul><li>[ ] </li></ul> 	|
+| LALOAD         	| <ul><li>[ ] </li></ul> 	|
+| FALOAD         	| <ul><li>[ ] </li></ul> 	|
+| DALOAD         	| <ul><li>[ ] </li></ul> 	|
+| AALOAD         	| <ul><li>[ ] </li></ul> 	|
+| BALOAD         	| <ul><li>[ ] </li></ul> 	|
+| CALOAD         	| <ul><li>[ ] </li></ul> 	|
+| SALOAD         	| <ul><li>[ ] </li></ul> 	|
+| ISTORE*        	| <ul><li>[ ] </li></ul> 	|
+| LSTORE*        	| <ul><li>[ ] </li></ul> 	|
+| FSTORE*        	| <ul><li>[ ] </li></ul> 	|
+| DSTORE*        	| <ul><li>[ ] </li></ul> 	|
+| ASTORE*        	| <ul><li>[ ] </li></ul> 	|
+| IASTORE        	| <ul><li>[ ] </li></ul> 	|
+| LASTORE        	| <ul><li>[ ] </li></ul> 	|
+| FASTORE        	| <ul><li>[ ] </li></ul> 	|
+| DASTORE        	| <ul><li>[ ] </li></ul> 	|
+| BASTORE        	| <ul><li>[ ] </li></ul> 	|
+| CASTORE        	| <ul><li>[ ] </li></ul> 	|
+| SASTORE        	| <ul><li>[ ] </li></ul> 	|
+| POP*           	| <ul><li>[x] </li></ul> 	|
+| DUP*           	| <ul><li>[x] </li></ul> 	|
+| DUP2*          	| <ul><li>[x] </li></ul> 	|
+| SWAP           	| <ul><li>[x] </li></ul> 	|
+| *ADD           	| <ul><li>[x] </li></ul> 	|
+| *SUB           	| <ul><li>[x] </li></ul> 	|
+| *MUL           	| <ul><li>[x] </li></ul> 	|
+| *DIV           	| <ul><li>[x] </li></ul> 	|
+| *REM           	| <ul><li>[x] </li></ul> 	|
+| *NEG           	| <ul><li>[x] </li></ul> 	|
+| *SHL           	| <ul><li>[x] </li></ul> 	|
+| *SHR           	| <ul><li>[x] </li></ul> 	|
+| *USHR          	| <ul><li>[x] </li></ul> 	|
+| *AND           	| <ul><li>[x] </li></ul> 	|
+| *OR            	| <ul><li>[x] </li></ul> 	|
+| *XOR           	| <ul><li>[x] </li></ul> 	|
+| IINC           	| <ul><li>[x] </li></ul> 	|
+| I2*            	| <ul><li>[x] </li></ul> 	|
+| L2*            	| <ul><li>[x] </li></ul> 	|
+| F2*            	| <ul><li>[x] </li></ul> 	|
+| D2*            	| <ul><li>[x] </li></ul> 	|
+| LCMP           	| <ul><li>[x] </li></ul> 	|
+| FCMP*          	| <ul><li>[x] </li></ul> 	|
+| DCMP*          	| <ul><li>[x] </li></ul> 	|
+| IF*            	| <ul><li>[ ] </li></ul> 	|
+| GOTO           	| <ul><li>[ ] </li></ul> 	|
+| JSR            	| <ul><li>[ ] </li></ul> 	|
+| RET            	| <ul><li>[ ] </li></ul> 	|
+| TABLESWITCH    	| <ul><li>[ ] </li></ul> 	|
+| LOOKUPSWITCH   	| <ul><li>[ ] </li></ul> 	|
+| *RETURN        	| <ul><li>[ ] </li></ul> 	|
+| *STATIC        	| <ul><li>[ ] </li></ul> 	|
+| *FIELD         	| <ul><li>[ ] </li></ul> 	|
+| INVOKE*        	| <ul><li>[ ] </li></ul> 	|
+| NEW            	| <ul><li>[ ] </li></ul> 	|
+| NEWARRAY       	| <ul><li>[ ] </li></ul> 	|
+| ANEWARRAY      	| <ul><li>[ ] </li></ul> 	|
+| ARRAYLENGTH    	| <ul><li>[ ] </li></ul> 	|
+| ATHROW         	| <ul><li>[ ] </li></ul> 	|
+| CHECKCAST      	| <ul><li>[ ] </li></ul> 	|
+| MONITOR*       	| <ul><li>[ ] </li></ul> 	|
+| WIDE           	| <ul><li>[ ] </li></ul> 	|
+| MULTIANEWARRAY 	| <ul><li>[ ] </li></ul> 	|
+| IF*NULL        	| <ul><li>[ ] </li></ul> 	|
+| GOTO_W         	| <ul><li>[ ] </li></ul> 	|
+| JSR_W          	| <ul><li>[ ] </li></ul> 	|
