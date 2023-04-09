@@ -144,6 +144,23 @@ public class Instructions {
         types.add(result);
     }
 
+    public static void FCONV(List<Object> args, List<Class<?>> types, Class<?> result) {
+        float value = (float) args.remove(args.size() - 1);
+        types.remove(types.size() - 1);
+
+        if (result == int.class) {
+            args.add((int) value);
+        } else if (result == long.class) {
+            args.add((long) value);
+        } else if (result == double.class) {
+            args.add((double) value);
+        } else {
+            throw new UnsupportedOperationException("Float to " + result + " conversion is not supported!");
+        }
+
+        types.add(result);
+    }
+
 }
 
 class Instructions_Helper {
