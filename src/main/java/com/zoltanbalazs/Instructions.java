@@ -4,244 +4,202 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class Instructions {
-    public static void ICONST(List<Object> args, List<Class<?>> types, int value) {
-        types.add(int.class);
-        args.add(value);
+    public static void ICONST(List<Pair<Class<?>, Object>> stack, int value) {
+        stack.add(new Pair<Class<?>, Object>(int.class, value));
     }
 
-    public static void LCONST(List<Object> args, List<Class<?>> types, long value) {
-        types.add(long.class);
-        args.add(value);
+    public static void LCONST(List<Pair<Class<?>, Object>> stack, long value) {
+        stack.add(new Pair<Class<?>, Object>(long.class, value));
     }
 
-    public static void FCONST(List<Object> args, List<Class<?>> types, float value) {
-        types.add(float.class);
-        args.add(value);
+    public static void FCONST(List<Pair<Class<?>, Object>> stack, float value) {
+        stack.add(new Pair<Class<?>, Object>(float.class, value));
     }
 
-    public static void DCONST(List<Object> args, List<Class<?>> types, double value) {
-        types.add(double.class);
-        args.add(value);
+    public static void DCONST(List<Pair<Class<?>, Object>> stack, double value) {
+        stack.add(new Pair<Class<?>, Object>(double.class, value));
     }
 
-    public static void BIPUSH(List<Object> args, List<Class<?>> types, int value) {
-        types.add(int.class);
-        args.add(value);
+    public static void BIPUSH(List<Pair<Class<?>, Object>> stack, int value) {
+        stack.add(new Pair<Class<?>, Object>(int.class, value));
     }
 
-    public static void SIPUSH(List<Object> args, List<Class<?>> types, int value) {
-        types.add(int.class);
-        args.add(value);
+    public static void SIPUSH(List<Pair<Class<?>, Object>> stack, int value) {
+        stack.add(new Pair<Class<?>, Object>(int.class, value));
     }
 
-    public static void LDC(List<Object> args, List<Class<?>> types, Class<?> type, Object value) {
-        types.add(type);
-        args.add(value);
+    public static void LDC(List<Pair<Class<?>, Object>> stack, Class<?> type, Object value) {
+        stack.add(new Pair<Class<?>, Object>(type, value));
     }
 
-    public static void ILOAD(List<Object> args, List<Class<?>> types, int value) {
-        types.add(int.class);
-        args.add(value);
+    public static void ILOAD(List<Pair<Class<?>, Object>> stack, int value) {
+        stack.add(new Pair<Class<?>, Object>(int.class, value));
     }
 
-    public static void LLOAD(List<Object> args, List<Class<?>> types, long value) {
-        types.add(long.class);
-        args.add(value);
+    public static void LLOAD(List<Pair<Class<?>, Object>> stack, long value) {
+        stack.add(new Pair<Class<?>, Object>(long.class, value));
     }
 
-    public static void FLOAD(List<Object> args, List<Class<?>> types, float value) {
-        types.add(float.class);
-        args.add(value);
+    public static void FLOAD(List<Pair<Class<?>, Object>> stack, float value) {
+        stack.add(new Pair<Class<?>, Object>(float.class, value));
     }
 
-    public static void DLOAD(List<Object> args, List<Class<?>> types, double value) {
-        types.add(double.class);
-        args.add(value);
+    public static void DLOAD(List<Pair<Class<?>, Object>> stack, double value) {
+        stack.add(new Pair<Class<?>, Object>(double.class, value));
     }
 
-    public static void ALOAD(List<Object> args, List<Class<?>> types, Object value) {
-        types.add(value.getClass());
-        args.add(value);
+    public static void ALOAD(List<Pair<Class<?>, Object>> stack, Object value) {
+        stack.add(new Pair<Class<?>, Object>(value.getClass(), value));
     }
 
-    public static Pair<Integer, Integer> IARIT(List<Object> args, List<Class<?>> types) {
-        int value2 = (int) args.remove(args.size() - 1);
-        int value1 = (int) args.remove(args.size() - 1);
+    public static Pair<Integer, Integer> IARIT(List<Pair<Class<?>, Object>> stack) {
+        Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
+        Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);
 
-        types.remove(types.size() - 1);
-        types.remove(types.size() - 1);
-
-        return new Pair<Integer, Integer>(value1, value2);
+        return new Pair<Integer, Integer>((int) value1.second, (int) value2.second);
     }
 
-    public static Pair<Long, Long> LARIT(List<Object> args, List<Class<?>> types) {
-        long value2 = (long) args.remove(args.size() - 1);
-        long value1 = (long) args.remove(args.size() - 1);
+    public static Pair<Long, Long> LARIT(List<Pair<Class<?>, Object>> stack) {
+        Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
+        Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);
 
-        types.remove(types.size() - 1);
-        types.remove(types.size() - 1);
-
-        return new Pair<Long, Long>(value1, value2);
+        return new Pair<Long, Long>((long) value1.second, (long) value2.second);
     }
 
-    public static Pair<Float, Float> FARIT(List<Object> args, List<Class<?>> types) {
-        float value2 = (float) args.remove(args.size() - 1);
-        float value1 = (float) args.remove(args.size() - 1);
+    public static Pair<Float, Float> FARIT(List<Pair<Class<?>, Object>> stack) {
+        Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
+        Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);
 
-        types.remove(types.size() - 1);
-        types.remove(types.size() - 1);
-
-        return new Pair<Float, Float>(value1, value2);
+        return new Pair<Float, Float>((float) value1.second, (float) value2.second);
     }
 
-    public static Pair<Double, Double> DARIT(List<Object> args, List<Class<?>> types) {
-        double value2 = (double) args.remove(args.size() - 1);
-        double value1 = (double) args.remove(args.size() - 1);
+    public static Pair<Double, Double> DARIT(List<Pair<Class<?>, Object>> stack) {
+        Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
+        Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);
 
-        types.remove(types.size() - 1);
-        types.remove(types.size() - 1);
-
-        return new Pair<Double, Double>(value1, value2);
+        return new Pair<Double, Double>((double) value1.second, (double) value2.second);
     }
 
-    public static void ICONV(List<Object> args, List<Class<?>> types, Class<?> result) {
-        int value = (int) args.remove(args.size() - 1);
-        types.remove(types.size() - 1);
+    public static void ICONV(List<Pair<Class<?>, Object>> stack, Class<?> result) {
+        Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
 
         if (result == long.class) {
-            args.add((long) value);
+            stack.add(new Pair<Class<?>, Object>(long.class, (long) value.second));
         } else if (result == float.class) {
-            args.add((float) value);
+            stack.add(new Pair<Class<?>, Object>(float.class, (float) value.second));
         } else if (result == double.class) {
-            args.add((double) value);
-        } else if (result == Byte.class) {
-            args.add((byte) value);
-        } else if (result == Character.class) {
-            args.add((char) value);
-        } else if (result == Short.class) {
-            args.add((short) value);
+            stack.add(new Pair<Class<?>, Object>(double.class, (double) value.second));
+        } else if (result == byte.class) {
+            stack.add(new Pair<Class<?>, Object>(byte.class, (byte) value.second));
+        } else if (result == char.class) {
+            stack.add(new Pair<Class<?>, Object>(char.class, (char) value.second));
+        } else if (result == short.class) {
+            stack.add(new Pair<Class<?>, Object>(short.class, (short) value.second));
         } else {
             throw new UnsupportedOperationException("Integer to " + result + " conversion is not supported!");
         }
-
-        types.add(result);
     }
 
-    public static void LCONV(List<Object> args, List<Class<?>> types, Class<?> result) {
-        long value = (long) args.remove(args.size() - 1);
-        types.remove(types.size() - 1);
+    public static void LCONV(List<Pair<Class<?>, Object>> stack, Class<?> result) {
+        Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
 
         if (result == int.class) {
-            args.add((int) value);
+            stack.add(new Pair<Class<?>, Object>(int.class, (int) value.second));
         } else if (result == float.class) {
-            args.add((float) value);
+            stack.add(new Pair<Class<?>, Object>(float.class, (float) value.second));
         } else if (result == double.class) {
-            args.add((double) value);
+            stack.add(new Pair<Class<?>, Object>(double.class, (double) value.second));
         } else {
             throw new UnsupportedOperationException("Long to " + result + " conversion is not supported!");
         }
-
-        types.add(result);
     }
 
-    public static void FCONV(List<Object> args, List<Class<?>> types, Class<?> result) {
-        float value = (float) args.remove(args.size() - 1);
-        types.remove(types.size() - 1);
+    public static void FCONV(List<Pair<Class<?>, Object>> stack, Class<?> result) {
+        Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
 
         if (result == int.class) {
-            args.add((int) value);
+            stack.add(new Pair<Class<?>, Object>(int.class, (int) value.second));
         } else if (result == long.class) {
-            args.add((long) value);
+            stack.add(new Pair<Class<?>, Object>(long.class, (long) value.second));
         } else if (result == double.class) {
-            args.add((double) value);
+            stack.add(new Pair<Class<?>, Object>(double.class, (double) value.second));
         } else {
             throw new UnsupportedOperationException("Float to " + result + " conversion is not supported!");
         }
-
-        types.add(result);
     }
 
-    public static void DCONV(List<Object> args, List<Class<?>> types, Class<?> result) {
-        double value = (double) args.remove(args.size() - 1);
-        types.remove(types.size() - 1);
+    public static void DCONV(List<Pair<Class<?>, Object>> stack, Class<?> result) {
+        Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
 
         if (result == int.class) {
-            args.add((int) value);
+            stack.add(new Pair<Class<?>, Object>(int.class, (int) value.second));
         } else if (result == long.class) {
-            args.add((long) value);
+            stack.add(new Pair<Class<?>, Object>(long.class, (long) value.second));
         } else if (result == float.class) {
-            args.add((float) value);
+            stack.add(new Pair<Class<?>, Object>(float.class, (float) value.second));
         } else {
             throw new UnsupportedOperationException("Double to " + result + " conversion is not supported!");
         }
-
-        types.add(result);
     }
 
-    public static void LCMP(List<Object> args, List<Class<?>> types) {
-        long value2 = (long) args.remove(args.size() - 1);
-        long value1 = (long) args.remove(args.size() - 1);
+    public static void LCMP(List<Pair<Class<?>, Object>> stack) {
+        Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
+        Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);
 
-        types.remove(types.size() - 1);
-        types.remove(types.size() - 1);
+        long l_value1 = (long) value1.second;
+        long l_value2 = (long) value2.second;
 
-        if (value1 == value2) {
-            args.add(0);
-        } else if (value1 < value2) {
-            args.add(-1);
+        if (l_value1 == l_value2) {
+            stack.add(new Pair<Class<?>, Object>(int.class, 0));
+        } else if (l_value1 < l_value2) {
+            stack.add(new Pair<Class<?>, Object>(int.class, -1));
         } else {
-            args.add(1);
+            stack.add(new Pair<Class<?>, Object>(int.class, 1));
         }
-
-        types.add(int.class);
     }
 
-    public static void FCMP(List<Object> args, List<Class<?>> types, boolean lessThan) {
-        float value2 = (float) args.remove(args.size() - 1);
-        float value1 = (float) args.remove(args.size() - 1);
+    public static void FCMP(List<Pair<Class<?>, Object>> stack, boolean lessThan) {
+        Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
+        Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);
 
-        types.remove(types.size() - 1);
-        types.remove(types.size() - 1);
+        float f_value1 = (float) value1.second;
+        float f_value2 = (float) value2.second;
 
-        if (Float.isNaN(value1) || Float.isNaN(value2)) {
+        if (Float.isNaN(f_value1) || Float.isNaN(f_value2)) {
             if (lessThan) {
-                args.add(-1);
+                stack.add(new Pair<Class<?>, Object>(int.class, -1));
             } else {
-                args.add(1);
+                stack.add(new Pair<Class<?>, Object>(int.class, 1));
             }
-        } else if (value1 == value2) {
-            args.add(0);
-        } else if (value1 < value2) {
-            args.add(-1);
+        } else if (f_value1 == f_value2) {
+            stack.add(new Pair<Class<?>, Object>(int.class, 0));
+        } else if (f_value1 < f_value2) {
+            stack.add(new Pair<Class<?>, Object>(int.class, -1));
         } else {
-            args.add(1);
+            stack.add(new Pair<Class<?>, Object>(int.class, 1));
         }
-
-        types.add(int.class);
     }
 
-    public static void DCMP(List<Object> args, List<Class<?>> types, boolean lessThan) {
-        double value2 = (double) args.remove(args.size() - 1);
-        double value1 = (double) args.remove(args.size() - 1);
+    public static void DCMP(List<Pair<Class<?>, Object>> stack, boolean lessThan) {
+        Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
+        Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);
 
-        types.remove(types.size() - 1);
-        types.remove(types.size() - 1);
+        double d_value1 = (double) value1.second;
+        double d_value2 = (double) value2.second;
 
-        if (Double.isNaN(value1) || Double.isNaN(value2)) {
+        if (Double.isNaN(d_value1) || Double.isNaN(d_value2)) {
             if (lessThan) {
-                args.add(-1);
+                stack.add(new Pair<Class<?>, Object>(int.class, -1));
             } else {
-                args.add(1);
+                stack.add(new Pair<Class<?>, Object>(int.class, 1));
             }
-        } else if (value1 == value2) {
-            args.add(0);
-        } else if (value1 < value2) {
-            args.add(-1);
+        } else if (d_value1 == d_value2) {
+            stack.add(new Pair<Class<?>, Object>(int.class, 0));
+        } else if (d_value1 < d_value2) {
+            stack.add(new Pair<Class<?>, Object>(int.class, -1));
         } else {
-            args.add(1);
+            stack.add(new Pair<Class<?>, Object>(int.class, 1));
         }
-
-        types.add(int.class);
     }
 }
 
