@@ -259,7 +259,8 @@ class ClassFile {
                         Instructions.LSTORE(stack, local, index);
                     }
                     case FSTORE -> {
-                        // TODO
+                        byte index = ClassFile_Helper.readByte(codeData);
+                        Instructions.FSTORE(stack, local, index);
                     }
                     case DSTORE -> {
                         // TODO
@@ -274,6 +275,10 @@ class ClassFile {
                     case LSTORE_0, LSTORE_1, LSTORE_2, LSTORE_3 -> {
                         // LSTORE_0 is 0x3F .. LSTORE_3 is 0x42
                         Instructions.LSTORE(stack, local, opCode - 0x3F);
+                    }
+                    case FSTORE_0, FSTORE_1, FSTORE_2, FSTORE_3 -> {
+                        // FSTORE_0 is 0x43 .. FSTORE_3 is 0x46
+                        Instructions.FSTORE(stack, local, opCode - 0x43);
                     }
                     }
                     case ASTORE_0, ASTORE_1, ASTORE_2, ASTORE_3 -> {
