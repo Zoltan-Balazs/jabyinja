@@ -492,6 +492,24 @@ class ClassFile {
                         args.add(values.first ^ values.second);
                     }
 
+                    case I2L -> {
+                        Instructions.ICONV(args, types, long.class);
+                    }
+                    case I2F -> {
+                        Instructions.ICONV(args, types, float.class);
+                    }
+                    case I2D -> {
+                        Instructions.ICONV(args, types, double.class);
+                    }
+                    case I2B -> {
+                        Instructions.ICONV(args, types, Byte.class);
+                    }
+                    case I2C -> {
+                        Instructions.ICONV(args, types, Character.class);
+                    }
+                    case I2S -> {
+                        Instructions.ICONV(args, types, Short.class);
+                    }
                     case IFNE -> {
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);

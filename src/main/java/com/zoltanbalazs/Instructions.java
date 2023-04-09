@@ -103,6 +103,30 @@ public class Instructions {
 
         return new Pair<Double, Double>(value1, value2);
     }
+
+    public static void ICONV(List<Object> args, List<Class<?>> types, Class<?> result) {
+        int value = (int) args.remove(args.size() - 1);
+        types.remove(types.size() - 1);
+
+        if (result == long.class) {
+            args.add((long) value);
+        } else if (result == float.class) {
+            args.add((float) value);
+        } else if (result == double.class) {
+            args.add((double) value);
+        } else if (result == Byte.class) {
+            args.add((byte) value);
+        } else if (result == Character.class) {
+            args.add((char) value);
+        } else if (result == Short.class) {
+            args.add((short) value);
+        } else {
+            throw new UnsupportedOperationException("Integer to " + result + " conversion is not supported!");
+        }
+
+        types.add(result);
+    }
+
 }
 
 class Instructions_Helper {
