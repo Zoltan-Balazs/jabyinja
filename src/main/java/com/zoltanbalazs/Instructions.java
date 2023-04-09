@@ -177,6 +177,72 @@ public class Instructions {
 
         types.add(result);
     }
+
+    public static void LCMP(List<Object> args, List<Class<?>> types) {
+        long value2 = (long) args.remove(args.size() - 1);
+        long value1 = (long) args.remove(args.size() - 1);
+
+        types.remove(types.size() - 1);
+        types.remove(types.size() - 1);
+
+        if (value1 == value2) {
+            args.add(0);
+        } else if (value1 < value2) {
+            args.add(-1);
+        } else {
+            args.add(1);
+        }
+
+        types.add(int.class);
+    }
+
+    public static void FCMP(List<Object> args, List<Class<?>> types, boolean lessThan) {
+        float value2 = (float) args.remove(args.size() - 1);
+        float value1 = (float) args.remove(args.size() - 1);
+
+        types.remove(types.size() - 1);
+        types.remove(types.size() - 1);
+
+        if (Float.isNaN(value1) || Float.isNaN(value2)) {
+            if (lessThan) {
+                args.add(-1);
+            } else {
+                args.add(1);
+            }
+        } else if (value1 == value2) {
+            args.add(0);
+        } else if (value1 < value2) {
+            args.add(-1);
+        } else {
+            args.add(1);
+        }
+
+        types.add(int.class);
+    }
+
+    public static void DCMP(List<Object> args, List<Class<?>> types, boolean lessThan) {
+        double value2 = (double) args.remove(args.size() - 1);
+        double value1 = (double) args.remove(args.size() - 1);
+
+        types.remove(types.size() - 1);
+        types.remove(types.size() - 1);
+
+        if (Double.isNaN(value1) || Double.isNaN(value2)) {
+            if (lessThan) {
+                args.add(-1);
+            } else {
+                args.add(1);
+            }
+        } else if (value1 == value2) {
+            args.add(0);
+        } else if (value1 < value2) {
+            args.add(-1);
+        } else {
+            args.add(1);
+        }
+
+        types.add(int.class);
+    }
 }
 
 class Instructions_Helper {

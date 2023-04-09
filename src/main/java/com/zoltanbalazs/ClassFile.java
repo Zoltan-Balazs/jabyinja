@@ -537,6 +537,21 @@ class ClassFile {
                     case I2S -> {
                         Instructions.ICONV(args, types, Short.class);
                     }
+                    case LCMP -> {
+                        Instructions.LCMP(args, types);
+                    }
+                    case FCMPL -> {
+                        Instructions.FCMP(args, types, true);
+                    }
+                    case FCMPG -> {
+                        Instructions.FCMP(args, types, false);
+                    }
+                    case DCMPL -> {
+                        Instructions.DCMP(args, types, true);
+                    }
+                    case DCMPG -> {
+                        Instructions.DCMP(args, types, false);
+                    }
                     case IFNE -> {
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
