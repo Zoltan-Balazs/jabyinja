@@ -621,9 +621,13 @@ class ClassFile {
                     }
                     case JSR -> {
                         // WILL NOT IMPLEMENT
+                        throw new UnsupportedOperationException(
+                                "JSR is deprecated since Java 7, this program only supports Java 7+ class files");
                     }
                     case RET -> {
                         // WILL NOT IMPLEMENT
+                        throw new UnsupportedOperationException(
+                                "RET is (effectively) deprecated since Java 7, this program only supports Java 7+ class files");
                     }
                     case TABLESWITCH -> {
                         // TODO ?
@@ -866,6 +870,8 @@ class ClassFile {
                     }
                     case JSR_W -> {
                         // WILL NOT IMPLEMENT
+                        throw new UnsupportedOperationException(
+                                "JSR_W is deprecated since Java 7, this program only supports Java 7+ class files");
                     }
                 }
             }
