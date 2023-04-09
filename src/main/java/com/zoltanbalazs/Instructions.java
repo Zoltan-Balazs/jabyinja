@@ -61,6 +61,9 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(value.getClass(), value));
     }
 
+    public static void ISTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
+        local[index] = (int) stack.remove(stack.size() - 1).second;
+    }
     public static void POP(List<Pair<Class<?>, Object>> stack, Opcode type) {
         int idx = stack.size() - 1;
         if (type == Opcode.POP) {

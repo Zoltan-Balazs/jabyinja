@@ -251,7 +251,8 @@ class ClassFile {
                         // TODO
                     }
                     case ISTORE -> {
-                        // TODO
+                        byte index = ClassFile_Helper.readByte(codeData);
+                        Instructions.ISTORE(stack, local, index);
                     }
                     case LSTORE -> {
                         // TODO
@@ -266,8 +267,9 @@ class ClassFile {
                         // TODO
                     }
                     case ISTORE_0, ISTORE_1, ISTORE_2, ISTORE_3 -> {
-                        Object value = stack.remove(stack.size() - 1).second;
-                        local[opCode - 0x3B] = (int) value; // ISTORE_0 is 0x3B .. ISTORE_3 is 0x3E
+                        // ISTORE_0 is 0x3B .. ISTORE_3 is 0x3E
+                        Instructions.ISTORE(stack, local, opCode - 0x3B);
+                    }
                     }
                     case ASTORE_0, ASTORE_1, ASTORE_2, ASTORE_3 -> {
                         // TODO
