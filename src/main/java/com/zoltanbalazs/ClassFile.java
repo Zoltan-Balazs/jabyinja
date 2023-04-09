@@ -267,7 +267,8 @@ class ClassFile {
                         Instructions.DSTORE(stack, local, index);
                     }
                     case ASTORE -> {
-                        // TODO
+                        byte index = ClassFile_Helper.readByte(codeData);
+                        Instructions.ASTORE(stack, local, index);
                     }
                     case ISTORE_0, ISTORE_1, ISTORE_2, ISTORE_3 -> {
                         // ISTORE_0 is 0x3B .. ISTORE_3 is 0x3E
@@ -286,6 +287,9 @@ class ClassFile {
                         Instructions.DSTORE(stack, local, opCode - 0x47);
                     }
                     case ASTORE_0, ASTORE_1, ASTORE_2, ASTORE_3 -> {
+                        // ASTORE_0 is 0x4B .. ASTORE_3 is 0x4E
+                        Instructions.ASTORE(stack, local, opCode - 0x4B);
+                    }
                         // TODO
                     }
                     case POP -> {
