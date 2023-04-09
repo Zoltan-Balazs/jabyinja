@@ -552,34 +552,42 @@ class ClassFile {
                         Instructions.SWAP(stack);
                     }
                     case IFEQ -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IFNE -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IFLT -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IFGE -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IFGT -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IFLE -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IF_ICMPEQ -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IF_ICMPNE -> {
+                        // TODO
                         byte branchbyte1 = ClassFile_Helper.readByte(codeData);
                         byte branchbyte2 = ClassFile_Helper.readByte(codeData);
 
@@ -592,30 +600,37 @@ class ClassFile {
                         }
                     }
                     case IF_ICMPLT -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IF_ICMPGE -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IF_ICMPGT -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IF_ICMPLE -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IF_ACMPEQ -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case IF_ACMPNE -> {
+                        // TODO
                         short offset = ClassFile_Helper.readShort(codeData);
                         System.out.println(offset);
                     }
                     case GOTO -> {
+                        // TODO
                         short index = ClassFile_Helper.readShort(codeData);
                         System.out.println(index);
                     }
@@ -651,9 +666,11 @@ class ClassFile {
                         // TODO
                     }
                     case RETURN -> {
+                        // TODO
                         return;
                     }
                     case GETSTATIC -> {
+                        // TODO
                         short index = ClassFile_Helper.readShort(codeData);
                         CP_Info fieldRef = CONSTANT_POOL.get(index - 1);
                         String className = getNameOfClass(fieldRef.getClassIndex());
@@ -665,6 +682,7 @@ class ClassFile {
                         stack.add(new Pair<Class<?>, Object>(systemClass, outField.get(null)));
                     }
                     case PUTSTATIC -> {
+                        // TODO
                         short index = ClassFile_Helper.readShort(codeData);
                         CP_Info fieldRef = CONSTANT_POOL.get(index - 1);
                         String className = getNameOfClass(fieldRef.getClassIndex());
@@ -680,6 +698,7 @@ class ClassFile {
                         // TODO
                     }
                     case INVOKEVIRTUAL -> {
+                        // TODO
                         short index = ClassFile_Helper.readShort(codeData);
                         CP_Info methodRef = CONSTANT_POOL.get(index - 1);
                         String className = getNameOfClass(methodRef.getClassIndex());
@@ -733,6 +752,7 @@ class ClassFile {
 
                     }
                     case INVOKESPECIAL -> {
+                        // TODO
                         short index = ClassFile_Helper.readShort(codeData);
                         CP_Info methodRef = CONSTANT_POOL.get(index - 1);
                         String className = getNameOfClass(methodRef.getClassIndex());
@@ -747,8 +767,8 @@ class ClassFile {
                         System.out.println(className);
                         System.out.println(memberName);
                     }
-                    // TODO: Recursive call.. push back to stack
                     case INVOKESTATIC -> {
+                        // TODO: Recursive call.. push back to stack
                         short index = ClassFile_Helper.readShort(codeData);
                         CP_Info methodRef = CONSTANT_POOL.get(index - 1);
                         String className = getNameOfClass(methodRef.getClassIndex());
@@ -820,6 +840,7 @@ class ClassFile {
                         // TODO
                     }
                     case NEW -> {
+                        // TODO
                         short index = ClassFile_Helper.readShort(codeData);
                         CP_Info classRef = (CONSTANT_Class_Info) CONSTANT_POOL.get(index - 1);
                         String memberName = getNameOfMember(index);
