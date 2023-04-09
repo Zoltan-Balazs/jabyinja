@@ -196,8 +196,8 @@ Thankfully, they are the exact same
 
 | OPCODE         	| IMPLEMENTED?           	|
 |----------------	|------------------------	|
-| NOP            	| <ul><li>[ ] </li></ul> 	|
-| ACONST_NULL    	| <ul><li>[ ] </li></ul> 	|
+| NOP            	| <ul><li>[x] </li></ul> 	|
+| ACONST_NULL    	| <ul><li>[x] </li></ul> 	|
 | ICONST_*       	| <ul><li>[x] </li></ul> 	|
 | LCONST_*       	| <ul><li>[x] </li></ul> 	|
 | FCONST_*       	| <ul><li>[x] </li></ul> 	|
@@ -218,11 +218,11 @@ Thankfully, they are the exact same
 | BALOAD         	| <ul><li>[ ] </li></ul> 	|
 | CALOAD         	| <ul><li>[ ] </li></ul> 	|
 | SALOAD         	| <ul><li>[ ] </li></ul> 	|
-| ISTORE*        	| <ul><li>[ ] </li></ul> 	|
-| LSTORE*        	| <ul><li>[ ] </li></ul> 	|
-| FSTORE*        	| <ul><li>[ ] </li></ul> 	|
-| DSTORE*        	| <ul><li>[ ] </li></ul> 	|
-| ASTORE*        	| <ul><li>[ ] </li></ul> 	|
+| ISTORE*        	| <ul><li>[x] </li></ul> 	|
+| LSTORE*        	| <ul><li>[x] </li></ul> 	|
+| FSTORE*        	| <ul><li>[x] </li></ul> 	|
+| DSTORE*        	| <ul><li>[x] </li></ul> 	|
+| ASTORE*        	| <ul><li>[x] </li></ul> 	|
 | IASTORE        	| <ul><li>[ ] </li></ul> 	|
 | LASTORE        	| <ul><li>[ ] </li></ul> 	|
 | FASTORE        	| <ul><li>[ ] </li></ul> 	|
