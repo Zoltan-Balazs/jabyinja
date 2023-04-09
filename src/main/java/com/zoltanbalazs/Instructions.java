@@ -52,6 +52,21 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(value.getClass(), value));
     }
 
+    public static void POP(List<Pair<Class<?>, Object>> stack, Opcode type) {
+        int idx = stack.size() - 1;
+        if (type == Opcode.POP) {
+            stack.remove(idx);
+        } else if (type == Opcode.POP2) {
+            if (stack.get(idx).first == long.class || stack.get(idx).first == double.class) {
+                stack.remove(idx);
+            } else {
+                stack.remove(idx);
+                stack.remove(stack.size() - 1);
+            }
+        } else {
+            throw new UnsupportedOperationException("POP for " + type + " is not implemented!");
+        }
+    }
     public static Pair<Integer, Integer> IARIT(List<Pair<Class<?>, Object>> stack) {
         Pair<Class<?>, Object> value2 = stack.remove(stack.size() - 1);
         Pair<Class<?>, Object> value1 = stack.remove(stack.size() - 1);

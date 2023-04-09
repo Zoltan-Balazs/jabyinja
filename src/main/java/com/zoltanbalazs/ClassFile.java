@@ -282,6 +282,12 @@ class ClassFile {
                     case ASTORE_0, ASTORE_1, ASTORE_2, ASTORE_3 -> {
                         // TODO
                     }
+                    case POP -> {
+                        Instructions.POP(stack, Opcode.POP);
+                    }
+                    case POP2 -> {
+                        Instructions.POP(stack, Opcode.POP2);
+                    }
                     case DUP -> {
                         // TODO
                     }
