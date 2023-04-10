@@ -33,10 +33,10 @@ public class Instructions {
     }
 
     public static void LDC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index) {
-        ConstantPoolTag tag = constant_pool.get(index - 1).tag;
+        ConstantPoolTag tag = constant_pool.get((index & 0xFF) - 1).tag;
 
         Class<?> type = Instructions_Helper.tagSwitchType(constant_pool, tag);
-        Object value = Instructions_Helper.tagSwitchValue(constant_pool, tag, index);
+        Object value = Instructions_Helper.tagSwitchValue(constant_pool, tag, (index & 0xFF));
 
         stack.add(new Pair<Class<?>, Object>(type, value));
     }
