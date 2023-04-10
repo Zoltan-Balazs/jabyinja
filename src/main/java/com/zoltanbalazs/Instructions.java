@@ -62,19 +62,19 @@ public class Instructions {
     }
 
     public static void ISTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
-        local[index] = (int) stack.remove(stack.size() - 1).second;
+        local[index] = ((Number) stack.remove(stack.size() - 1).second).intValue();
     }
 
     public static void LSTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
-        local[index] = (long) stack.remove(stack.size() - 1).second;
+        local[index] = ((Number) stack.remove(stack.size() - 1).second).longValue();
     }
 
     public static void FSTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
-        local[index] = (float) stack.remove(stack.size() - 1).second;
+        local[index] = ((Number) stack.remove(stack.size() - 1).second).floatValue();
     }
 
     public static void DSTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
-        local[index] = (double) stack.remove(stack.size() - 1).second;
+        local[index] = ((Number) stack.remove(stack.size() - 1).second).doubleValue();
     }
 
     public static void ASTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
