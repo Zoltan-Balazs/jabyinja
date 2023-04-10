@@ -189,17 +189,17 @@ public class Instructions {
         Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
 
         if (result == long.class) {
-            stack.add(new Pair<Class<?>, Object>(long.class, (long) value.second));
+            stack.add(new Pair<Class<?>, Object>(long.class, (long) (int) value.second));
         } else if (result == float.class) {
-            stack.add(new Pair<Class<?>, Object>(float.class, (float) value.second));
+            stack.add(new Pair<Class<?>, Object>(float.class, (float) (int) value.second));
         } else if (result == double.class) {
-            stack.add(new Pair<Class<?>, Object>(double.class, (double) value.second));
+            stack.add(new Pair<Class<?>, Object>(double.class, (double) (int) value.second));
         } else if (result == byte.class) {
-            stack.add(new Pair<Class<?>, Object>(byte.class, (byte) value.second));
+            stack.add(new Pair<Class<?>, Object>(byte.class, (byte) (int) value.second));
         } else if (result == char.class) {
-            stack.add(new Pair<Class<?>, Object>(char.class, (char) value.second));
+            stack.add(new Pair<Class<?>, Object>(char.class, (char) (int) value.second));
         } else if (result == short.class) {
-            stack.add(new Pair<Class<?>, Object>(short.class, (short) value.second));
+            stack.add(new Pair<Class<?>, Object>(short.class, (short) (int) value.second));
         } else {
             throw new UnsupportedOperationException("Integer to " + result + " conversion is not supported!");
         }
@@ -209,11 +209,11 @@ public class Instructions {
         Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
 
         if (result == int.class) {
-            stack.add(new Pair<Class<?>, Object>(int.class, (int) value.second));
+            stack.add(new Pair<Class<?>, Object>(int.class, (int) (long) value.second));
         } else if (result == float.class) {
-            stack.add(new Pair<Class<?>, Object>(float.class, (float) value.second));
+            stack.add(new Pair<Class<?>, Object>(float.class, (float) (long) value.second));
         } else if (result == double.class) {
-            stack.add(new Pair<Class<?>, Object>(double.class, (double) value.second));
+            stack.add(new Pair<Class<?>, Object>(double.class, (double) (long) value.second));
         } else {
             throw new UnsupportedOperationException("Long to " + result + " conversion is not supported!");
         }
@@ -223,11 +223,11 @@ public class Instructions {
         Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
 
         if (result == int.class) {
-            stack.add(new Pair<Class<?>, Object>(int.class, (int) value.second));
+            stack.add(new Pair<Class<?>, Object>(int.class, (int) (float) value.second));
         } else if (result == long.class) {
-            stack.add(new Pair<Class<?>, Object>(long.class, (long) value.second));
+            stack.add(new Pair<Class<?>, Object>(long.class, (long) (float) value.second));
         } else if (result == double.class) {
-            stack.add(new Pair<Class<?>, Object>(double.class, (double) value.second));
+            stack.add(new Pair<Class<?>, Object>(double.class, (double) (float) value.second));
         } else {
             throw new UnsupportedOperationException("Float to " + result + " conversion is not supported!");
         }
@@ -237,11 +237,11 @@ public class Instructions {
         Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
 
         if (result == int.class) {
-            stack.add(new Pair<Class<?>, Object>(int.class, (int) value.second));
+            stack.add(new Pair<Class<?>, Object>(int.class, (int) (double) value.second));
         } else if (result == long.class) {
-            stack.add(new Pair<Class<?>, Object>(long.class, (long) value.second));
+            stack.add(new Pair<Class<?>, Object>(long.class, (long) (double) value.second));
         } else if (result == float.class) {
-            stack.add(new Pair<Class<?>, Object>(float.class, (float) value.second));
+            stack.add(new Pair<Class<?>, Object>(float.class, (float) (double) value.second));
         } else {
             throw new UnsupportedOperationException("Double to " + result + " conversion is not supported!");
         }
