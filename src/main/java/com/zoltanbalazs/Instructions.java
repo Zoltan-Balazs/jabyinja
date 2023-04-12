@@ -63,66 +63,42 @@ public class Instructions {
     }
 
     public static void IALOAD(List<Pair<Class<?>, Object>> stack) {
-        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
-        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
-
-        Object value = Array.get(arrayRef.second, index);
+        Object value = Instructions_Helper.ARRAYLOAD(stack);
         stack.add(new Pair<Class<?>, Object>(int.class, value));
     }
 
     public static void LALOAD(List<Pair<Class<?>, Object>> stack) {
-        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
-        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
-
-        Object value = Array.get(arrayRef.second, index);
+        Object value = Instructions_Helper.ARRAYLOAD(stack);
         stack.add(new Pair<Class<?>, Object>(long.class, value));
     }
 
     public static void FALOAD(List<Pair<Class<?>, Object>> stack) {
-        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
-        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
-
-        Object value = Array.get(arrayRef.second, index);
+        Object value = Instructions_Helper.ARRAYLOAD(stack);
         stack.add(new Pair<Class<?>, Object>(float.class, value));
     }
 
     public static void DALOAD(List<Pair<Class<?>, Object>> stack) {
-        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
-        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
-
-        Object value = Array.get(arrayRef.second, index);
+        Object value = Instructions_Helper.ARRAYLOAD(stack);
         stack.add(new Pair<Class<?>, Object>(double.class, value));
     }
 
     public static void AALOAD(List<Pair<Class<?>, Object>> stack) {
-        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
-        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
-
-        Object value = Array.get(arrayRef.second, index);
+        Object value = Instructions_Helper.ARRAYLOAD(stack);
         stack.add(new Pair<Class<?>, Object>(value.getClass(), value));
     }
 
     public static void BALOAD(List<Pair<Class<?>, Object>> stack) {
-        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
-        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
-
-        Object value = Array.get(arrayRef.second, index);
+        Object value = Instructions_Helper.ARRAYLOAD(stack);
         stack.add(new Pair<Class<?>, Object>(byte.class, value));
     }
 
     public static void CALOAD(List<Pair<Class<?>, Object>> stack) {
-        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
-        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
-
-        Object value = Array.get(arrayRef.second, index);
+        Object value = Instructions_Helper.ARRAYLOAD(stack);
         stack.add(new Pair<Class<?>, Object>(char.class, value));
     }
 
     public static void SALOAD(List<Pair<Class<?>, Object>> stack) {
-        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
-        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
-
-        Object value = Array.get(arrayRef.second, index);
+        Object value = Instructions_Helper.ARRAYLOAD(stack);
         stack.add(new Pair<Class<?>, Object>(short.class, value));
     }
 
@@ -520,5 +496,12 @@ class Instructions_Helper {
                 throw new UnsupportedOperationException("Array type code " + atype + " is not recognized!");
             }
         }
+    }
+
+    public static Object ARRAYLOAD(List<Pair<Class<?>, Object>> stack) {
+        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
+
+        return Array.get(arrayRef.second, index);
     }
 }
