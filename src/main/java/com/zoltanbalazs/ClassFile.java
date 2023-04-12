@@ -875,7 +875,7 @@ class ClassFile {
                         Instructions.ANEWARRAY(stack, CONSTANT_POOL, index);
                     }
                     case ARRAYLENGTH -> {
-                        // TODO
+                        Instructions.ARRAYLENGTH(stack);
                     }
                     case ATHROW -> {
                         // TODO

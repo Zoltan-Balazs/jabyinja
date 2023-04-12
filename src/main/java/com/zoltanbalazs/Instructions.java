@@ -412,6 +412,11 @@ public class Instructions {
 
         stack.add(new Pair<Class<?>, Object>(arrayType, Array.newInstance(arrayType, count)));
     }
+
+    public static void ARRAYLENGTH(List<Pair<Class<?>, Object>> stack) {
+        Pair<Class<?>, Object> arrayref = stack.remove(stack.size() - 1);
+        stack.add(new Pair<Class<?>, Object>(int.class, Array.getLength(arrayref.second)));
+    }
 }
 
 class Instructions_Helper {
