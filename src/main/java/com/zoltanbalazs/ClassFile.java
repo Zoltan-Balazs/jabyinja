@@ -249,7 +249,7 @@ class ClassFile {
                         Instructions.CALOAD(stack);
                     }
                     case SALOAD -> {
-                        // TODO
+                        Instructions.SALOAD(stack);
                     }
                     case ISTORE -> {
                         byte index = ClassFile_Helper.readByte(codeData);
@@ -313,7 +313,7 @@ class ClassFile {
                         Instructions.CASTORE(stack);
                     }
                     case SASTORE -> {
-                        // TODO
+                        Instructions.SASTORE(stack);
                     }
                     case POP -> {
                         Instructions.POP(stack, Opcode.POP);
