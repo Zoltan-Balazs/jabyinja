@@ -432,6 +432,14 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(arrayType, Array.newInstance(arrayType, count)));
     }
 
+    public static void ANEWARRAY(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index) {
+        ConstantPoolTag tag = constant_pool.get((index & 0xFF) + 1).tag;
+
+        Class<?> arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
+        int count = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+        stack.add(new Pair<Class<?>, Object>(arrayType, Array.newInstance(arrayType, count)));
+    }
 }
 
 class Instructions_Helper {

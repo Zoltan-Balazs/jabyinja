@@ -871,7 +871,8 @@ class ClassFile {
                         Instructions.NEWARRAY(stack, atype);
                     }
                     case ANEWARRAY -> {
-                        // TODO
+                        short index = ClassFile_Helper.readShort(codeData);
+                        Instructions.ANEWARRAY(stack, CONSTANT_POOL, index);
                     }
                     case ARRAYLENGTH -> {
                         // TODO
