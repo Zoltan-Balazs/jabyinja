@@ -210,27 +210,27 @@ Thankfully, they are the exact same
 | FLOAD*         	| <ul><li>[x] </li></ul> 	|
 | DLOAD*         	| <ul><li>[x] </li></ul> 	|
 | ALOAD*         	| <ul><li>[x] </li></ul> 	|
-| IALOAD         	| <ul><li>[ ] </li></ul> 	|
-| LALOAD         	| <ul><li>[ ] </li></ul> 	|
-| FALOAD         	| <ul><li>[ ] </li></ul> 	|
-| DALOAD         	| <ul><li>[ ] </li></ul> 	|
-| AALOAD         	| <ul><li>[ ] </li></ul> 	|
-| BALOAD         	| <ul><li>[ ] </li></ul> 	|
-| CALOAD         	| <ul><li>[ ] </li></ul> 	|
-| SALOAD         	| <ul><li>[ ] </li></ul> 	|
+| IALOAD         	| <ul><li>[x] </li></ul> 	|
+| LALOAD         	| <ul><li>[x] </li></ul> 	|
+| FALOAD         	| <ul><li>[x] </li></ul> 	|
+| DALOAD         	| <ul><li>[x] </li></ul> 	|
+| AALOAD         	| <ul><li>[x] </li></ul> 	|
+| BALOAD         	| <ul><li>[x] </li></ul> 	|
+| CALOAD         	| <ul><li>[x] </li></ul> 	|
+| SALOAD         	| <ul><li>[x] </li></ul> 	|
 | ISTORE*        	| <ul><li>[x] </li></ul> 	|
 | LSTORE*        	| <ul><li>[x] </li></ul> 	|
 | FSTORE*        	| <ul><li>[x] </li></ul> 	|
 | DSTORE*        	| <ul><li>[x] </li></ul> 	|
 | ASTORE*        	| <ul><li>[x] </li></ul> 	|
-| IASTORE        	| <ul><li>[ ] </li></ul> 	|
-| LASTORE        	| <ul><li>[ ] </li></ul> 	|
-| FASTORE        	| <ul><li>[ ] </li></ul> 	|
-| DASTORE        	| <ul><li>[ ] </li></ul> 	|
-| AASTORE        	| <ul><li>[ ] </li></ul> 	|
-| BASTORE        	| <ul><li>[ ] </li></ul> 	|
-| CASTORE        	| <ul><li>[ ] </li></ul> 	|
-| SASTORE        	| <ul><li>[ ] </li></ul> 	|
+| IASTORE        	| <ul><li>[x] </li></ul> 	|
+| LASTORE        	| <ul><li>[x] </li></ul> 	|
+| FASTORE        	| <ul><li>[x] </li></ul> 	|
+| DASTORE        	| <ul><li>[x] </li></ul> 	|
+| AASTORE        	| <ul><li>[x] </li></ul> 	|
+| BASTORE        	| <ul><li>[x] </li></ul> 	|
+| CASTORE        	| <ul><li>[x] </li></ul> 	|
+| SASTORE        	| <ul><li>[x] </li></ul> 	|
 | POP*           	| <ul><li>[x] </li></ul> 	|
 | DUP*           	| <ul><li>[x] </li></ul> 	|
 | DUP2*          	| <ul><li>[x] </li></ul> 	|
@@ -266,8 +266,8 @@ Thankfully, they are the exact same
 | *FIELD         	| <ul><li>[ ] </li></ul> 	|
 | INVOKE*        	| <ul><li>[ ] </li></ul> 	|
 | NEW            	| <ul><li>[ ] </li></ul> 	|
-| NEWARRAY       	| <ul><li>[ ] </li></ul> 	|
-| ANEWARRAY      	| <ul><li>[ ] </li></ul> 	|
+| NEWARRAY       	| <ul><li>[x] </li></ul> 	|
+| ANEWARRAY      	| <ul><li>[x] </li></ul> 	|
 | ARRAYLENGTH    	| <ul><li>[ ] </li></ul> 	|
 | ATHROW         	| <ul><li>[ ] </li></ul> 	|
 | CHECKCAST      	| <ul><li>[ ] </li></ul> 	|
