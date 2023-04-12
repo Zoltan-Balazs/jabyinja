@@ -227,7 +227,7 @@ class ClassFile {
                         Instructions.ALOAD(stack, local[opCode - 0x2A]);
                     }
                     case IALOAD -> {
-                        // TODO
+                        Instructions.IALOAD(stack);
                     }
                     case LALOAD -> {
                         // TODO
@@ -291,7 +291,7 @@ class ClassFile {
                         Instructions.ASTORE(stack, local, opCode - 0x4B);
                     }
                     case IASTORE -> {
-                        // TODO
+                        Instructions.IASTORE(stack);
                     }
                     case LASTORE -> {
                         // TODO
