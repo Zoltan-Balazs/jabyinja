@@ -582,34 +582,138 @@ class ClassFile {
                     Instructions.SWAP(stack);
                 }
                 case IFEQ -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
 
+                    int value = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value == 0) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IFNE -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value != 0) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IFLT -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value < 0) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IFGE -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value >= 0) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IFGT -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value > 0) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IFLE -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value <= 0) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IF_ICMPEQ -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
 
+                    int value2 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+                    int value1 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value1 == value2) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IF_ICMPNE -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value2 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+                    int value1 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value1 != value2) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IF_ICMPLT -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value2 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+                    int value1 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value1 < value2) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IF_ICMPGE -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value2 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+                    int value1 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value1 >= value2) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IF_ICMPGT -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value2 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+                    int value1 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value1 > value2) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IF_ICMPLE -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    int value2 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+                    int value1 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+                    if (value1 <= value2) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IF_ACMPEQ -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    Object value2 = stack.remove(stack.size() - 1).second;
+                    Object value1 = stack.remove(stack.size() - 1).second;
+
+                    if (value1.equals(value2)) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IF_ACMPNE -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    Object value2 = stack.remove(stack.size() - 1).second;
+                    Object value1 = stack.remove(stack.size() - 1).second;
+
+                    if (!value1.equals(value2)) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case GOTO -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
@@ -878,8 +982,22 @@ class ClassFile {
                     // TODO
                 }
                 case IFNULL -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    Object value = stack.remove(stack.size() - 1).second;
+
+                    if (value == null) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case IFNONNULL -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+
+                    Object value = stack.remove(stack.size() - 1).second;
+
+                    if (value != null) {
+                        codeIndex.Set(codeIndex.Get() - 2 - 1);
+                    }
                 }
                 case GOTO_W -> {
                     int offset = ClassFile_Helper.readInt(code, codeIndex);
