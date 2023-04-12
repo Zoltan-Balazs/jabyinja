@@ -242,7 +242,8 @@ class ClassFile {
                         Instructions.AALOAD(stack);
                     }
                     case BALOAD -> {
-                        // TODO
+                        // Potential bug.. boolean is treated as byte!
+                        Instructions.BALOAD(stack);
                     }
                     case CALOAD -> {
                         // TODO
@@ -306,7 +307,7 @@ class ClassFile {
                         Instructions.AASTORE(stack);
                     }
                     case BASTORE -> {
-                        // TODO
+                        Instructions.BASTORE(stack);
                     }
                     case CASTORE -> {
                         // TODO
