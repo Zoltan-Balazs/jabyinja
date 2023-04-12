@@ -239,7 +239,7 @@ class ClassFile {
                         // TODO
                     }
                     case AALOAD -> {
-                        // TODO
+                        Instructions.AALOAD(stack);
                     }
                     case BALOAD -> {
                         // TODO
@@ -303,7 +303,7 @@ class ClassFile {
                         // TODO
                     }
                     case AASTORE -> {
-                        // TODO
+                        Instructions.AASTORE(stack);
                     }
                     case BASTORE -> {
                         // TODO
