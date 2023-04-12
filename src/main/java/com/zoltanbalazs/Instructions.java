@@ -109,6 +109,15 @@ public class Instructions {
         Object value = Array.get(arrayRef.second, index);
         stack.add(new Pair<Class<?>, Object>(byte.class, value));
     }
+
+    public static void CALOAD(List<Pair<Class<?>, Object>> stack) {
+        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
+
+        Object value = Array.get(arrayRef.second, index);
+        stack.add(new Pair<Class<?>, Object>(char.class, value));
+    }
+
     public static void ISTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
         local[index] = ((Number) stack.remove(stack.size() - 1).second).intValue();
     }
@@ -156,6 +165,10 @@ public class Instructions {
     }
 
     public static void BASTORE(List<Pair<Class<?>, Object>> stack) {
+        AASTORE(stack);
+    }
+
+    public static void CASTORE(List<Pair<Class<?>, Object>> stack) {
         AASTORE(stack);
     }
 

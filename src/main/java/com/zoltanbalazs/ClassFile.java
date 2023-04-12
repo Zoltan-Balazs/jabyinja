@@ -246,7 +246,7 @@ class ClassFile {
                         Instructions.BALOAD(stack);
                     }
                     case CALOAD -> {
-                        // TODO
+                        Instructions.CALOAD(stack);
                     }
                     case SALOAD -> {
                         // TODO
@@ -310,7 +310,7 @@ class ClassFile {
                         Instructions.BASTORE(stack);
                     }
                     case CASTORE -> {
-                        // TODO
+                        Instructions.CASTORE(stack);
                     }
                     case SASTORE -> {
                         // TODO
