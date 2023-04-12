@@ -163,6 +163,10 @@ public class CP_Info {
 		return -1;
 	}
 
+	public short getDescriptorIndex() {
+		return -1;
+	}
+
 	public short getClassIndex() {
 		return -1;
 	}
@@ -387,6 +391,11 @@ class CONSTANT_NameAndType_Info extends CP_Info {
 	@Override
 	public short getNameIndex() {
 		return name_index;
+	}
+
+	@Override
+	public short getDescriptorIndex() {
+		return descriptor_index;
 	}
 
 	@Override

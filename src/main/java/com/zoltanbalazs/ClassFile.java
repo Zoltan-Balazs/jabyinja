@@ -156,7 +156,6 @@ class ClassFile {
                 attr.add(ATTRIBUTE);
             }
         }
-
         return attr;
     }
 
@@ -168,6 +167,14 @@ class ClassFile {
     public String getNameOfMember(short name_and_type_index) {
         return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getNameIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
+    }
+
+    public int getNumberOfArguments(short name_and_type_index) {
+        String descriptor = new String(
+                CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getDescriptorIndex() - 1).getBytes(),
+                StandardCharsets.UTF_8);
+
+        return (int) descriptor.chars().filter(ch -> ch == ';').count();
     }
 
     public void executeCode(byte[] code)
@@ -734,7 +741,7 @@ class ClassFile {
 
                         Class<?>[] types = new Class<?>[type.size()];
                         for (int j = 0; j < type.size(); ++j) {
-                            types[j] = (Class<?>) type.get(j);
+                            types[j] = Object.class;// (Class<?>) type.get(j); HACKY BYPASS!
                         }
 
                         Class<?> classClass = Class.forName(className.replace("/", "."));
@@ -779,9 +786,14 @@ class ClassFile {
                     CP_Info methodRef = CONSTANT_POOL.get(index - 1);
                     String className = getNameOfClass(methodRef.getClassIndex());
                     String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
+                    int numberOfArguments = getNumberOfArguments(methodRef.getNameAndTypeIndex());
 
                     try {
-                        List<Pair<Class<?>, Object>> args = stack;
+                        int stackSize = stack.size();
+                        List<Pair<Class<?>, Object>> args = new ArrayList<>();
+                        for (int i = stackSize - numberOfArguments; i < stackSize; ++i) {
+                            args.add(stack.get(i));
+                        }
                         List<Object> arg = new ArrayList<Object>();
                         List<Class<?>> type = new ArrayList<Class<?>>();
                         for (var a : args) {
@@ -814,9 +826,13 @@ class ClassFile {
                             arguments[j] = (Object) arg.get(j);
                         }
 
-                        // Object result = method.invoke(objectref.second, arguments);
+                        Object result = method.invoke(className.replace("/", "."), arguments);
+                        Class<?> returnType = method.getReturnType();
 
-                        stack.removeAll(stack);
+                        for (int i = 0; i < numberOfArguments; ++i) {
+                            stack.remove(stack.size() - 1);
+                        }
+                        stack.add(new Pair<Class<?>, Object>(returnType, result));
 
                         /*
                          * if (result != null) {
@@ -865,10 +881,41 @@ class ClassFile {
                     CP_Info classRef = (CONSTANT_Class_Info) CONSTANT_POOL.get(index - 1);
                     String memberName = getNameOfMember(index);
 
-                    Class<?> classClass = Class.forName(memberName.replace("/", "."));
-                    // TODO: Fix, for general usage..
-                    Constructor<?> conEmpty = classClass.getConstructor(InputStream.class);
-                    stack.add(new Pair<Class<?>, Object>(classClass, conEmpty.newInstance(System.in)));
+                    try {
+                        Class<?> classClass = Class.forName(memberName.replace("/", "."));
+                        // TODO: Fix, for general usage..
+                        for (Constructor<?> c : classClass.getConstructors()) {
+                            System.out.println(c);
+                        }
+                        Constructor<?> conEmpty = classClass.getConstructor(InputStream.class);
+                        stack.add(new Pair<Class<?>, Object>(classClass, conEmpty.newInstance(System.in)));
+                    } catch (ClassNotFoundException cnfe) {
+                        Method_Info method = findMethodsByName(memberName);
+                        List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");
+
+                        for (Attribute_Info attribute : attributes) {
+                            try {
+                                Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+
+                                int stackSize = stack.size();
+
+                                for (int j = 0; j < stackSize; ++j) {
+                                    if (stack.get(0).first == long.class || stack.get(0).first == double.class) {
+                                        local[j] = stack.remove(0).second;
+                                        local[j + 1] = local[j];
+                                        j += 1;
+                                        stackSize += 1;
+                                    } else {
+                                        local[j] = stack.remove(0).second;
+                                    }
+                                }
+
+                                executeCode(codeAttribute.code);
+                            } catch (Exception ee) {
+                                ee.printStackTrace();
+                            }
+                        }
+                    }
                 }
                 case NEWARRAY -> {
                     byte atype = code[codeIndex.Next()];
