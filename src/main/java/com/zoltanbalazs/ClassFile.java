@@ -612,6 +612,8 @@ class ClassFile {
                 case IF_ACMPNE -> {
                 }
                 case GOTO -> {
+                    short offset = ClassFile_Helper.readShort(code, codeIndex);
+                    codeIndex.Set(codeIndex.Get() + offset - 2 - 1);
                 }
                 case JSR -> {
                     // WILL NOT IMPLEMENT
@@ -880,6 +882,9 @@ class ClassFile {
                 case IFNONNULL -> {
                 }
                 case GOTO_W -> {
+                    int offset = ClassFile_Helper.readInt(code, codeIndex);
+                    codeIndex.Set(codeIndex.Get() + offset - 4 - 1);
+                }
                 case JSR_W -> {
                     // WILL NOT IMPLEMENT
                     throw new UnsupportedOperationException(
