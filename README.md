@@ -268,7 +268,7 @@ Thankfully, they are the exact same
 | NEW            	| <ul><li>[ ] </li></ul> 	|
 | NEWARRAY       	| <ul><li>[x] </li></ul> 	|
 | ANEWARRAY      	| <ul><li>[x] </li></ul> 	|
-| ARRAYLENGTH    	| <ul><li>[ ] </li></ul> 	|
+| ARRAYLENGTH    	| <ul><li>[x] </li></ul> 	|
 | ATHROW         	| <ul><li>[ ] </li></ul> 	|
 | CHECKCAST      	| <ul><li>[ ] </li></ul> 	|
 | MONITOR*       	| <ul><li>[ ] </li></ul> 	|
