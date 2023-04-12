@@ -397,6 +397,109 @@ public class Instructions {
         }
     }
 
+    public static void IF1I(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
+        int value = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+        switch (type) {
+            case IFEQ -> {
+                if (value == 0) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IFNE -> {
+                if (value != 0) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IFLT -> {
+                if (value < 0) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IFGE -> {
+                if (value >= 0) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IFGT -> {
+                if (value > 0) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IFLE -> {
+                if (value <= 0) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            default ->
+                throw new IllegalArgumentException("One value Integer IF for opcode " + type + " is not supported!");
+        }
+    }
+
+    public static void IF2I(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
+        int value2 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        int value1 = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+        switch (type) {
+            case IF_ICMPEQ -> {
+                if (value1 == value2) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IF_ICMPNE -> {
+                if (value1 != value2) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IF_ICMPLT -> {
+                if (value1 < value2) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IF_ICMPGE -> {
+                if (value1 >= value2) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IF_ICMPGT -> {
+                if (value1 > value2) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IF_ICMPLE -> {
+                if (value1 <= value2) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            default ->
+                throw new IllegalArgumentException("Two value Integer IF for opcode " + type + " is not supported!");
+        }
+    }
+
+    public static void IF2A(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
+        Object value2 = stack.remove(stack.size() - 1).second;
+        Object value1 = stack.remove(stack.size() - 1).second;
+
+        switch (type) {
+            case IF_ACMPEQ -> {
+                if (value1.equals(value2)) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IF_ACMPNE -> {
+                if (!value1.equals(value2)) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            default ->
+                throw new IllegalArgumentException("Two value Reference IF for opcode " + type + " is not supported!");
+        }
+    }
+
+    public static void GOTO(CodeIndex codeIndex, short offset) {
+        codeIndex.Inc(offset - 2 - 1);
+    }
+
     public static void NEWARRAY(List<Pair<Class<?>, Object>> stack, byte atype) {
         Class<?> arrayType = Instructions_Helper.GetArrayType(atype);
         int count = ((Number) stack.remove(stack.size() - 1).second).intValue();
@@ -416,6 +519,29 @@ public class Instructions {
     public static void ARRAYLENGTH(List<Pair<Class<?>, Object>> stack) {
         Pair<Class<?>, Object> arrayref = stack.remove(stack.size() - 1);
         stack.add(new Pair<Class<?>, Object>(int.class, Array.getLength(arrayref.second)));
+    }
+
+    public static void IF1A(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
+        Object value = stack.remove(stack.size() - 1).second;
+
+        switch (type) {
+            case IFNULL -> {
+                if (value == null) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            case IFNONNULL -> {
+                if (value != null) {
+                    codeIndex.Inc(offset - 2 - 1);
+                }
+            }
+            default ->
+                throw new IllegalArgumentException("One value Reference IF for opcode " + type + " is not supported!");
+        }
+    }
+
+    public static void GOTO_W(CodeIndex codeIndex, int offset) {
+        codeIndex.Inc(offset - 4 - 1);
     }
 }
 
