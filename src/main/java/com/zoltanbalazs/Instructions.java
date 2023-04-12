@@ -70,6 +70,13 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(int.class, value));
     }
 
+    public static void LALOAD(List<Pair<Class<?>, Object>> stack) {
+        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
+
+        Object value = Array.get(arrayRef.second, index);
+        stack.add(new Pair<Class<?>, Object>(long.class, value));
+    }
     public static void AALOAD(List<Pair<Class<?>, Object>> stack) {
         int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
         Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
@@ -103,6 +110,9 @@ public class Instructions {
         AASTORE(stack);
     }
 
+    public static void LASTORE(List<Pair<Class<?>, Object>> stack) {
+        AASTORE(stack);
+    }
     public static void AASTORE(List<Pair<Class<?>, Object>> stack) {
         Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
         int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
