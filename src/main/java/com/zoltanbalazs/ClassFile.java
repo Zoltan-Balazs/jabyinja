@@ -867,7 +867,8 @@ class ClassFile {
                         stack.add(new Pair<Class<?>, Object>(classClass, conEmpty.newInstance(System.in)));
                     }
                     case NEWARRAY -> {
-                        // TODO
+                        byte atype = ClassFile_Helper.readByte(codeData);
+                        Instructions.NEWARRAY(stack, atype);
                     }
                     case ANEWARRAY -> {
                         // TODO

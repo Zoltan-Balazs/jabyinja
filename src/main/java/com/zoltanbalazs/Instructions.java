@@ -424,6 +424,14 @@ public class Instructions {
                     "Double comparison failed, first value: " + d_value1 + ", second value: " + d_value2);
         }
     }
+
+    public static void NEWARRAY(List<Pair<Class<?>, Object>> stack, byte atype) {
+        Class<?> arrayType = Instructions_Helper.GetArrayType(atype);
+        int count = ((Number) stack.remove(stack.size() - 1).second).intValue();
+
+        stack.add(new Pair<Class<?>, Object>(arrayType, Array.newInstance(arrayType, count)));
+    }
+
 }
 
 class Instructions_Helper {
@@ -470,6 +478,38 @@ class Instructions_Helper {
             }
             default -> {
                 throw new UnsupportedOperationException(tag + " is not implemented yet!");
+            }
+        }
+    }
+
+    public static Class<?> GetArrayType(byte atype) {
+        switch (atype) {
+            case 4 -> {
+                return Boolean.class;
+            }
+            case 5 -> {
+                return char.class;
+            }
+            case 6 -> {
+                return float.class;
+            }
+            case 7 -> {
+                return double.class;
+            }
+            case 8 -> {
+                return byte.class;
+            }
+            case 9 -> {
+                return short.class;
+            }
+            case 10 -> {
+                return int.class;
+            }
+            case 11 -> {
+                return long.class;
+            }
+            default -> {
+                throw new UnsupportedOperationException("Array type code " + atype + " is not recognized!");
             }
         }
     }
