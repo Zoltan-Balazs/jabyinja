@@ -774,10 +774,8 @@ class ClassFile {
                         CP_Info methodRef = CONSTANT_POOL.get(index - 1);
                         String className = getNameOfClass(methodRef.getClassIndex());
                         String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
-                        Pair<Class<?>, Object> objectref = new Pair<Class<?>,Object>(void.class, null);
-                        
+
                         try {
-                            objectref = stack.remove(0);
                             List<Pair<Class<?>, Object>> args = stack;
                             List<Object> arg = new ArrayList<Object>();
                             List<Class<?>> type = new ArrayList<Class<?>>();
@@ -811,13 +809,15 @@ class ClassFile {
                                 arguments[i] = (Object) arg.get(i);
                             }
 
-                            Object result = method.invoke(objectref.second, arguments);
+                            // Object result = method.invoke(objectref.second, arguments);
 
                             stack.removeAll(stack);
 
-                            if (result != null) {
-                                stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
-                            }
+                            /*
+                             * if (result != null) {
+                             * stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
+                             * }
+                             */
                         } catch (ClassNotFoundException e) {
                             Method_Info method = findMethodsByName(memberName);
                             List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");
@@ -826,7 +826,6 @@ class ClassFile {
                                 try {
                                     Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                                    stack.add(0, objectref);
                                     int stackSize = stack.size();
 
                                     for (int i = 0; i < stackSize; ++i) {
