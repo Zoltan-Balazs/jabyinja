@@ -35,8 +35,8 @@ public class Instructions {
     public static void LDC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index) {
         ConstantPoolTag tag = constant_pool.get((index & 0xFF) - 1).tag;
 
-        Class<?> type = Instructions_Helper.tagSwitchType(constant_pool, tag);
-        Object value = Instructions_Helper.tagSwitchValue(constant_pool, tag, (index & 0xFF));
+        Class<?> type = Instructions_Helper.TagSwitchType(constant_pool, tag);
+        Object value = Instructions_Helper.TagSwitchValue(constant_pool, tag, (index & 0xFF));
 
         stack.add(new Pair<Class<?>, Object>(type, value));
     }
@@ -326,7 +326,7 @@ public class Instructions {
 }
 
 class Instructions_Helper {
-    public static Object tagSwitchValue(List<CP_Info> CONSTANT_POOL, ConstantPoolTag tag, int index) {
+    public static Object TagSwitchValue(List<CP_Info> CONSTANT_POOL, ConstantPoolTag tag, int index) {
         switch (tag) {
             case CONSTANT_String -> {
                 return new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(),
@@ -350,7 +350,7 @@ class Instructions_Helper {
         }
     }
 
-    public static Class<?> tagSwitchType(List<CP_Info> CONSTANT_POOL, ConstantPoolTag tag) {
+    public static Class<?> TagSwitchType(List<CP_Info> CONSTANT_POOL, ConstantPoolTag tag) {
         switch (tag) {
             case CONSTANT_String -> {
                 return String.class;
