@@ -233,7 +233,7 @@ class ClassFile {
                         Instructions.LALOAD(stack);
                     }
                     case FALOAD -> {
-                        // TODO
+                        Instructions.FALOAD(stack);
                     }
                     case DALOAD -> {
                         // TODO
@@ -297,7 +297,7 @@ class ClassFile {
                         Instructions.LASTORE(stack);
                     }
                     case FASTORE -> {
-                        // TODO
+                        Instructions.FASTORE(stack);
                     }
                     case DASTORE -> {
                         // TODO
