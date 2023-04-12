@@ -255,8 +255,8 @@ Thankfully, they are the exact same
 | LCMP           	| <ul><li>[x] </li></ul> 	|
 | FCMP*          	| <ul><li>[x] </li></ul> 	|
 | DCMP*          	| <ul><li>[x] </li></ul> 	|
-| IF*            	| <ul><li>[ ] </li></ul> 	|
-| GOTO           	| <ul><li>[ ] </li></ul> 	|
+| IF*            	| <ul><li>[x] </li></ul> 	|
+| GOTO           	| <ul><li>[x] </li></ul> 	|
 | ~~JSR~~          	| <ul><li>[x] </li></ul> 	|
 | ~~RET~~           | <ul><li>[x] </li></ul> 	|
 | TABLESWITCH    	| <ul><li>[ ] </li></ul> 	|
@@ -274,6 +274,6 @@ Thankfully, they are the exact same
 | MONITOR*       	| <ul><li>[ ] </li></ul> 	|
 | WIDE           	| <ul><li>[ ] </li></ul> 	|
 | MULTIANEWARRAY 	| <ul><li>[ ] </li></ul> 	|
-| IF*NULL        	| <ul><li>[ ] </li></ul> 	|
-| GOTO_W         	| <ul><li>[ ] </li></ul> 	|
+| IF*NULL        	| <ul><li>[x] </li></ul> 	|
+| GOTO_W         	| <ul><li>[x] </li></ul> 	|
 | ~~JSR_W~~         | <ul><li>[x] </li></ul> 	|
