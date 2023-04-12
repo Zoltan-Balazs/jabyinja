@@ -56,7 +56,7 @@ class ClassFile {
     private static List<Attribute_Info> ATTRIBUTES;
 
     private static List<Pair<Class<?>, Object>> stack = new ArrayList<>();
-    private static Object[] local = new Object[4];
+    private static Object[] local = new Object[256];
 
     public ClassFile(String fileName) {
         readClassFile(fileName);
@@ -192,19 +192,19 @@ class ClassFile {
                         Instructions.LDC(stack, CONSTANT_POOL, index);
                     }
                     case ILOAD -> {
-                        Instructions.ILOAD(stack, (int) local[ClassFile_Helper.readByte(codeData)]);
+                        Instructions.ILOAD(stack, (int) local[ClassFile_Helper.readByte(codeData) & 0xFF]);
                     }
                     case LLOAD -> {
-                        Instructions.LLOAD(stack, (long) local[ClassFile_Helper.readByte(codeData)]);
+                        Instructions.LLOAD(stack, (long) local[ClassFile_Helper.readByte(codeData) & 0xFF]);
                     }
                     case FLOAD -> {
-                        Instructions.FLOAD(stack, (float) local[ClassFile_Helper.readByte(codeData)]);
+                        Instructions.FLOAD(stack, (float) local[ClassFile_Helper.readByte(codeData) & 0xFF]);
                     }
                     case DLOAD -> {
-                        Instructions.DLOAD(stack, (double) local[ClassFile_Helper.readByte(codeData)]);
+                        Instructions.DLOAD(stack, (double) local[ClassFile_Helper.readByte(codeData) & 0xFF]);
                     }
                     case ALOAD -> {
-                        Instructions.ALOAD(stack, local[ClassFile_Helper.readByte(codeData)]);
+                        Instructions.ALOAD(stack, local[ClassFile_Helper.readByte(codeData) & 0xFF]);
                     }
                     case ILOAD_0, ILOAD_1, ILOAD_2, ILOAD_3 -> {
                         // ILOAD_0 is 0x1A .. ILOAD_3 is 0x1D
@@ -252,23 +252,23 @@ class ClassFile {
                     }
                     case ISTORE -> {
                         byte index = ClassFile_Helper.readByte(codeData);
-                        Instructions.ISTORE(stack, local, index);
+                        Instructions.ISTORE(stack, local, index & 0xFF);
                     }
                     case LSTORE -> {
                         byte index = ClassFile_Helper.readByte(codeData);
-                        Instructions.LSTORE(stack, local, index);
+                        Instructions.LSTORE(stack, local, index & 0xFF);
                     }
                     case FSTORE -> {
                         byte index = ClassFile_Helper.readByte(codeData);
-                        Instructions.FSTORE(stack, local, index);
+                        Instructions.FSTORE(stack, local, index & 0xFF);
                     }
                     case DSTORE -> {
                         byte index = ClassFile_Helper.readByte(codeData);
-                        Instructions.DSTORE(stack, local, index);
+                        Instructions.DSTORE(stack, local, index & 0xFF);
                     }
                     case ASTORE -> {
                         byte index = ClassFile_Helper.readByte(codeData);
-                        Instructions.ASTORE(stack, local, index);
+                        Instructions.ASTORE(stack, local, index & 0xFF);
                     }
                     case ISTORE_0, ISTORE_1, ISTORE_2, ISTORE_3 -> {
                         // ISTORE_0 is 0x3B .. ISTORE_3 is 0x3E
@@ -486,7 +486,7 @@ class ClassFile {
                         byte index = ClassFile_Helper.readByte(codeData);
                         byte constVal = ClassFile_Helper.readByte(codeData); // Potential bug, constVal is a signed byte
 
-                        local[index] = (int) local[index] + constVal;
+                        local[index & 0xFF] = (int) local[index & 0xFF] + constVal;
                     }
                     case I2L -> {
                         Instructions.ICONV(stack, long.class);
@@ -773,9 +773,10 @@ class ClassFile {
                         CP_Info methodRef = CONSTANT_POOL.get(index - 1);
                         String className = getNameOfClass(methodRef.getClassIndex());
                         String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
-
+                        Pair<Class<?>, Object> objectref = new Pair<Class<?>,Object>(void.class, null);
+                        
                         try {
-                            Pair<Class<?>, Object> objectref = stack.remove(0);
+                            objectref = stack.remove(0);
                             List<Pair<Class<?>, Object>> args = stack;
                             List<Object> arg = new ArrayList<Object>();
                             List<Class<?>> type = new ArrayList<Class<?>>();
@@ -823,6 +824,20 @@ class ClassFile {
                             for (Attribute_Info attribute : attributes) {
                                 try {
                                     Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+
+                                    stack.add(0, objectref);
+                                    int stackSize = stack.size();
+
+                                    for (int i = 0; i < stackSize; ++i) {
+                                        if (stack.get(0).first == long.class || stack.get(0).first == double.class) {
+                                            local[i] = stack.remove(0).second;
+                                            local[i + 1] = local[i];
+                                            i += 1;
+                                            stackSize += 1;
+                                        } else {
+                                            local[i] = stack.remove(0).second;
+                                        }
+                                    }
 
                                     executeCode(codeAttribute.code);
                                 } catch (Exception ee) {
