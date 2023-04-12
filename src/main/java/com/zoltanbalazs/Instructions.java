@@ -86,6 +86,14 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(float.class, value));
     }
 
+    public static void DALOAD(List<Pair<Class<?>, Object>> stack) {
+        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
+
+        Object value = Array.get(arrayRef.second, index);
+        stack.add(new Pair<Class<?>, Object>(double.class, value));
+    }
+
     public static void AALOAD(List<Pair<Class<?>, Object>> stack) {
         int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
         Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
@@ -126,6 +134,11 @@ public class Instructions {
     public static void FASTORE(List<Pair<Class<?>, Object>> stack) {
         AASTORE(stack);
     }
+
+    public static void DASTORE(List<Pair<Class<?>, Object>> stack) {
+        AASTORE(stack);
+    }
+
     public static void AASTORE(List<Pair<Class<?>, Object>> stack) {
         Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
         int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
