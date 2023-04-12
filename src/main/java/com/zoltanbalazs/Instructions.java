@@ -125,39 +125,35 @@ public class Instructions {
     }
 
     public static void IASTORE(List<Pair<Class<?>, Object>> stack) {
-        AASTORE(stack);
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
     public static void LASTORE(List<Pair<Class<?>, Object>> stack) {
-        AASTORE(stack);
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
     public static void FASTORE(List<Pair<Class<?>, Object>> stack) {
-        AASTORE(stack);
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
     public static void DASTORE(List<Pair<Class<?>, Object>> stack) {
-        AASTORE(stack);
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
     public static void AASTORE(List<Pair<Class<?>, Object>> stack) {
-        Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
-        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
-        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
-
-        Array.set(arrayRef.second, index, value.second);
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
     public static void BASTORE(List<Pair<Class<?>, Object>> stack) {
-        AASTORE(stack);
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
     public static void CASTORE(List<Pair<Class<?>, Object>> stack) {
-        AASTORE(stack);
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
     public static void SASTORE(List<Pair<Class<?>, Object>> stack) {
-        AASTORE(stack);
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
     public static void POP(List<Pair<Class<?>, Object>> stack, Opcode type) {
@@ -503,5 +499,13 @@ class Instructions_Helper {
         Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
 
         return Array.get(arrayRef.second, index);
+    }
+
+    public static void ARRAYSTORE(List<Pair<Class<?>, Object>> stack) {
+        Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
+        int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
+
+        Array.set(arrayRef.second, index, value.second);
     }
 }
