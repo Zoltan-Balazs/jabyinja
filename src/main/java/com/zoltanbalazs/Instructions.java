@@ -67,6 +67,7 @@ public class Instructions {
 
     public static void LSTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
         local[index] = ((Number) stack.remove(stack.size() - 1).second).longValue();
+        local[index + 1] = local[index];
     }
 
     public static void FSTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
@@ -75,6 +76,7 @@ public class Instructions {
 
     public static void DSTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
         local[index] = ((Number) stack.remove(stack.size() - 1).second).doubleValue();
+        local[index + 1] = local[index];
     }
 
     public static void ASTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
