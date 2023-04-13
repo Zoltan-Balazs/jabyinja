@@ -31,8 +31,13 @@ jobs:
       run: mvn --batch-mode --update-snapshots verify
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - name: Publish JAR
+    - name: Copy JAR
       run: mkdir staging && cp target/*.jar staging
+    - name: Publish JAR
+      uses: actions/upload-artifact@v3
+      with:
+        name: Package
+        path: staging
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
