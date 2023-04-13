@@ -260,6 +260,10 @@ public class Instructions {
         return new Pair<Double, Double>((double) value1.second, (double) value2.second);
     }
 
+    public static void IINC(Object[] local, int index, int constVal) {
+        local[index] = (int) local[index] + constVal;
+    }
+
     public static void ICONV(List<Pair<Class<?>, Object>> stack, Class<?> result) {
         Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
 

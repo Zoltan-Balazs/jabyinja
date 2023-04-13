@@ -522,7 +522,7 @@ class ClassFile {
                     byte index = code[codeIndex.Next()];
                     byte constVal = code[codeIndex.Next()]; // Potential bug, constVal is a signed byte
 
-                    local[index & 0xFF] = (int) local[index & 0xFF] + constVal;
+                    Instructions.IINC(local, index & 0xFF, constVal);
                 }
                 case I2L -> {
                     Instructions.ICONV(stack, long.class);
