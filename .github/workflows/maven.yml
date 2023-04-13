@@ -34,7 +34,7 @@ jobs:
     - name: Copy JAR
       run: mkdir staging && cp target/*.jar staging
     - name: Publish JAR
-      uses: actions/upload-artifact@v3
+      uses: softprops/action-gh-release@v1
       with:
         name: Package
         path: staging
