@@ -648,14 +648,10 @@ class ClassFile {
                     Instructions.GOTO(codeIndex, offset);
                 }
                 case JSR -> {
-                    // WILL NOT IMPLEMENT
-                    throw new UnsupportedOperationException(
-                            "JSR is deprecated since Java 7, this program only supports Java 7+ class files");
+                    Instructions.JSR();
                 }
                 case RET -> {
-                    // WILL NOT IMPLEMENT
-                    throw new UnsupportedOperationException(
-                            "RET is (effectively) deprecated since Java 7, this program only supports Java 7+ class files");
+                    Instructions.RET();
                 }
                 case TABLESWITCH -> {
                     // TODO ?
@@ -963,9 +959,7 @@ class ClassFile {
                     Instructions.GOTO_W(codeIndex, offset);
                 }
                 case JSR_W -> {
-                    // WILL NOT IMPLEMENT
-                    throw new UnsupportedOperationException(
-                            "JSR_W is deprecated since Java 7, this program only supports Java 7+ class files");
+                    Instructions.JSR_W();
                 }
             }
         }

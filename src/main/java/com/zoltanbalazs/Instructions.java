@@ -504,6 +504,16 @@ public class Instructions {
         codeIndex.Inc(offset - 2 - 1);
     }
 
+    public static void JSR() {
+        throw new UnsupportedOperationException(
+                "JSR is deprecated since Java 7, this program only supports Java 7+ class files");
+    }
+
+    public static void RET() {
+        throw new UnsupportedOperationException(
+                "RET is (effectively) deprecated since Java 7, this program only supports Java 7+ class files");
+    }
+
     public static void NEWARRAY(List<Pair<Class<?>, Object>> stack, byte atype) {
         Class<?> arrayType = Instructions_Helper.GetArrayType(atype);
         int count = ((Number) stack.remove(stack.size() - 1).second).intValue();
@@ -610,6 +620,11 @@ public class Instructions {
 
     public static void GOTO_W(CodeIndex codeIndex, int offset) {
         codeIndex.Inc(offset - 4 - 1);
+    }
+
+    public static void JSR_W() {
+        throw new UnsupportedOperationException(
+                "JSR_W is deprecated since Java 7, this program only supports Java 7+ class files");
     }
 }
 
