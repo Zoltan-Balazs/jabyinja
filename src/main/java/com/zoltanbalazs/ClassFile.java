@@ -658,7 +658,8 @@ class ClassFile {
                     Instructions.TABLESWITCH(code, codeIndex, stack);
                 }
                 case LOOKUPSWITCH -> {
-                    // TODO ?
+                    // If there are big gaps in the switch cases
+                    Instructions.LOOKUPSWITCH(code, codeIndex, stack);
                 }
                 case IRETURN -> {
                     // TODO

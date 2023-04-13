@@ -260,7 +260,7 @@ Thankfully, they are the exact same
 | ~~JSR~~          	| <ul><li>[x] </li></ul> 	|
 | ~~RET~~           | <ul><li>[x] </li></ul> 	|
 | TABLESWITCH    	| <ul><li>[x] </li></ul> 	|
-| LOOKUPSWITCH   	| <ul><li>[ ] </li></ul> 	|
+| LOOKUPSWITCH   	| <ul><li>[x] </li></ul> 	|
 | *RETURN        	| <ul><li>[ ] </li></ul> 	|
 | *STATIC        	| <ul><li>[ ] </li></ul> 	|
 | *FIELD         	| <ul><li>[ ] </li></ul> 	|

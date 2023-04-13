@@ -535,6 +535,29 @@ public class Instructions {
         }
     }
 
+    public static void LOOKUPSWITCH(byte[] code, CodeIndex codeIndex, List<Pair<Class<?>, Object>> stack) {
+        int startingPos = codeIndex.Get() - 1;
+        while (codeIndex.Get() % 4 != 0) {
+            codeIndex.Inc(1);
+        }
+
+        int defaultOffset = ClassFile_Helper.readInt(code, codeIndex);
+        int numberOfPairs = ClassFile_Helper.readInt(code, codeIndex);
+        int comparedValue = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        boolean valueFound = false;
+        for (int i = 0; i < numberOfPairs && !valueFound; ++i) {
+            Pair<Integer, Integer> key = new Pair<Integer, Integer>(
+                    ClassFile_Helper.readInt(code, codeIndex), ClassFile_Helper.readInt(code, codeIndex));
+            if (key.first == comparedValue) {
+                codeIndex.Set(startingPos + key.second);
+                valueFound = true;
+            }
+        }
+        if (!valueFound) {
+            codeIndex.Set(startingPos + defaultOffset);
+        }
+    }
+
     public static void NEWARRAY(List<Pair<Class<?>, Object>> stack, byte atype) {
         Class<?> arrayType = Instructions_Helper.GetArrayType(atype);
         int count = ((Number) stack.remove(stack.size() - 1).second).intValue();
