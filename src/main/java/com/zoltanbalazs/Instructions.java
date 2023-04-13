@@ -525,6 +525,70 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(int.class, Array.getLength(arrayref.second)));
     }
 
+    public static void WIDE(byte[] code, CodeIndex codeIndex, List<Pair<Class<?>, Object>> stack, Object[] local,
+            Opcode instruction) {
+        short index = -1;
+        short constVal = -1;
+
+        switch (instruction) {
+            case ILOAD, LLOAD, FLOAD, DLOAD, ALOAD, LSTORE, ISTORE, FSTORE, DSTORE, ASTORE -> {
+                index = ClassFile_Helper.readShort(code, codeIndex);
+            }
+            case IINC -> {
+                index = ClassFile_Helper.readShort(code, codeIndex);
+                constVal = ClassFile_Helper.readShort(code, codeIndex);
+            }
+            case RET -> {
+                throw new UnsupportedOperationException(
+                        "RET is (effectively) deprecated since Java 7, this program only supports Java 7+ class files");
+            }
+            default -> {
+                throw new UnsupportedOperationException(
+                        "WIDE for " + instruction + " is not supported!");
+            }
+        }
+
+        switch (instruction) {
+            case ILOAD -> {
+                ILOAD(stack, (int) local[index & 0xFFFF]);
+            }
+            case LLOAD -> {
+                LLOAD(stack, (long) local[index & 0xFFFF]);
+            }
+            case FLOAD -> {
+                FLOAD(stack, (float) local[index & 0xFFFF]);
+            }
+            case DLOAD -> {
+                DLOAD(stack, (double) local[index & 0xFFFF]);
+            }
+            case ALOAD -> {
+                ALOAD(stack, local[index & 0xFFFF]);
+            }
+            case ISTORE -> {
+                ISTORE(stack, local, index & 0xFFFF);
+            }
+            case LSTORE -> {
+                LSTORE(stack, local, index & 0xFFFF);
+            }
+            case FSTORE -> {
+                FSTORE(stack, local, index & 0xFFFF);
+            }
+            case DSTORE -> {
+                DSTORE(stack, local, index & 0xFFFF);
+            }
+            case ASTORE -> {
+                ASTORE(stack, local, index & 0xFFFF);
+            }
+            case IINC -> {
+                IINC(local, index & 0xFFFF, constVal);
+            }
+            default -> {
+                throw new UnsupportedOperationException(
+                        "WIDE for " + instruction + " is not supported!");
+            }
+        }
+    }
+
     public static void IF1A(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
         Object value = stack.remove(stack.size() - 1).second;
 

@@ -272,7 +272,7 @@ Thankfully, they are the exact same
 | ATHROW         	| <ul><li>[ ] </li></ul> 	|
 | CHECKCAST      	| <ul><li>[ ] </li></ul> 	|
 | MONITOR*       	| <ul><li>[ ] </li></ul> 	|
-| WIDE           	| <ul><li>[ ] </li></ul> 	|
+| WIDE           	| <ul><li>[x] </li></ul> 	|
 | MULTIANEWARRAY 	| <ul><li>[ ] </li></ul> 	|
 | IF*NULL        	| <ul><li>[x] </li></ul> 	|
 | GOTO_W         	| <ul><li>[x] </li></ul> 	|

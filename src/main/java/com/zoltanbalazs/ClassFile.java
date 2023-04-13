@@ -87,7 +87,7 @@ class ClassFile {
     private static List<Attribute_Info> ATTRIBUTES;
 
     private static List<Pair<Class<?>, Object>> stack = new ArrayList<>();
-    private static Object[] local = new Object[256];
+    private static Object[] local = new Object[65535];
 
     public ClassFile(String fileName) {
         readClassFile(fileName);
@@ -944,7 +944,8 @@ class ClassFile {
                     // TODO
                 }
                 case WIDE -> {
-                    // TODO
+                    Opcode newOpcode = Opcode.opcodeRepresentation(code[codeIndex.Next()]);
+                    Instructions.WIDE(code, codeIndex, stack, local, newOpcode);
                 }
                 case MULTIANEWARRAY -> {
                     // TODO
