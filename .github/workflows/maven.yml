@@ -33,13 +33,11 @@ jobs:
       run: mvn --batch-mode --update-snapshots verify
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - name: Copy JAR
-      run: mkdir staging && cp target/*.jar staging
     - name: Publish JAR
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: staging/*.jar
+        files: target/*.jar
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
