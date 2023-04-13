@@ -259,7 +259,7 @@ Thankfully, they are the exact same
 | GOTO           	| <ul><li>[x] </li></ul> 	|
 | ~~JSR~~          	| <ul><li>[x] </li></ul> 	|
 | ~~RET~~           | <ul><li>[x] </li></ul> 	|
-| TABLESWITCH    	| <ul><li>[ ] </li></ul> 	|
+| TABLESWITCH    	| <ul><li>[x] </li></ul> 	|
 | LOOKUPSWITCH   	| <ul><li>[ ] </li></ul> 	|
 | *RETURN        	| <ul><li>[ ] </li></ul> 	|
 | *STATIC        	| <ul><li>[ ] </li></ul> 	|

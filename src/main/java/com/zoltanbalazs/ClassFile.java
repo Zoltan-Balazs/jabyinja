@@ -654,7 +654,8 @@ class ClassFile {
                     Instructions.RET();
                 }
                 case TABLESWITCH -> {
-                    // TODO ?
+                    // If switch cases are close enough
+                    Instructions.TABLESWITCH(code, codeIndex, stack);
                 }
                 case LOOKUPSWITCH -> {
                     // TODO ?

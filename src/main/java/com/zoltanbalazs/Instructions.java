@@ -514,6 +514,27 @@ public class Instructions {
                 "RET is (effectively) deprecated since Java 7, this program only supports Java 7+ class files");
     }
 
+    public static void TABLESWITCH(byte[] code, CodeIndex codeIndex, List<Pair<Class<?>, Object>> stack) {
+        int startingPos = codeIndex.Get() - 1;
+        while (codeIndex.Get() % 4 != 0) {
+            codeIndex.Inc(1);
+        }
+
+        int defaultOffset = ClassFile_Helper.readInt(code, codeIndex);
+        int lowValue = ClassFile_Helper.readInt(code, codeIndex);
+        int highValue = ClassFile_Helper.readInt(code, codeIndex);
+        int comparedValue = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        if (comparedValue < lowValue || highValue < comparedValue) {
+            codeIndex.Set(startingPos + defaultOffset);
+        } else {
+            for (int i = lowValue; i < comparedValue; ++i) {
+                ClassFile_Helper.readInt(code, codeIndex); // SKIP
+            }
+            int offset = ClassFile_Helper.readInt(code, codeIndex);
+            codeIndex.Set(startingPos + offset);
+        }
+    }
+
     public static void NEWARRAY(List<Pair<Class<?>, Object>> stack, byte atype) {
         Class<?> arrayType = Instructions_Helper.GetArrayType(atype);
         int count = ((Number) stack.remove(stack.size() - 1).second).intValue();
