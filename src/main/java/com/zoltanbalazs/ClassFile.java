@@ -1028,6 +1028,94 @@ class ClassFile {
                 }
                 case INVOKEDYNAMIC -> {
                     // TODO
+                    short index = ClassFile_Helper.readShort(code, codeIndex);
+                    CP_Info methodRef = CONSTANT_POOL.get(index - 1);
+                    // String className = getNameOfClass(methodRef.getClassIndex());
+                    String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
+                    int numberOfArguments = getNumberOfArguments(methodRef.getNameAndTypeIndex());
+                    byte discard = code[codeIndex.Next()];
+                    discard = code[codeIndex.Next()];
+
+                    try {
+                        int stackSize = stack.size();
+                        List<Pair<Class<?>, Object>> args = new ArrayList<>();
+                        if (0 <= stackSize - numberOfArguments) {
+                            args = stack.subList(stackSize - numberOfArguments, stackSize);
+                        }
+
+                        List<Object> arg = new ArrayList<Object>();
+                        List<Class<?>> type = new ArrayList<Class<?>>();
+                        for (var a : args) {
+                            Class<?> a_type = a.first;
+                            Object curr_arg = a.second;
+                            if (a_type == int.class) {
+                                arg.add((int) curr_arg);
+                            } else if (a_type == float.class) {
+                                arg.add((float) curr_arg);
+                            } else if (a_type == double.class) {
+                                arg.add((double) curr_arg);
+                            } else if (a_type == long.class) {
+                                arg.add((long) curr_arg);
+                            } else {
+                                arg.add(a_type.cast(curr_arg));
+                            }
+                            type.add(a.first);
+                        }
+
+                        Class<?>[] types = new Class<?>[type.size()];
+                        for (int j = 0; j < type.size(); ++j) {
+                            types[j] = (Class<?>) type.get(j);
+                        }
+
+                        // Class<?> classClass = Class.forName(className.replace("/", "."));
+                        // Method method = classClass.getDeclaredMethod(memberName, types);
+
+                        Object[] arguments = new Object[arg.size()];
+                        for (int j = 0; j < arg.size(); ++j) {
+                            arguments[j] = (Object) arg.get(j);
+                        }
+
+                        // Object result = method.invoke(className.replace("/", "."), arguments);
+                        // Class<?> returnType = method.getReturnType();
+
+                        if (0 <= stackSize - numberOfArguments) {
+                            stack.subList(stackSize - numberOfArguments, stackSize).clear();
+                        }
+
+                        // if (result != null) {
+                        // stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
+                        // }
+                        // } catch (ClassNotFoundException e) {
+                        // Method_Info method = findMethodsByName(memberName);
+                        // List<Attribute_Info> attributes = findAttributesByName(method.attributes,
+                        // "Code");
+
+                        // for (Attribute_Info attribute : attributes) {
+                        // try {
+                        // Code_Attribute codeAttribute =
+                        // Code_Attribute_Helper.readCodeAttributes(attribute);
+
+                        // int stackSize = stack.size();
+
+                        // for (int j = 0; j < stackSize; ++j) {
+                        // if (stack.get(0).first == long.class || stack.get(0).first == double.class) {
+                        // local[j] = stack.remove(0).second;
+                        // local[j + 1] = local[j];
+                        // j += 1;
+                        // stackSize += 1;
+                        // } else {
+                        // local[j] = stack.remove(0).second;
+                        // }
+                        // }
+
+                        // executeCode(codeAttribute.code);
+                        // } catch (Exception ee) {
+                        // ee.printStackTrace();
+                        // }
+                        // }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 case NEW -> {
                     // TODO
