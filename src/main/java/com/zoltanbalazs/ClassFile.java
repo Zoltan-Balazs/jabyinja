@@ -884,12 +884,7 @@ class ClassFile {
 
                     try {
                         Class<?> classClass = Class.forName(memberName.replace("/", "."));
-                        // TODO: Fix, for general usage..
-                        for (Constructor<?> c : classClass.getConstructors()) {
-                            System.out.println(c);
-                        }
-                        Constructor<?> conEmpty = classClass.getConstructor(InputStream.class);
-                        stack.add(new Pair<Class<?>, Object>(classClass, conEmpty.newInstance(System.in)));
+                        stack.add(new Pair<Class<?>, Object>(classClass, classClass));
                     } catch (ClassNotFoundException cnfe) {
                         Method_Info method = findMethodsByName(memberName);
                         List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");

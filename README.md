@@ -281,7 +281,7 @@ Thankfully, they are the exact same
 | *STATIC        	| <ul><li>[ ] </li></ul> 	|
 | *FIELD         	| <ul><li>[ ] </li></ul> 	|
 | INVOKE*        	| <ul><li>[ ] </li></ul> 	|
-| NEW            	| <ul><li>[ ] </li></ul> 	|
+| NEW            	| <ul><li>[x] </li></ul> 	|
 | NEWARRAY       	| <ul><li>[x] </li></ul> 	|
 | ANEWARRAY      	| <ul><li>[x] </li></ul> 	|
 | ARRAYLENGTH    	| <ul><li>[x] </li></ul> 	|
