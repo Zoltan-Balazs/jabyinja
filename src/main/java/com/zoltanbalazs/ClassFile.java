@@ -881,9 +881,10 @@ class ClassFile {
                     try {
                         int stackSize = stack.size();
                         List<Pair<Class<?>, Object>> args = new ArrayList<>();
-                        for (int i = stackSize - numberOfArguments; i < stackSize; ++i) {
-                            args.add(stack.get(i));
+                        if (0 <= stackSize - numberOfArguments) {
+                            args = stack.subList(stackSize - numberOfArguments, stackSize);
                         }
+
                         List<Object> arg = new ArrayList<Object>();
                         List<Class<?>> type = new ArrayList<Class<?>>();
                         for (var a : args) {
@@ -919,16 +920,13 @@ class ClassFile {
                         Object result = method.invoke(className.replace("/", "."), arguments);
                         Class<?> returnType = method.getReturnType();
 
-                        for (int i = 0; i < numberOfArguments; ++i) {
-                            stack.remove(stack.size() - 1);
+                        if (0 <= stackSize - numberOfArguments) {
+                            stack.subList(stackSize - numberOfArguments, stackSize).clear();
                         }
-                        stack.add(new Pair<Class<?>, Object>(returnType, result));
 
-                        /*
-                         * if (result != null) {
-                         * stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
-                         * }
-                         */
+                        if (result != null) {
+                            stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
+                        }
                     } catch (ClassNotFoundException e) {
                         Method_Info method = findMethodsByName(memberName);
                         List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");
