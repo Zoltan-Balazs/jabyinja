@@ -173,46 +173,40 @@ public class Instructions {
     }
 
     public static void DUP(List<Pair<Class<?>, Object>> stack, Opcode type) {
-        int idx = stack.size() - 1;
+        int stackSize = stack.size();
         if (type == Opcode.DUP) {
-            stack.add((idx - 1) > 0 ? (idx - 1) : 0, stack.get(idx));
+            stack.add((stackSize - 1) > 0 ? (stackSize - 1) : 0, stack.get(stackSize - 1));
         } else if (type == Opcode.DUP_X1) {
-            stack.add((idx - 2) > 0 ? (idx - 2) : 0, stack.get(idx));
+            stack.add((stackSize - 2) > 0 ? (stackSize - 2) : 0, stack.get(stackSize - 1));
         } else if (type == Opcode.DUP_X2) {
-            stack.add((idx - 3) > 0 ? (idx - 3) : 0, stack.get(idx));
+            stack.add((stackSize - 3) > 0 ? (stackSize - 3) : 0, stack.get(stackSize - 1));
         } else {
             throw new UnsupportedOperationException("DUP for " + type + " is not implemented!");
         }
     }
 
     public static void DUP2(List<Pair<Class<?>, Object>> stack, Opcode type) {
-        int idx = stack.size() - 1;
+        int stackSize = stack.size();
         if (type == Opcode.DUP2) {
-            if (stack.get(idx).first == long.class || stack.get(idx).first == double.class) {
-                stack.add((idx - 1) > 0 ? (idx - 1) : 0, stack.get(idx));
+            if (stack.get(stackSize - 1).first == long.class || stack.get(stackSize - 1).first == double.class) {
+                stack.add((stackSize - 1) > 0 ? (stackSize - 1) : 0, stack.get(stackSize - 1));
             } else {
-                int idx1 = idx;
-                stack.add((idx1 - 2) > 0 ? (idx1 - 2) : 0, stack.get(idx1));
-                int idx2 = stack.size() - 2;
-                stack.add((idx2 - 2) > 0 ? (idx2 - 2) : 0, stack.get(idx2));
+                stack.add((stackSize - 2) > 0 ? (stackSize - 2) : 0, stack.get(stackSize - 1));
+                stack.add((stackSize - 2) > 0 ? (stackSize - 2) : 0, stack.get(stackSize - 1));
             }
         } else if (type == Opcode.DUP_X1) {
-            if (stack.get(idx).first == long.class || stack.get(idx).first == double.class) {
-                stack.add((idx - 2) > 0 ? (idx - 2) : 0, stack.get(idx));
+            if (stack.get(stackSize - 2).first == long.class || stack.get(stackSize - 2).first == double.class) {
+                stack.add((stackSize - 2) > 0 ? (stackSize - 2) : 0, stack.get(stackSize - 1));
             } else {
-                int idx1 = idx;
-                stack.add((idx1 - 3) > 0 ? (idx1 - 3) : 0, stack.get(idx1));
-                int idx2 = stack.size() - 2;
-                stack.add((idx2 - 3) > 0 ? (idx2 - 3) : 0, stack.get(idx2));
+                stack.add((stackSize - 3) > 0 ? (stackSize - 3) : 0, stack.get(stackSize - 3));
+                stack.add((stackSize - 3) > 0 ? (stackSize - 3) : 0, stack.get(stackSize - 3));
             }
         } else if (type == Opcode.DUP_X2) {
-            if (stack.get(idx).first == long.class || stack.get(idx).first == double.class) {
-                stack.add((idx - 3) > 0 ? (idx - 3) : 0, stack.get(idx));
+            if (stack.get(stackSize - 3).first == long.class || stack.get(stackSize - 3).first == double.class) {
+                stack.add((stackSize - 3) > 0 ? (stackSize - 3) : 0, stack.get(stackSize - 1));
             } else {
-                int idx1 = idx;
-                stack.add((idx1 - 4) > 0 ? (idx1 - 4) : 0, stack.get(idx1));
-                int idx2 = stack.size() - 2;
-                stack.add((idx2 - 4) > 0 ? (idx2 - 4) : 0, stack.get(idx2));
+                stack.add((stackSize - 4) > 0 ? (stackSize - 4) : 0, stack.get(stackSize - 4));
+                stack.add((stackSize - 4) > 0 ? (stackSize - 4) : 0, stack.get(stackSize - 4));
             }
         } else {
             throw new UnsupportedOperationException("DUP2 for " + type + " is not implemented!");
