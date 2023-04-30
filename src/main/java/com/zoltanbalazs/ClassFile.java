@@ -718,9 +718,19 @@ class ClassFile {
                     String className = getNameOfClass(methodRef.getClassIndex());
                     String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
 
+                    CP_Info methodDescription = CONSTANT_POOL
+                            .get(CONSTANT_POOL.get(methodRef.getNameAndTypeIndex() - 1).getDescriptorIndex() - 1);
+                    String methodDescArgs = new String(methodDescription.getBytes(), StandardCharsets.UTF_8);
+                    List<Class<?>> arguments = stringToTypes(
+                            methodDescArgs.substring(methodDescArgs.indexOf("(") + 1,
+                                    methodDescArgs.indexOf(")")));
+                    int numberOfArguments = arguments.size();
+
                     try {
-                        Pair<Class<?>, Object> objectref = stack.remove(0);
-                        List<Pair<Class<?>, Object>> args = stack;
+                        int stackSize = stack.size();
+                        Pair<Class<?>, Object> objectref = stack.remove(stackSize - numberOfArguments - 1);
+                        List<Pair<Class<?>, Object>> args = stack.subList(stackSize - numberOfArguments - 1,
+                                stackSize - 1);
                         List<Object> arg = new ArrayList<Object>();
                         List<Class<?>> type = new ArrayList<Class<?>>();
                         for (var a : args) {
@@ -746,16 +756,47 @@ class ClassFile {
                         }
 
                         Class<?> classClass = Class.forName(className.replace("/", "."));
-                        Method method = classClass.getDeclaredMethod(memberName, types);
+                        Method method;
 
-                        Object[] arguments = new Object[arg.size()];
-                        for (int j = 0; j < arg.size(); ++j) {
-                            arguments[j] = (Object) arg.get(j);
+                        try {
+                            method = classClass.getDeclaredMethod(memberName, types);
+                        } catch (NoSuchMethodException e) {
+                            for (int j = 0; j < type.size(); ++j) {
+                                types[j] = (Class<?>) type.get(j);
+                            }
+                            try {
+                                method = classClass.getDeclaredMethod(memberName, types);
+                            } catch (NoSuchMethodException ne) {
+                                types = new Class<?>[arguments.size()];
+                                for (int j = 0; j < arguments.size(); ++j) {
+                                    types[j] = (Class<?>) arguments.get(j);
+                                }
+                                method = classClass.getDeclaredMethod(memberName, types);
+                            }
+
                         }
 
-                        Object result = method.invoke(objectref.second, arguments);
+                        Object[] objArguments = new Object[arg.size()];
+                        for (int j = 0; j < arg.size(); ++j) {
+                            objArguments[j] = (Object) arg.get(j);
+                        }
 
-                        stack.removeAll(stack);
+                        Object result = null;
+                        try {
+                            result = method.invoke(objectref.second, objArguments);
+                        } catch (IllegalArgumentException ie) {
+                            objArguments = new Object[arguments.size()];
+                            for (int j = 0; j < arguments.size(); ++j) {
+                                if (arg.size() <= j) {
+                                    objArguments[j] = null;
+                                } else {
+                                    objArguments[j] = (Object) arg.get(j);
+                                }
+                            }
+                            result = method.invoke(objectref.second, objArguments);
+                        }
+
+                        stack.subList(stackSize - numberOfArguments - 1, stackSize - 1).clear();
 
                         if (result != null) {
                             stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
