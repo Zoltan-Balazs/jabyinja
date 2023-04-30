@@ -130,6 +130,9 @@ class Constant_Pool_Helper {
 					tmp.name_and_type_index = ClassFile_Helper.readShort(in);
 					constant_pool.add(tmp);
 				}
+				case POOR_CHOICE -> {
+					// Ignored..
+				}
 				case ERROR -> {
 					throw new InvalidConstantPoolTagException(Byte.toString(tagValue));
 				}
