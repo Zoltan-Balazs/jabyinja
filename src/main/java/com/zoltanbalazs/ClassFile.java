@@ -959,6 +959,72 @@ class ClassFile {
                 }
                 case INVOKEINTERFACE -> {
                     // TODO
+                    short index = ClassFile_Helper.readShort(code, codeIndex);
+                    CP_Info interfaceRef = (CONSTANT_InterfaceMethodref_Info) CONSTANT_POOL.get(index - 1);
+                    String className = getNameOfClass(interfaceRef.getClassIndex());
+                    String memberName = getNameOfMember(CONSTANT_POOL.get(index - 1).getNameAndTypeIndex());
+                    int numberOfArguments = getNumberOfArguments(interfaceRef.getNameAndTypeIndex());
+                    byte count = code[codeIndex.Next()]; // TODO: Unsigned byte...
+                    byte discard = code[codeIndex.Next()];
+
+                    try {
+                        int stackSize = stack.size();
+                        Pair<Class<?>, Object> objectref = stack.remove(stackSize - count);
+                        List<Pair<Class<?>, Object>> args = stack.subList(stackSize - count, stackSize - 1);
+                        List<Object> arg = new ArrayList<Object>();
+                        List<Class<?>> type = new ArrayList<Class<?>>();
+                        for (var a : args) {
+                            Class<?> a_type = a.first;
+                            Object curr_arg = a.second;
+                            if (a_type == int.class) {
+                                arg.add((int) curr_arg);
+                            } else if (a_type == float.class) {
+                                arg.add((float) curr_arg);
+                            } else if (a_type == double.class) {
+                                arg.add((double) curr_arg);
+                            } else if (a_type == long.class) {
+                                arg.add((long) curr_arg);
+                            } else {
+                                arg.add(a_type.cast(curr_arg));
+                            }
+                            type.add(a.first);
+                        }
+
+                        Class<?>[] types = new Class<?>[type.size()];
+                        for (int j = 0; j < type.size(); ++j) {
+                            types[j] = Object.class;// (Class<?>) type.get(j); HACKY BYPASS!
+                        }
+
+                        Class<?> classClass = Class.forName(className.replace("/", "."));
+
+                        Method method = null;
+                        try {
+                            method = classClass.getDeclaredMethod(memberName, types);
+                        } catch (NoSuchMethodException e) {
+                            for (int j = 0; j < type.size(); ++j) {
+                                types[j] = (Class<?>) type.get(j);
+                            }
+                            method = classClass.getDeclaredMethod(memberName, types);
+                        }
+
+                        Object[] objArguments = new Object[arg.size()];
+                        for (int j = 0; j < arg.size(); ++j) {
+                            objArguments[j] = (Object) arg.get(j);
+                        }
+
+                        Object result = method.invoke(objectref.second, objArguments);
+
+                        // for (int i = stackSize - count; i < stackSize - 1; ++i) {
+                        stack.subList(stackSize - count, stackSize - 1).clear();
+                        // }
+
+                        if (result != null) {
+                            // stack.add(objectRef); HUH?
+                            stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 case INVOKEDYNAMIC -> {
                     // TODO
