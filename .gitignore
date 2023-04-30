@@ -10,4 +10,5 @@ thesis/images/*
 !thesis/elteikthesis.*
 !thesis/images/
 !thesis/text/
+!src/test/
 !thesis/images/elte_cimer_szines.eps
