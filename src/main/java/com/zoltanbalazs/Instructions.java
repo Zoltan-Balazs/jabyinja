@@ -643,6 +643,29 @@ public class Instructions {
         }
     }
 
+    public static void MULTIANEWARRAY(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
+            byte dimensions)
+            throws ClassNotFoundException {
+        ConstantPoolTag tag = constant_pool.get((index & 0xFF) + 1).tag;
+
+        Class<?> arrayType = null;
+        Class<?> hackyType = null;
+        if (tag == ConstantPoolTag.CONSTANT_Utf8 || tag == ConstantPoolTag.CONSTANT_Fieldref) {
+            arrayType = Class.forName(ClassFile.getNameOfClass(index).replace("/", "."));
+            hackyType = Class.forName(ClassFile.getNameOfClass(index).replace("/", ".").replaceAll("\\[+", "["));
+        } else {
+            arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
+        }
+
+        int[] size = new int[dimensions];
+        for (int i = 0; i < dimensions; ++i) {
+            int count = ((Number) stack.remove(0).second).intValue();
+            size[i] = count;
+        }
+
+        stack.add(new Pair<Class<?>, Object>(arrayType, Array.newInstance(hackyType, size)));
+    }
+
     public static void IF1A(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
         Object value = stack.remove(stack.size() - 1).second;
 

@@ -946,7 +946,9 @@ class ClassFile {
                     Instructions.WIDE(code, codeIndex, stack, local, newOpcode);
                 }
                 case MULTIANEWARRAY -> {
-                    // TODO
+                    short index = ClassFile_Helper.readShort(code, codeIndex);
+                    byte dimensions = code[codeIndex.Next()];
+                    Instructions.MULTIANEWARRAY(stack, CONSTANT_POOL, index, dimensions);
                 }
                 case IFNULL -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
