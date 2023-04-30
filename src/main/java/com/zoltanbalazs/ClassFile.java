@@ -169,12 +169,15 @@ class ClassFile {
                 StandardCharsets.UTF_8);
     }
 
-    public int getNumberOfArguments(short name_and_type_index) {
+    public int getNumberOfArguments(short name_and_type_index) throws ClassNotFoundException {
         String descriptor = new String(
                 CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getDescriptorIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
 
-        return (int) descriptor.chars().filter(ch -> ch == ';').count();
+        return stringToTypes(
+                descriptor.substring(descriptor.indexOf("(") + 1,
+                        descriptor.indexOf(")")))
+                .size();
     }
 
     public void executeCode(byte[] code)
@@ -967,6 +970,83 @@ class ClassFile {
                 }
             }
         }
+    }
+
+    public Pair<Integer, String> decodeClassName(String argument) {
+        String type = argument.substring(0 + 1);
+        int endIdx = type.indexOf(";");
+        type = type.substring(0, endIdx);
+        return new Pair<Integer, String>(1 + endIdx + 1, type.replace("/", "."));
+    }
+
+    public Pair<Integer, Class<?>> stringToType(String argument) throws ClassNotFoundException {
+        switch (argument.charAt(0)) {
+            case 'B' -> {
+                return new Pair<Integer, Class<?>>(1, byte.class);
+            }
+            case 'C' -> {
+                return new Pair<Integer, Class<?>>(1, char.class);
+            }
+            case 'D' -> {
+                return new Pair<Integer, Class<?>>(1, double.class);
+            }
+            case 'F' -> {
+                return new Pair<Integer, Class<?>>(1, float.class);
+            }
+            case 'I' -> {
+                return new Pair<Integer, Class<?>>(1, int.class);
+            }
+            case 'J' -> {
+                return new Pair<Integer, Class<?>>(1, int.class);
+            }
+            case 'L' -> {
+                Pair<Integer, String> className = decodeClassName(argument);
+                return new Pair<Integer, Class<?>>(className.first, Class.forName(className.second));
+            }
+            case 'S' -> {
+                return new Pair<Integer, Class<?>>(1, short.class);
+            }
+            case 'Z' -> {
+                return new Pair<Integer, Class<?>>(1, boolean.class);
+            }
+            case '[' -> {
+                StringBuilder type = new StringBuilder();
+                int idx = 0;
+                while (argument.charAt(idx) == '[') {
+                    type.append("[");
+                    idx++;
+                }
+                if (argument.charAt(idx) == 'L') {
+                    Pair<Integer, String> className = decodeClassName(argument.substring(idx, argument.length()));
+                    type.append("L");
+                    type.append(className.second);
+                    type.append(";");
+                    return new Pair<Integer, Class<?>>(idx + className.first, Class.forName(type.toString()));
+                } else {
+                    type.append(argument.charAt(idx));
+                    return new Pair<Integer, Class<?>>(idx + 1, Class.forName(type.toString()));
+                }
+            }
+            case 'V' -> {
+                return new Pair<Integer, Class<?>>(1, void.class);
+            }
+            default -> {
+                throw new IllegalStateException("Unknown type identifier: " + argument);
+            }
+        }
+    }
+
+    public List<Class<?>> stringToTypes(String arguments) throws ClassNotFoundException {
+        List<Class<?>> argTypes = new ArrayList<Class<?>>();
+
+        int idx = 0;
+        while (idx != arguments.length()) {
+            Pair<Integer, Class<?>> currentType = stringToType(arguments.substring(idx, arguments.length()));
+            argTypes.add(currentType.second);
+            idx += currentType.first;
+        }
+
+        return argTypes;
     }
 
     @Override
