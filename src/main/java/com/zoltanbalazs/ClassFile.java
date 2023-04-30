@@ -159,7 +159,7 @@ class ClassFile {
         return attr;
     }
 
-    public String getNameOfClass(short class_index) {
+    public static String getNameOfClass(short class_index) {
         return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(class_index - 1).getNameIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
@@ -804,7 +804,6 @@ class ClassFile {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
                 case INVOKESPECIAL -> {
                     // TODO
