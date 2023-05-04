@@ -1,6 +1,7 @@
 package com.zoltanbalazs;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,6 +10,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1115,8 +1118,21 @@ class ClassFile {
                         stack.add(new Pair<Class<?>, Object>(classClass, classClass));
                     } catch (ClassNotFoundException cnfe) {
                         Method_Info method = findMethodsByName(memberName);
-                        List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");
 
+                        if (method == null) {
+                            // ClassFile CLASS_FILE = new ClassFile(
+                            // FILE_NAME.split(memberName.split("/")[0])[0] + memberName + ".class");
+
+                            // File f = new File(memberName.split("/")[0] + memberName + ".class");
+                            File f = new File(FILE_NAME);
+                            URL[] cp = { new File(new File(new File(f.getParent()).getParent()).getParent()).toURI()
+                                    .toURL() };
+                            URLClassLoader urlcl = new URLClassLoader(cp);
+                            Class<?> clazz = urlcl.loadClass(memberName.replace("/", "."));
+
+                            stack.add(new Pair<Class<?>, Object>(clazz, clazz));
+                        } else {
+                        List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");
                         for (Attribute_Info attribute : attributes) {
                             try {
                                 Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
@@ -1137,6 +1153,7 @@ class ClassFile {
                                 executeCode(codeAttribute.code);
                             } catch (Exception ee) {
                                 ee.printStackTrace();
+                                }
                             }
                         }
                     }
