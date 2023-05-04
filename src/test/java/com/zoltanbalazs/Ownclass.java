@@ -25,5 +25,8 @@ public class Ownclass {
         Test t3 = new Test("Hello World");
         System.out.println(t3);
         System.out.println(t);
+
+        double v = Test.GetC();
+        System.out.println(v);
     }
 }

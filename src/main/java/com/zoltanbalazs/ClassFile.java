@@ -797,11 +797,27 @@ class ClassFile {
                             for (Constructor<?> ctor : objectref.first.getConstructors()) {
 
                                 Field[] fields = objectref.second.getClass().getFields();
-                                Object[] values = new Object[fields.length];
+
+                                int nonStaticParams = 0;
                                 for (int i = 0; i < fields.length; ++i) {
-                                    values[i] = fields[i].get(objectref.second);
+                                    if (!java.lang.reflect.Modifier.isStatic(fields[i].getModifiers())) {
+                                        nonStaticParams++;
+                                    }
                                 }
-                                obj = ctor.newInstance(values);
+
+                                Object[] values = new Object[nonStaticParams];
+                                int ctr = 0;
+                                for (int i = 0; i < fields.length; ++i) {
+                                    if (!java.lang.reflect.Modifier.isStatic(fields[i].getModifiers())) {
+                                        values[ctr++] = fields[i].get(objectref.second);
+                                    }
+                                }
+
+                                try {
+                                    obj = ctor.newInstance(values);
+                                } catch (Exception e) {
+
+                                }
 
                                 if (obj != null) {
                                     break;
