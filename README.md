@@ -286,7 +286,7 @@ Thankfully, they are the exact same
 | ANEWARRAY      	| <ul><li>[x] </li></ul> 	|
 | ARRAYLENGTH    	| <ul><li>[x] </li></ul> 	|
 | ATHROW         	| <ul><li>[ ] </li></ul> 	|
-| CHECKCAST      	| <ul><li>[ ] </li></ul> 	|
+| CHECKCAST      	| <ul><li>[x] </li></ul> 	|
 | INSTANCEOF      | <ul><li>[x] </li></ul>  |
 | MONITOR*       	| <ul><li>[ ] </li></ul> 	|
 | WIDE           	| <ul><li>[x] </li></ul> 	|

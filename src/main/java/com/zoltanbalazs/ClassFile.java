@@ -1157,6 +1157,14 @@ class ClassFile {
                 }
                 case CHECKCAST -> {
                     // TODO
+                    short index = ClassFile_Helper.readShort(code, codeIndex);
+                    Pair<Class<?>, Object> objectRef = stack.get(stack.size() - 1);
+                    String memberName = getNameOfMember(index);
+                    Class<?> classClass = Class.forName(memberName.replace("/", "."));
+
+                    if (classClass == objectRef.first) {
+
+                    }
                 }
                 case INSTANCEOF -> {
                     // TODO
