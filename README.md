@@ -277,7 +277,7 @@ Thankfully, they are the exact same
 | ~~RET~~         | <ul><li>[x] </li></ul> 	|
 | TABLESWITCH    	| <ul><li>[x] </li></ul> 	|
 | LOOKUPSWITCH   	| <ul><li>[x] </li></ul> 	|
-| *RETURN        	| <ul><li>[ ] </li></ul> 	|
+| *RETURN        	| <ul><li>[x] </li></ul> 	|
 | *STATIC        	| <ul><li>[ ] </li></ul> 	|
 | *FIELD         	| <ul><li>[ ] </li></ul> 	|
 | INVOKE*        	| <ul><li>[ ] </li></ul> 	|

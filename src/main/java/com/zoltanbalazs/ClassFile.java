@@ -180,7 +180,7 @@ class ClassFile {
                 .size();
     }
 
-    public void executeCode(byte[] code)
+    public Pair<Class<?>, Object> executeCode(byte[] code)
             throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException,
             NoSuchMethodException, SecurityException, InstantiationException, IllegalArgumentException,
             InvocationTargetException {
@@ -664,24 +664,12 @@ class ClassFile {
                     // If there are big gaps in the switch cases
                     Instructions.LOOKUPSWITCH(code, codeIndex, stack);
                 }
-                case IRETURN -> {
-                    // TODO
-                }
-                case LRETURN -> {
-                    // TODO
-                }
-                case FRETURN -> {
-                    // TODO
-                }
-                case DRETURN -> {
-                    // TODO
-                }
-                case ARETURN -> {
-                    // TODO
+                case IRETURN, LRETURN, FRETURN, DRETURN, ARETURN -> {
+                    int stackSize = stack.size();
+                    return stack.get(stackSize - 1);
                 }
                 case RETURN -> {
-                    // TODO
-                    return;
+                    return new Pair<Class<?>, Object>(void.class, null);
                 }
                 case GETSTATIC -> {
                     // TODO
@@ -1205,6 +1193,7 @@ class ClassFile {
                 }
             }
         }
+        return new Pair<Class<?>, Object>(void.class, null); // Should throw an error...
     }
 
     public Pair<Integer, String> decodeClassName(String argument) {
