@@ -7,7 +7,8 @@ public class Dup2 {
 
     public static void main(String[] args) {
         long b = 5;
-        long a = dup2(b);
-        System.out.println(a);
+        // long a = dup2(b);
+        // System.out.println(a);
+        System.out.println(dup2(b));
     }
 }
