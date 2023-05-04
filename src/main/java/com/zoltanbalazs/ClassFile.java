@@ -792,7 +792,22 @@ class ClassFile {
                         result = method.invoke(objectref.second, objArguments);
                     } catch (IllegalArgumentException ie) {
                         try {
-                            Object obj = objectref.first.getConstructor(int.class).newInstance(94);
+                            Object obj = null;
+
+                            for (Constructor<?> ctor : objectref.first.getConstructors()) {
+
+                                Field[] fields = objectref.second.getClass().getFields();
+                                Object[] values = new Object[fields.length];
+                                for (int i = 0; i < fields.length; ++i) {
+                                    values[i] = fields[i].get(objectref.second);
+                                }
+                                obj = ctor.newInstance(values);
+
+                                if (obj != null) {
+                                    break;
+                                }
+                            }
+
                             method = obj.getClass().getDeclaredMethod(memberName, types);
                             result = method.invoke(obj,
                                     objArguments);
