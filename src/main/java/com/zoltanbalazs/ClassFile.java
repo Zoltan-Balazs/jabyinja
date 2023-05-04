@@ -72,6 +72,7 @@ class CodeIndex {
 class ClassFile {
     private static final byte[] MAGIC_NUMBER = HexFormat.of().parseHex("CAFEBABE");
 
+    private static String FILE_NAME = "";
     private static boolean VALID_CLASS_FILE = false;
     private static short MINOR_VERSION;
     private static short MAJOR_VERSION;
@@ -93,6 +94,7 @@ class ClassFile {
     private static Object[] local = new Object[65535];
 
     public ClassFile(String fileName) {
+        FILE_NAME = fileName;
         readClassFile(fileName);
     }
 
@@ -717,13 +719,18 @@ class ClassFile {
                                     methodDescArgs.indexOf(")")));
                     int numberOfArguments = arguments.size();
 
+                    Class<?> classClass;
+                    int stackSize = stack.size();
+                    Class<?>[] types = new Class<?>[0];
+                    List<Class<?>> type = new ArrayList<Class<?>>();
+                    List<Object> arg = new ArrayList<Object>();
+                    Pair<Class<?>, Object> objectref = null;
+
                     try {
-                        int stackSize = stack.size();
-                        Pair<Class<?>, Object> objectref = stack.remove(stackSize - numberOfArguments - 1);
+                        objectref = stack.remove(stackSize - numberOfArguments - 1);
                         List<Pair<Class<?>, Object>> args = stack.subList(stackSize - numberOfArguments - 1,
                                 stackSize - 1);
-                        List<Object> arg = new ArrayList<Object>();
-                        List<Class<?>> type = new ArrayList<Class<?>>();
+
                         for (var a : args) {
                             Class<?> a_type = a.first;
                             Object curr_arg = a.second;
@@ -741,41 +748,61 @@ class ClassFile {
                             type.add(a.first);
                         }
 
-                        Class<?>[] types = new Class<?>[type.size()];
+                        types = new Class<?>[type.size()];
                         for (int j = 0; j < type.size(); ++j) {
                             types[j] = Object.class;// (Class<?>) type.get(j); HACKY BYPASS!
+                            types[j] = (Class<?>) type.get(j);
                         }
 
-                        Class<?> classClass = Class.forName(className.replace("/", "."));
-                        Method method;
+                        classClass = Class.forName(className.replace("/", "."));
+                    } catch (Exception e) {
+                        File f = new File(FILE_NAME);
+                        URL[] cp = { new File(new File(new File(f.getParent()).getParent()).getParent()).toURI()
+                                .toURL() };
+                        URLClassLoader urlcl = new URLClassLoader(cp);
+                        classClass = urlcl.loadClass(className.replace("/", "."));
+                    }
+                    Method method;
 
+                    try {
+                        method = classClass.getDeclaredMethod(memberName, types);
+                    } catch (NoSuchMethodException e) {
+                        for (int j = 0; j < type.size(); ++j) {
+                            types[j] = (Class<?>) type.get(j);
+                        }
                         try {
                             method = classClass.getDeclaredMethod(memberName, types);
-                        } catch (NoSuchMethodException e) {
-                            for (int j = 0; j < type.size(); ++j) {
-                                types[j] = (Class<?>) type.get(j);
+                        } catch (NoSuchMethodException ne) {
+                            types = new Class<?>[arguments.size()];
+                            for (int j = 0; j < arguments.size(); ++j) {
+                                types[j] = (Class<?>) arguments.get(j);
                             }
-                            try {
-                                method = classClass.getDeclaredMethod(memberName, types);
-                            } catch (NoSuchMethodException ne) {
-                                types = new Class<?>[arguments.size()];
-                                for (int j = 0; j < arguments.size(); ++j) {
-                                    types[j] = (Class<?>) arguments.get(j);
-                                }
-                                method = classClass.getDeclaredMethod(memberName, types);
-                            }
-
+                            method = classClass.getDeclaredMethod(memberName, types);
                         }
 
-                        Object[] objArguments = new Object[arg.size()];
-                        for (int j = 0; j < arg.size(); ++j) {
-                            objArguments[j] = (Object) arg.get(j);
-                        }
+                    }
 
-                        Object result = null;
+                    Object[] objArguments = new Object[arg.size()];
+                    for (int j = 0; j < arg.size(); ++j) {
+                        objArguments[j] = (Object) arg.get(j);
+                    }
+
+                    Object result = null;
+                    try {
+                        result = method.invoke(objectref.second, objArguments);
+                    } catch (IllegalArgumentException ie) {
                         try {
-                            result = method.invoke(objectref.second, objArguments);
-                        } catch (IllegalArgumentException ie) {
+                            Object obj = objectref.first.getConstructor(int.class).newInstance(94);
+                            method = obj.getClass().getDeclaredMethod(memberName, types);
+                            result = method.invoke(obj,
+                                    objArguments);
+
+                            for (int i = 0; i < 65536; ++i) {
+                                if (local[i] == objectref.second) {
+                                    local[i] = obj;
+                                }
+                            }
+                        } catch (Exception e) {
                             objArguments = new Object[arguments.size()];
                             for (int j = 0; j < arguments.size(); ++j) {
                                 if (arg.size() <= j) {
@@ -784,16 +811,13 @@ class ClassFile {
                                     objArguments[j] = (Object) arg.get(j);
                                 }
                             }
-                            result = method.invoke(objectref.second, objArguments);
                         }
+                    }
 
-                        stack.subList(stackSize - numberOfArguments - 1, stackSize - 1).clear();
+                    stack.subList(stackSize - numberOfArguments - 1, stackSize - 1).clear();
 
-                        if (result != null) {
-                            stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (result != null) {
+                        stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
                     }
                 }
                 case INVOKESPECIAL -> {
@@ -808,7 +832,11 @@ class ClassFile {
                     try {
                         classClass = Class.forName(className.replace("/", "."));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        File f = new File(FILE_NAME);
+                        URL[] cp = { new File(new File(new File(f.getParent()).getParent()).getParent()).toURI()
+                                .toURL() };
+                        URLClassLoader urlcl = new URLClassLoader(cp);
+                        classClass = urlcl.loadClass(className.replace("/", "."));
                     }
 
                     if (memberName.equals("<init>")) {
@@ -915,7 +943,12 @@ class ClassFile {
                         }
 
                         if (result != null) {
-                            stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
+                            Class<?> resultClass = result.getClass();
+                            if (resultClass == Double.class) {
+                                stack.add(new Pair<Class<?>, Object>(double.class, result));
+                            } else {
+                                stack.add(new Pair<Class<?>, Object>(resultClass, result));
+                            }
                         }
                     } catch (ClassNotFoundException e) {
                         Method_Info method = findMethodsByName(memberName);
@@ -927,17 +960,20 @@ class ClassFile {
 
                                 int stackSize = stack.size();
 
-                                for (int j = 0; j < stackSize; ++j) {
-                                    if (stack.get(0).first == long.class || stack.get(0).first == double.class) {
-                                        local[j] = stack.remove(0).second;
-                                        local[j + 1] = local[j];
-                                        j += 1;
-                                        stackSize += 1;
-                                    } else {
-                                        local[j] = stack.remove(0).second;
-                                    }
+                                for (int j = 0; j < stackSize - 1; ++j) {
+                                    // if (stack.get(0).first == long.class || stack.get(0).first == double.class) {
+                                    // local[j] = stack.remove(0).second;
+                                    // local[j + 1] = local[j];
+                                    // j += 1;
+                                    // stackSize += 1;
+                                    // } else {
+                                    // local[j] = stack.remove(0).second;
+                                    // }
+                                    stack.remove(1);
                                 }
 
+                                local[0] = local[1];
+                                // stack.add(executeCode(codeAttribute.code)); Kulon stack..
                                 executeCode(codeAttribute.code);
                             } catch (Exception ee) {
                                 ee.printStackTrace();
@@ -1132,27 +1168,27 @@ class ClassFile {
 
                             stack.add(new Pair<Class<?>, Object>(clazz, clazz));
                         } else {
-                        List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");
-                        for (Attribute_Info attribute : attributes) {
-                            try {
-                                Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+                            List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");
+                            for (Attribute_Info attribute : attributes) {
+                                try {
+                                    Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                                int stackSize = stack.size();
+                                    int stackSize = stack.size();
 
-                                for (int j = 0; j < stackSize; ++j) {
-                                    if (stack.get(0).first == long.class || stack.get(0).first == double.class) {
-                                        local[j] = stack.remove(0).second;
-                                        local[j + 1] = local[j];
-                                        j += 1;
-                                        stackSize += 1;
-                                    } else {
-                                        local[j] = stack.remove(0).second;
+                                    for (int j = 0; j < stackSize; ++j) {
+                                        if (stack.get(0).first == long.class || stack.get(0).first == double.class) {
+                                            local[j] = stack.remove(0).second;
+                                            local[j + 1] = local[j];
+                                            j += 1;
+                                            stackSize += 1;
+                                        } else {
+                                            local[j] = stack.remove(0).second;
+                                        }
                                     }
-                                }
 
-                                executeCode(codeAttribute.code);
-                            } catch (Exception ee) {
-                                ee.printStackTrace();
+                                    executeCode(codeAttribute.code);
+                                } catch (Exception ee) {
+                                    ee.printStackTrace();
                                 }
                             }
                         }
