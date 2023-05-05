@@ -602,7 +602,7 @@ public class Instructions {
             Object[] local,
             String file_name)
             throws ClassNotFoundException, MalformedURLException, IOException, NoSuchMethodException,
-            IllegalAccessException, InvocationTargetException {
+            IllegalAccessException, InvocationTargetException, InstantiationException {
         CP_Info reference_to_method = constant_pool.get(index - 1);
         String name_of_class = ClassFile.getNameOfClass(reference_to_method.getClassIndex());
         String name_and_type_of_member = ClassFile.getNameOfMember(reference_to_method.getNameAndTypeIndex());
@@ -612,11 +612,11 @@ public class Instructions {
         int number_of_method_arguments = method_arguments.size();
 
         int stack_size = stack.size();
-        List<Object> arguments_of_function = new ArrayList<Object>();
-        List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
         List<Pair<Class<?>, Object>> arguments_on_stack = stack.subList(stack_size - number_of_method_arguments,
                 stack_size);
 
+        List<Object> arguments_of_function = new ArrayList<Object>();
+        List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
         Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
         Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
         for (int j = 0; j < type_of_arguments.size(); ++j) {
@@ -632,10 +632,10 @@ public class Instructions {
 
         Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
                 types_of_function_paramaters,
-                method_arguments);
+                method_arguments, arguments_on_stack);
         types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(reference_to_class,
                 name_and_type_of_member,
-                types_of_function_paramaters, method_arguments);
+                types_of_function_paramaters, method_arguments, arguments_on_stack);
 
         Object[] arguments_as_objects = new Object[arguments_of_function.size()];
         for (int j = 0; j < arguments_of_function.size(); ++j) {
@@ -644,15 +644,23 @@ public class Instructions {
 
         Pair<Class<?>, Object> objectref = stack.get(stack_size - number_of_method_arguments - 1);
         Object result = null;
+        Object obj = null;
+
+        int objectRefIdx = -1;
+        for (int i = 0; i < 65535 && objectRefIdx == -1; ++i) {
+            if (local[i] == objectref.second) {
+                objectRefIdx = i;
+            }
+        }
+
         try {
+            method.setAccessible(true);
             result = method.invoke(objectref.second, arguments_as_objects);
         } catch (IllegalArgumentException ie) {
             try {
-                Object obj = null;
-
                 for (Constructor<?> ctor : objectref.first.getConstructors()) {
 
-                    Field[] fields = objectref.second.getClass().getFields();
+                    Field[] fields = objectref.second.getClass().getDeclaredFields();
 
                     int nonStaticParams = 0;
                     for (int i = 0; i < fields.length; ++i) {
@@ -665,6 +673,7 @@ public class Instructions {
                     int ctr = 0;
                     for (int i = 0; i < fields.length; ++i) {
                         if (!java.lang.reflect.Modifier.isStatic(fields[i].getModifiers())) {
+                            fields[i].setAccessible(true);
                             values[ctr++] = fields[i].get(objectref.second);
                         }
                     }
@@ -680,23 +689,25 @@ public class Instructions {
                     }
                 }
 
-                method = obj.getClass().getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
+                if (obj == null) {
+                    obj = local[objectRefIdx];
+                }
+
+                method = obj.getClass().getDeclaredMethod(name_and_type_of_member,
+                        types_of_function_paramaters);
+                method.setAccessible(true);
                 result = method.invoke(obj, arguments_as_objects);
 
-                for (int i = 0; i < 65536; ++i) {
-                    if (local[i] == objectref.second) {
-                        local[i] = obj;
-                    }
-                }
+                local[objectRefIdx] = obj;
             } catch (Exception e) {
-                arguments_as_objects = new Object[method_arguments.size()];
-                for (int j = 0; j < method_arguments.size(); ++j) {
-                    if (arguments_of_function.size() <= j) {
-                        arguments_as_objects[j] = null;
-                    } else {
-                        arguments_as_objects[j] = (Object) arguments_of_function.get(j);
-                    }
-                }
+                method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class,
+                        name_and_type_of_member,
+                        types_of_function_paramaters,
+                        method_arguments, arguments_on_stack);
+                method.setAccessible(true);
+                result = method.invoke(obj, arguments_as_objects);
+
+                local[objectRefIdx] = obj;
             }
         }
 
@@ -704,6 +715,8 @@ public class Instructions {
 
         if (result != null) {
             stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
+        } else if (obj != null) {
+            local[objectRefIdx] = obj;
         }
     }
 
@@ -728,11 +741,11 @@ public class Instructions {
             int number_of_method_arguments = method_arguments.size();
 
             int stack_size = stack.size();
-            List<Object> arguments_of_function = new ArrayList<Object>();
-            List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
             List<Pair<Class<?>, Object>> arguments_on_stack = stack.subList(stack_size - number_of_method_arguments,
                     stack_size);
 
+            List<Object> arguments_of_function = new ArrayList<Object>();
+            List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
             Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
             Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
             for (int j = 0; j < type_of_arguments.size(); ++j) {
@@ -744,8 +757,9 @@ public class Instructions {
                 arguments_as_objects[j] = (Object) arguments_of_function.get(j);
             }
 
-            Constructor<?> initConstructor = reference_to_class.getConstructor(types_of_function_paramaters);
-            stack.removeAll(stack);
+            Constructor<?> initConstructor = reference_to_class.getDeclaredConstructor(types_of_function_paramaters);
+            initConstructor.setAccessible(true);
+            stack.subList(stack_size - number_of_method_arguments - 2, stack_size).clear();
             stack.add(
                     new Pair<Class<?>, Object>(reference_to_class, initConstructor.newInstance(arguments_as_objects)));
         } else {
@@ -765,13 +779,13 @@ public class Instructions {
         int number_of_method_arguments = method_arguments.size();
 
         int stack_size = stack.size();
-        List<Object> arguments_of_function = new ArrayList<Object>();
-        List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
         List<Pair<Class<?>, Object>> arguments_on_stack = new ArrayList<>();
         if (0 <= stack_size - number_of_method_arguments) {
             arguments_on_stack = stack.subList(stack_size - number_of_method_arguments, stack_size);
         }
 
+        List<Object> arguments_of_function = new ArrayList<Object>();
+        List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
         Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
         Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
         for (int j = 0; j < type_of_arguments.size(); ++j) {
@@ -787,13 +801,14 @@ public class Instructions {
 
         Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
                 types_of_function_paramaters,
-                method_arguments);
+                method_arguments, arguments_on_stack);
 
         Object[] arguments_as_objects = new Object[arguments_of_function.size()];
         for (int j = 0; j < arguments_of_function.size(); ++j) {
             arguments_as_objects[j] = (Object) arguments_of_function.get(j);
         }
 
+        method.setAccessible(true);
         Object result = method.invoke(name_of_class.replace("/", "."), arguments_as_objects);
         Class<?> returnType = method.getReturnType();
 
@@ -812,7 +827,7 @@ public class Instructions {
             Object[] local,
             String file_name)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-
+        // TODO
         CP_Info reference_to_interface = (CONSTANT_InterfaceMethodref_Info) constant_pool.get(index - 1);
         String name_of_class = ClassFile.getNameOfClass(reference_to_interface.getClassIndex());
         String name_and_type_of_member = ClassFile.getNameOfMember(reference_to_interface.getNameAndTypeIndex());
@@ -821,11 +836,11 @@ public class Instructions {
         List<Class<?>> method_arguments = ClassFile.getArguments(description_of_method);
 
         int stack_size = stack.size();
-        List<Object> arguments_of_function = new ArrayList<Object>();
-        List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
         List<Pair<Class<?>, Object>> arguments_on_stack = stack.subList(stack_size - count + 1,
                 stack_size);
 
+        List<Object> arguments_of_function = new ArrayList<Object>();
+        List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
         Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
         Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
         for (int j = 0; j < type_of_arguments.size(); ++j) {
@@ -841,10 +856,10 @@ public class Instructions {
 
         Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
                 types_of_function_paramaters,
-                method_arguments);
+                method_arguments, arguments_on_stack);
         types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(reference_to_class,
                 name_and_type_of_member,
-                types_of_function_paramaters, method_arguments);
+                types_of_function_paramaters, method_arguments, arguments_on_stack);
 
         Object[] arguments_as_objects = new Object[arguments_of_function.size()];
         for (int j = 0; j < arguments_of_function.size(); ++j) {
@@ -1234,24 +1249,67 @@ class Instructions_Helper {
     }
 
     public static Method GET_CORRECT_METHOD(Class<?> reference_to_class, String name_and_type_of_member,
-            Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments) throws NoSuchMethodException {
+            Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments,
+            List<Pair<Class<?>, Object>> arguments_on_stack) throws NoSuchMethodException {
         Method returnedMethod = null;
 
         if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
-            returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
-                    types_of_function_paramaters);
+            try {
+                returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
+                        types_of_function_paramaters);
+            } catch (Exception e) {
+                for (Method method : reference_to_class.getDeclaredMethods()) {
+                    boolean isCorrectMethod = true;
+
+                    if (method.getName().equals(name_and_type_of_member)) {
+                        for (int i = 0; i < method.getParameterTypes().length; ++i) {
+                            Class<?> type = method.getParameterTypes()[i];
+                            if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
+                                isCorrectMethod = false;
+                            }
+                        }
+                    } else {
+                        isCorrectMethod = false;
+                    }
+
+                    if (isCorrectMethod) {
+                        return method;
+                    }
+                }
+            }
         } else {
             types_of_function_paramaters = new Class<?>[method_arguments.size()];
             for (int j = 0; j < method_arguments.size(); ++j) {
                 types_of_function_paramaters[j] = (Class<?>) method_arguments.get(j);
             }
             if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
-                returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
-                        types_of_function_paramaters);
+                try {
+                    returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
+                            types_of_function_paramaters);
+                } catch (Exception e) {
+                    for (Method method : reference_to_class.getDeclaredMethods()) {
+                        boolean isCorrectMethod = true;
+
+                        if (method.getName().equals(name_and_type_of_member)) {
+                            for (int i = 0; i < method.getParameterTypes().length; ++i) {
+                                Class<?> type = method.getParameterTypes()[i];
+                                if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
+                                    isCorrectMethod = false;
+                                }
+                            }
+                        } else {
+                            isCorrectMethod = false;
+                        }
+
+                        if (isCorrectMethod) {
+                            return method;
+                        }
+                    }
+                }
             } else {
                 types_of_function_paramaters = new Class<?>[method_arguments.size()];
                 for (int j = 0; j < method_arguments.size(); ++j) {
-                    types_of_function_paramaters[j] = (Class<?>) method_arguments.get(j);
+                    types_of_function_paramaters[j] = arguments_on_stack.get(j).first;
                 }
                 if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member,
                         types_of_function_paramaters)) {
@@ -1265,7 +1323,8 @@ class Instructions_Helper {
     }
 
     public static Class<?>[] GET_CORRECT_METHOD_TYPES(Class<?> reference_to_class, String name_and_type_of_member,
-            Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments) throws NoSuchMethodException {
+            Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments,
+            List<Pair<Class<?>, Object>> arguments_on_stack) throws NoSuchMethodException {
         if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
             reference_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
             return types_of_function_paramaters;
@@ -1275,9 +1334,31 @@ class Instructions_Helper {
                 types_of_function_paramaters[j] = (Class<?>) method_arguments.get(j);
             }
             if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
-                reference_to_class.getDeclaredMethod(name_and_type_of_member,
-                        types_of_function_paramaters);
-                return types_of_function_paramaters;
+                try {
+                    reference_to_class.getDeclaredMethod(name_and_type_of_member,
+                            types_of_function_paramaters);
+
+                    return types_of_function_paramaters;
+                } catch (Exception e) {
+                    for (Method method : reference_to_class.getDeclaredMethods()) {
+                        boolean isCorrectMethod = true;
+
+                        if (method.getName().equals(name_and_type_of_member)) {
+                            for (int i = 0; i < method.getParameterTypes().length; ++i) {
+                                Class<?> type = method.getParameterTypes()[i];
+                                if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
+                                    isCorrectMethod = false;
+                                }
+                            }
+                        } else {
+                            isCorrectMethod = false;
+                        }
+
+                        if (isCorrectMethod) {
+                            return types_of_function_paramaters;
+                        }
+                    }
+                }
             } else {
                 types_of_function_paramaters = new Class<?>[method_arguments.size()];
                 for (int j = 0; j < method_arguments.size(); ++j) {
