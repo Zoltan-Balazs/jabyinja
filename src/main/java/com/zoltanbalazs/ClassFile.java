@@ -720,7 +720,8 @@ class ClassFile {
                     System.out.println(memberName);
                 }
                 case GETFIELD -> {
-                    // TODO
+                    short index = ClassFile_Helper.readShort(code, codeIndex);
+                    Instructions.GETFIELD(stack, CONSTANT_POOL, index);
                 }
                 case PUTFIELD -> {
                     // TODO
