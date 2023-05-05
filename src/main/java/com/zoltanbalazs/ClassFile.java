@@ -865,7 +865,13 @@ class ClassFile {
             }
             case 'L' -> {
                 Pair<Integer, String> className = decodeClassName(argument);
+                if (ClassFile.isClassBuiltIn(className.second)) {
                 return new Pair<Integer, Class<?>>(className.first, Class.forName(className.second));
+                } else {
+                    return new Pair<Integer, Class<?>>(className.first,
+                            Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(FILE_NAME, className.second));
+                }
+
             }
             case 'S' -> {
                 return new Pair<Integer, Class<?>>(1, short.class);
