@@ -1,7 +1,17 @@
 package com.zoltanbalazs;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Instructions {
@@ -552,6 +562,21 @@ public class Instructions {
         }
     }
 
+
+    public static void NEW(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index, Object[] local,
+            String file_name) throws ClassNotFoundException {
+        String name_of_class = ClassFile.getNameOfMember(index);
+        Class<?> reference_to_class = null;
+
+        if (ClassFile.isClassBuiltIn(name_of_class)) {
+            reference_to_class = Class.forName(name_of_class.replace("/", "."));
+        } else {
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+        }
+
+        stack.add(new Pair<Class<?>, Object>(reference_to_class, reference_to_class));
+    }
+
     public static void NEWARRAY(List<Pair<Class<?>, Object>> stack, byte atype) {
         Class<?> arrayType = Instructions_Helper.GetArrayType(atype);
         int count = ((Number) stack.remove(stack.size() - 1).second).intValue();
@@ -789,4 +814,23 @@ class Instructions_Helper {
 
         Array.set(arrayRef.second, index, value.second);
     }
+    public static Class<?> LOAD_CLASS_FROM_OTHER_FILE(String file_name, String class_name) {
+        Class<?> returned_class = null;
+        try {
+            File f = new File(file_name);
+            int length = class_name.split("/").length;
+            for (int i = 0; i < length; ++i) {
+                f = new File(f.getParent());
+            }
+
+            URL[] cp = { f.toURI().toURL() };
+            URLClassLoader urlcl = new URLClassLoader(cp);
+            returned_class = urlcl.loadClass(class_name.replace("/", "."));
+            urlcl.close();
+        } catch (Exception e) {
+            return null;
+        }
+        return returned_class;
+    }
+
 }

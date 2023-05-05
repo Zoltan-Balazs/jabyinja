@@ -1176,55 +1176,8 @@ class ClassFile {
                     }
                 }
                 case NEW -> {
-                    // TODO
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    CP_Info classRef = (CONSTANT_Class_Info) CONSTANT_POOL.get(index - 1);
-                    String memberName = getNameOfMember(index);
-
-                    try {
-                        Class<?> classClass = Class.forName(memberName.replace("/", "."));
-                        stack.add(new Pair<Class<?>, Object>(classClass, classClass));
-                    } catch (ClassNotFoundException cnfe) {
-                        Method_Info method = findMethodsByName(memberName);
-
-                        if (method == null) {
-                            // ClassFile CLASS_FILE = new ClassFile(
-                            // FILE_NAME.split(memberName.split("/")[0])[0] + memberName + ".class");
-
-                            // File f = new File(memberName.split("/")[0] + memberName + ".class");
-                            File f = new File(FILE_NAME);
-                            URL[] cp = { new File(new File(new File(f.getParent()).getParent()).getParent()).toURI()
-                                    .toURL() };
-                            URLClassLoader urlcl = new URLClassLoader(cp);
-                            Class<?> clazz = urlcl.loadClass(memberName.replace("/", "."));
-
-                            stack.add(new Pair<Class<?>, Object>(clazz, clazz));
-                        } else {
-                            List<Attribute_Info> attributes = findAttributesByName(method.attributes, "Code");
-                            for (Attribute_Info attribute : attributes) {
-                                try {
-                                    Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
-
-                                    int stackSize = stack.size();
-
-                                    for (int j = 0; j < stackSize; ++j) {
-                                        if (stack.get(0).first == long.class || stack.get(0).first == double.class) {
-                                            local[j] = stack.remove(0).second;
-                                            local[j + 1] = local[j];
-                                            j += 1;
-                                            stackSize += 1;
-                                        } else {
-                                            local[j] = stack.remove(0).second;
-                                        }
-                                    }
-
-                                    executeCode(codeAttribute.code);
-                                } catch (Exception ee) {
-                                    ee.printStackTrace();
-                                }
-                            }
-                        }
-                    }
+                    Instructions.NEW(stack, CONSTANT_POOL, index, local, FILE_NAME);
                 }
                 case NEWARRAY -> {
                     byte atype = code[codeIndex.Next()];
