@@ -828,6 +828,38 @@ public class Instructions {
         }
     }
 
+    public static void INVOKEDYNAMIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
+            Object[] local,
+            String file_name) throws ClassNotFoundException {
+        CP_Info reference_to_method = constant_pool.get(index - 1);
+        String description_of_method = ClassFile.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
+        List<Class<?>> method_arguments = ClassFile.getArguments(description_of_method);
+        int number_of_method_arguments = method_arguments.size();
+
+        int stack_size = stack.size();
+        List<Pair<Class<?>, Object>> arguments_on_stack = new ArrayList<>();
+        if (0 <= stack_size - number_of_method_arguments) {
+            arguments_on_stack = stack.subList(stack_size - number_of_method_arguments, stack_size);
+        }
+
+        List<Object> arguments_of_function = new ArrayList<Object>();
+        List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
+        Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
+        Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
+        for (int j = 0; j < type_of_arguments.size(); ++j) {
+            types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
+        }
+
+        Object[] arguments_as_objects = new Object[arguments_of_function.size()];
+        for (int j = 0; j < arguments_of_function.size(); ++j) {
+            arguments_as_objects[j] = (Object) arguments_of_function.get(j);
+        }
+
+        if (0 <= stack_size - number_of_method_arguments) {
+            stack.subList(stack_size - number_of_method_arguments, stack_size).clear();
+        }
+    }
+
     public static void NEW(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index, Object[] local,
             String file_name) throws ClassNotFoundException {
         String name_of_class = ClassFile.getNameOfMember(index);
