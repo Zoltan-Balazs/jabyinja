@@ -1,4 +1,4 @@
-package com.zoltanbalazs;
+package com.zoltanbalazs.Own;
 
 public class Ownclass {
 

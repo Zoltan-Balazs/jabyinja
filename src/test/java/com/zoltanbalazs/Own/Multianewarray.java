@@ -1,4 +1,4 @@
-package com.zoltanbalazs;
+package com.zoltanbalazs.Own;
 
 class Multianewarray {
     public static void main(String[] args) {

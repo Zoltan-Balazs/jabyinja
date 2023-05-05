@@ -1,4 +1,4 @@
-package com.zoltanbalazs;
+package com.zoltanbalazs.Own;
 
 import java.util.ArrayList;
 import java.util.List;

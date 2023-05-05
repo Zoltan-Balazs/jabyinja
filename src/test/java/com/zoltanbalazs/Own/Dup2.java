@@ -1,4 +1,4 @@
-package com.zoltanbalazs;
+package com.zoltanbalazs.Own;
 
 public class Dup2 {
     public static long dup2(long a) {
