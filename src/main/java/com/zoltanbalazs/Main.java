@@ -1,6 +1,7 @@
 package com.zoltanbalazs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -8,9 +9,9 @@ public class Main {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            CLASS_FILE = new ClassFile("Main.class");
+            CLASS_FILE = new ClassFile("Main.class", null);
         } else {
-            CLASS_FILE = new ClassFile(args[0]);
+            CLASS_FILE = new ClassFile(args[0], Arrays.copyOfRange(args, 1, args.length));
         }
 
         Method_Info method = new Method_Info();

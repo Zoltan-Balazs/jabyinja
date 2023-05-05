@@ -88,9 +88,10 @@ class ClassFile {
     private static List<Pair<Class<?>, Object>> stack = new ArrayList<>();
     private static Object[] local = new Object[65535];
 
-    public ClassFile(String fileName) {
+    public ClassFile(String fileName, String[] mainArgs) {
         FILE_NAME = fileName;
         readClassFile(fileName);
+        local[0] = mainArgs;
     }
 
     public void readClassFile(String fileName) {
