@@ -442,6 +442,7 @@ public class Instructions {
             default ->
                 throw new IllegalArgumentException("One value Integer IF for opcode " + type + " is not supported!");
         }
+        stack.clear();
     }
 
     public static void IF2I(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
@@ -482,6 +483,7 @@ public class Instructions {
             default ->
                 throw new IllegalArgumentException("Two value Integer IF for opcode " + type + " is not supported!");
         }
+        stack.clear();
     }
 
     public static void IF2A(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
@@ -502,6 +504,7 @@ public class Instructions {
             default ->
                 throw new IllegalArgumentException("Two value Reference IF for opcode " + type + " is not supported!");
         }
+        stack.clear();
     }
 
     public static void GOTO(CodeIndex codeIndex, short offset) {
