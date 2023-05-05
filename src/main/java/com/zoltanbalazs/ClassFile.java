@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -191,13 +192,23 @@ class ClassFile {
         }
     }
 
-    public static boolean doesMethodExists(Class<?> referece_to_class, String name_and_type_of_member,
+    public static boolean doesMethodExists(Class<?> reference_to_class, String name_and_type_of_member,
             Class<?>[] types_of_function_paramaters) {
         try {
-            referece_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
+            reference_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
             return true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            for (Method method : reference_to_class.getDeclaredMethods()) {
+                if (method.getName().equals(name_and_type_of_member)) {
+                    for (int i = 0; i < method.getParameterTypes().length; ++i) {
+                        Class<?> type = method.getParameterTypes()[i];
+                        if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
             return false;
+                        }
+                    }
+                }
+            }
+            return true;
         }
     }
 
