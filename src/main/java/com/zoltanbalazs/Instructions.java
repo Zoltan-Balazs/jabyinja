@@ -771,6 +771,60 @@ public class Instructions {
 
     }
 
+    public static void INVOKEINTERFACE(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
+            byte count,
+            Object[] local,
+            String file_name)
+            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+
+        CP_Info reference_to_interface = (CONSTANT_InterfaceMethodref_Info) constant_pool.get(index - 1);
+        String name_of_class = ClassFile.getNameOfClass(reference_to_interface.getClassIndex());
+        String name_and_type_of_member = ClassFile.getNameOfMember(reference_to_interface.getNameAndTypeIndex());
+        String description_of_method = ClassFile.getDescriptionOfMethod(reference_to_interface.getNameAndTypeIndex());
+
+        List<Class<?>> method_arguments = ClassFile.getArguments(description_of_method);
+
+        int stack_size = stack.size();
+        List<Object> arguments_of_function = new ArrayList<Object>();
+        List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
+        List<Pair<Class<?>, Object>> arguments_on_stack = stack.subList(stack_size - count + 1,
+                stack_size);
+
+        Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
+        Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
+        for (int j = 0; j < type_of_arguments.size(); ++j) {
+            types_of_function_paramaters[j] = Object.class;
+        }
+
+        Class<?> reference_to_class = null;
+        if (ClassFile.isClassBuiltIn(name_of_class)) {
+            reference_to_class = Class.forName(name_of_class.replace("/", "."));
+        } else {
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+        }
+
+        Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
+                types_of_function_paramaters,
+                method_arguments);
+        types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(reference_to_class,
+                name_and_type_of_member,
+                types_of_function_paramaters, method_arguments);
+
+        Object[] arguments_as_objects = new Object[arguments_of_function.size()];
+        for (int j = 0; j < arguments_of_function.size(); ++j) {
+            arguments_as_objects[j] = (Object) arguments_of_function.get(j);
+        }
+
+        Pair<Class<?>, Object> objectref = stack.get(stack_size - count);
+        Object result = method.invoke(objectref.second, arguments_as_objects);
+
+        stack.subList(stack_size - count, stack_size).clear();
+
+        if (result != null) {
+            stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
+        }
+    }
+
     public static void NEW(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index, Object[] local,
             String file_name) throws ClassNotFoundException {
         String name_of_class = ClassFile.getNameOfMember(index);

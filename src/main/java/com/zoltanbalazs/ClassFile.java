@@ -1,17 +1,12 @@
 package com.zoltanbalazs;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -184,6 +179,30 @@ class ClassFile {
         return stringToTypes(
                 method_descriptions.substring(method_descriptions.indexOf("(") + 1,
                         method_descriptions.indexOf(")")));
+    }
+
+    public static boolean isClassBuiltIn(String className) {
+        try {
+            Class.forName(className.replace("/", "."));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean doesMethodExists(Class<?> referece_to_class, String name_and_type_of_member,
+            Class<?>[] types_of_function_paramaters) {
+        try {
+            referece_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static int getNumberOfArguments(short name_and_type_index) throws ClassNotFoundException {
+        String descriptor = getDescriptionOfMethod(name_and_type_index);
+        return getArguments(descriptor).size();
     }
 
     public static Pair<Class<?>, Object> executeCode(byte[] code)
@@ -719,71 +738,10 @@ class ClassFile {
                 }
                 case INVOKEINTERFACE -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    CP_Info interfaceRef = (CONSTANT_InterfaceMethodref_Info) CONSTANT_POOL.get(index - 1);
-                    String className = getNameOfClass(interfaceRef.getClassIndex());
-                    String memberName = getNameOfMember(CONSTANT_POOL.get(index - 1).getNameAndTypeIndex());
-                    int numberOfArguments = getNumberOfArguments(interfaceRef.getNameAndTypeIndex());
                     byte count = code[codeIndex.Next()]; // TODO: Unsigned byte...
-                    byte discard = code[codeIndex.Next()];
+                    codeIndex.Next();
 
-                    try {
-                        int stackSize = stack.size();
-                        Pair<Class<?>, Object> objectref = stack.remove(stackSize - count);
-                        List<Pair<Class<?>, Object>> args = stack.subList(stackSize - count, stackSize - 1);
-                        List<Object> arg = new ArrayList<Object>();
-                        List<Class<?>> type = new ArrayList<Class<?>>();
-                        for (var a : args) {
-                            Class<?> a_type = a.first;
-                            Object curr_arg = a.second;
-                            if (a_type == int.class) {
-                                arg.add((int) curr_arg);
-                            } else if (a_type == float.class) {
-                                arg.add((float) curr_arg);
-                            } else if (a_type == double.class) {
-                                arg.add((double) curr_arg);
-                            } else if (a_type == long.class) {
-                                arg.add((long) curr_arg);
-                            } else {
-                                arg.add(a_type.cast(curr_arg));
-                            }
-                            type.add(a.first);
-                        }
-
-                        Class<?>[] types = new Class<?>[type.size()];
-                        for (int j = 0; j < type.size(); ++j) {
-                            types[j] = Object.class;// (Class<?>) type.get(j); HACKY BYPASS!
-                        }
-
-                        Class<?> classClass = Class.forName(className.replace("/", "."));
-
-                        Method method = null;
-                        try {
-                            method = classClass.getDeclaredMethod(memberName, types);
-                        } catch (NoSuchMethodException e) {
-                            for (int j = 0; j < type.size(); ++j) {
-                                types[j] = (Class<?>) type.get(j);
-                            }
-                            method = classClass.getDeclaredMethod(memberName, types);
-                        }
-
-                        Object[] objArguments = new Object[arg.size()];
-                        for (int j = 0; j < arg.size(); ++j) {
-                            objArguments[j] = (Object) arg.get(j);
-                        }
-
-                        Object result = method.invoke(objectref.second, objArguments);
-
-                        // for (int i = stackSize - count; i < stackSize - 1; ++i) {
-                        stack.subList(stackSize - count, stackSize - 1).clear();
-                        // }
-
-                        if (result != null) {
-                            // stack.add(objectRef); HUH?
-                            stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Instructions.INVOKEINTERFACE(stack, CONSTANT_POOL, index, count, local, FILE_NAME);
                 }
                 case INVOKEDYNAMIC -> {
                     // TODO
