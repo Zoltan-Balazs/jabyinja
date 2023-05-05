@@ -814,6 +814,27 @@ class Instructions_Helper {
 
         Array.set(arrayRef.second, index, value.second);
     }
+
+    public static void SETARGUMENTS_AND_TYPES(List<Pair<Class<?>, Object>> arguments_on_stack,
+            List<Object> arguments_of_function, List<Class<?>> type_of_arguments) {
+        for (var arguments : arguments_on_stack) {
+            Class<?> argument_type = arguments.first;
+            Object current_argument = arguments.second;
+            if (argument_type == int.class) {
+                arguments_of_function.add((int) current_argument);
+            } else if (argument_type == float.class) {
+                arguments_of_function.add((float) current_argument);
+            } else if (argument_type == double.class) {
+                arguments_of_function.add((double) current_argument);
+            } else if (argument_type == long.class) {
+                arguments_of_function.add((long) current_argument);
+            } else {
+                arguments_of_function.add(argument_type.cast(current_argument));
+            }
+            type_of_arguments.add(arguments.first);
+        }
+    }
+
     public static Class<?> LOAD_CLASS_FROM_OTHER_FILE(String file_name, String class_name) {
         Class<?> returned_class = null;
         try {
@@ -833,4 +854,65 @@ class Instructions_Helper {
         return returned_class;
     }
 
+    public static Method GET_CORRECT_METHOD(Class<?> reference_to_class, String name_and_type_of_member,
+            Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments) throws NoSuchMethodException {
+        Method returnedMethod = null;
+
+        if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
+            returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
+                    types_of_function_paramaters);
+        } else {
+            types_of_function_paramaters = new Class<?>[method_arguments.size()];
+            for (int j = 0; j < method_arguments.size(); ++j) {
+                types_of_function_paramaters[j] = (Class<?>) method_arguments.get(j);
+            }
+            if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
+                returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
+                        types_of_function_paramaters);
+            } else {
+                types_of_function_paramaters = new Class<?>[method_arguments.size()];
+                for (int j = 0; j < method_arguments.size(); ++j) {
+                    types_of_function_paramaters[j] = (Class<?>) method_arguments.get(j);
+                }
+                if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member,
+                        types_of_function_paramaters)) {
+                    returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
+                            types_of_function_paramaters);
+                }
+            }
+        }
+
+        return returnedMethod;
+    }
+
+    public static Class<?>[] GET_CORRECT_METHOD_TYPES(Class<?> reference_to_class, String name_and_type_of_member,
+            Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments) throws NoSuchMethodException {
+        if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
+            reference_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
+            return types_of_function_paramaters;
+        } else {
+            types_of_function_paramaters = new Class<?>[method_arguments.size()];
+            for (int j = 0; j < method_arguments.size(); ++j) {
+                types_of_function_paramaters[j] = (Class<?>) method_arguments.get(j);
+            }
+            if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
+                reference_to_class.getDeclaredMethod(name_and_type_of_member,
+                        types_of_function_paramaters);
+                return types_of_function_paramaters;
+            } else {
+                types_of_function_paramaters = new Class<?>[method_arguments.size()];
+                for (int j = 0; j < method_arguments.size(); ++j) {
+                    types_of_function_paramaters[j] = (Class<?>) method_arguments.get(j);
+                }
+                if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member,
+                        types_of_function_paramaters)) {
+                    reference_to_class.getDeclaredMethod(name_and_type_of_member,
+                            types_of_function_paramaters);
+                    return types_of_function_paramaters;
+                }
+            }
+        }
+
+        return null;
+    }
 }
