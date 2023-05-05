@@ -278,9 +278,9 @@ Thankfully, they are the exact same
 | TABLESWITCH    	| <ul><li>[x] </li></ul> 	|
 | LOOKUPSWITCH   	| <ul><li>[x] </li></ul> 	|
 | *RETURN        	| <ul><li>[x] </li></ul> 	|
-| *STATIC        	| <ul><li>[ ] </li></ul> 	|
-| *FIELD         	| <ul><li>[ ] </li></ul> 	|
-| INVOKE*        	| <ul><li>[ ] </li></ul> 	|
+| *STATIC        	| <ul><li>[x] </li></ul> 	|
+| *FIELD         	| <ul><li>[x] </li></ul> 	|
+| INVOKE*        	| <ul><li>[x] </li></ul> 	|
 | NEW            	| <ul><li>[x] </li></ul> 	|
 | NEWARRAY       	| <ul><li>[x] </li></ul> 	|
 | ANEWARRAY      	| <ul><li>[x] </li></ul> 	|
