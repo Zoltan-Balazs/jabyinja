@@ -776,23 +776,8 @@ class ClassFile {
                     Instructions.CHECKCAST(stack, index, FILE_NAME);
                 }
                 case INSTANCEOF -> {
-                    // TODO
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Pair<Class<?>, Object> objectRef = stack.remove(stack.size() - 1);
-
-                    if (objectRef.second == null) {
-                        stack.add(new Pair<Class<?>, Object>(int.class, 0));
-                    } else {
-                        String memberName = getNameOfMember(index);
-                        Class<?> classClass = Class.forName(memberName.replace("/", "."));
-
-                        Class<?> type = objectRef.first;
-                        if (classClass.isAssignableFrom(type)) {
-                            stack.add(new Pair<Class<?>, Object>(int.class, 1));
-                        } else {
-                            stack.add(new Pair<Class<?>, Object>(int.class, 0));
-                        }
-                    }
+                    Instructions.INSTANCEOF(stack, index, FILE_NAME);
                 }
                 case MONITORENTER -> {
                     // TODO

@@ -924,6 +924,32 @@ public class Instructions {
             throw new ClassCastException(e.getMessage());
         }
     }
+
+    // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.5.instanceof
+    public static void INSTANCEOF(List<Pair<Class<?>, Object>> stack, short index, String file_name)
+            throws ClassNotFoundException {
+        Pair<Class<?>, Object> objectRef = stack.remove(stack.size() - 1);
+
+        if (objectRef == null) {
+            stack.add(new Pair<Class<?>, Object>(int.class, 0));
+        } else {
+            String name_of_class = ClassFile.getNameOfMember(index);
+            Class<?> reference_to_class = null;
+            if (ClassFile.isClassBuiltIn(name_of_class)) {
+                reference_to_class = Class.forName(name_of_class.replace("/", "."));
+            } else {
+                reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            }
+
+            Class<?> type = objectRef.first;
+            if (reference_to_class.isAssignableFrom(type)) {
+                stack.add(new Pair<Class<?>, Object>(int.class, 1));
+            } else {
+                stack.add(new Pair<Class<?>, Object>(int.class, 0));
+            }
+        }
+    }
+
     public static void WIDE(byte[] code, CodeIndex codeIndex, List<Pair<Class<?>, Object>> stack, Object[] local,
             Opcode instruction) {
         short index = -1;
