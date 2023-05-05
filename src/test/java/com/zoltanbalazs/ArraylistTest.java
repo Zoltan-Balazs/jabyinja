@@ -14,5 +14,7 @@ public class ArraylistTest {
         for (int i = 0; i < 15; ++i) {
             System.out.println(a.get(i));
         }
+
+        System.out.println(a.size());
     }
 }

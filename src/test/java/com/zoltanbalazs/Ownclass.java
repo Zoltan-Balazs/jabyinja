@@ -28,5 +28,7 @@ public class Ownclass {
 
         double v = Test.GetC();
         System.out.println(v);
+
+        System.out.println(t.GetSize());
     }
 }
