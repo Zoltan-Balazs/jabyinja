@@ -133,7 +133,7 @@ class ClassFile {
         }
     }
 
-    public Method_Info findMethodsByName(String methodName) {
+    public static Method_Info findMethodsByName(String methodName) {
         for (Method_Info METHOD : METHODS) {
             CP_Info currentItem = CONSTANT_POOL.get(METHOD.name_index - 1);
 
@@ -148,7 +148,7 @@ class ClassFile {
         return null;
     }
 
-    public List<Attribute_Info> findAttributesByName(List<Attribute_Info> attributes, String attributeName) {
+    public static List<Attribute_Info> findAttributesByName(List<Attribute_Info> attributes, String attributeName) {
         List<Attribute_Info> attr = new ArrayList<Attribute_Info>();
 
         for (Attribute_Info ATTRIBUTE : attributes) {
@@ -169,23 +169,24 @@ class ClassFile {
                 StandardCharsets.UTF_8);
     }
 
-    public String getNameOfMember(short name_and_type_index) {
+    public static String getNameOfMember(short name_and_type_index) {
         return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getNameIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
-    public int getNumberOfArguments(short name_and_type_index) throws ClassNotFoundException {
-        String descriptor = new String(
+    public static String getDescriptionOfMethod(short name_and_type_index) {
+        return new String(
                 CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getDescriptorIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
-
-        return stringToTypes(
-                descriptor.substring(descriptor.indexOf("(") + 1,
-                        descriptor.indexOf(")")))
-                .size();
     }
 
-    public Pair<Class<?>, Object> executeCode(byte[] code)
+    public static List<Class<?>> getArguments(String method_descriptions) throws ClassNotFoundException {
+        return stringToTypes(
+                method_descriptions.substring(method_descriptions.indexOf("(") + 1,
+                        method_descriptions.indexOf(")")));
+    }
+
+    public static Pair<Class<?>, Object> executeCode(byte[] code)
             throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException,
             NoSuchMethodException, SecurityException, InstantiationException, IllegalArgumentException,
             InvocationTargetException {
@@ -1304,14 +1305,14 @@ class ClassFile {
         return new Pair<Class<?>, Object>(void.class, null); // Should throw an error...
     }
 
-    public Pair<Integer, String> decodeClassName(String argument) {
+    public static Pair<Integer, String> decodeClassName(String argument) {
         String type = argument.substring(0 + 1);
         int endIdx = type.indexOf(";");
         type = type.substring(0, endIdx);
         return new Pair<Integer, String>(1 + endIdx + 1, type.replace("/", "."));
     }
 
-    public Pair<Integer, Class<?>> stringToType(String argument) throws ClassNotFoundException {
+    public static Pair<Integer, Class<?>> stringToType(String argument) throws ClassNotFoundException {
         switch (argument.charAt(0)) {
             case 'B' -> {
                 return new Pair<Integer, Class<?>>(1, byte.class);
@@ -1368,7 +1369,7 @@ class ClassFile {
         }
     }
 
-    public List<Class<?>> stringToTypes(String arguments) throws ClassNotFoundException {
+    public static List<Class<?>> stringToTypes(String arguments) throws ClassNotFoundException {
         List<Class<?>> argTypes = new ArrayList<Class<?>>();
 
         int idx = 0;
