@@ -1214,7 +1214,13 @@ class Instructions_Helper {
         for (var arguments : arguments_on_stack) {
             Class<?> argument_type = arguments.first;
             Object current_argument = arguments.second;
-            if (argument_type == int.class) {
+
+            if (current_argument.getClass().isArray() && current_argument.getClass() != argument_type) {
+                arguments_of_function.add(current_argument.getClass().cast(current_argument));
+                // arguments_of_function.add(argument_type.cast(current_argument));
+                type_of_arguments.add(current_argument.getClass());
+                continue;
+            } else if (argument_type == int.class) {
                 arguments_of_function.add((int) current_argument);
             } else if (argument_type == float.class) {
                 arguments_of_function.add((float) current_argument);
