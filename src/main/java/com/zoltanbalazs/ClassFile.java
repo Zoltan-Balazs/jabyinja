@@ -128,7 +128,7 @@ class ClassFile {
         }
     }
 
-    public static Method_Info findMethodsByName(String methodName) {
+    public Method_Info findMethodsByName(String methodName) {
         for (Method_Info METHOD : METHODS) {
             CP_Info currentItem = CONSTANT_POOL.get(METHOD.name_index - 1);
 
@@ -143,7 +143,7 @@ class ClassFile {
         return null;
     }
 
-    public static List<Attribute_Info> findAttributesByName(List<Attribute_Info> attributes, String attributeName) {
+    public List<Attribute_Info> findAttributesByName(List<Attribute_Info> attributes, String attributeName) {
         List<Attribute_Info> attr = new ArrayList<Attribute_Info>();
 
         for (Attribute_Info ATTRIBUTE : attributes) {
@@ -205,7 +205,7 @@ class ClassFile {
         return getArguments(descriptor).size();
     }
 
-    public static Pair<Class<?>, Object> executeCode(byte[] code)
+    public Pair<Class<?>, Object> executeCode(byte[] code)
             throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException,
             NoSuchMethodException, SecurityException, InstantiationException, IllegalArgumentException,
             InvocationTargetException {
@@ -748,10 +748,12 @@ class ClassFile {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
                     CP_Info methodRef = CONSTANT_POOL.get(index - 1);
                     // String className = getNameOfClass(methodRef.getClassIndex());
-                    String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
+                    // String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
                     int numberOfArguments = getNumberOfArguments(methodRef.getNameAndTypeIndex());
-                    byte discard = code[codeIndex.Next()];
-                    discard = code[codeIndex.Next()];
+
+                    // Discard..
+                    codeIndex.Next();
+                    codeIndex.Next();
 
                     try {
                         int stackSize = stack.size();
