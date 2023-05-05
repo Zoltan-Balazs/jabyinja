@@ -724,7 +724,8 @@ class ClassFile {
                     Instructions.GETFIELD(stack, CONSTANT_POOL, index);
                 }
                 case PUTFIELD -> {
-                    // TODO
+                    short index = ClassFile_Helper.readShort(code, codeIndex);
+                    Instructions.PUTFIELD(stack, CONSTANT_POOL, index);
                 }
                 case INVOKEVIRTUAL -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);

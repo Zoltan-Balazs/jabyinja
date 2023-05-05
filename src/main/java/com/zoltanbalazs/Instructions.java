@@ -582,6 +582,22 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(field.getClass(), field));
     }
 
+    public static void PUTFIELD(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index)
+            throws NoSuchFieldException, IllegalAccessException {
+        CP_Info reference_to_field = constant_pool.get(index - 1);
+        String name_of_field = ClassFile.getNameOfMember(reference_to_field.getNameAndTypeIndex());
+
+        int stack_size = stack.size();
+        Pair<Class<?>, Object> objectref = stack.get(stack_size - 2);
+        Pair<Class<?>, Object> value = stack.get(stack_size - 1);
+
+        Field f = objectref.second.getClass().getDeclaredField(name_of_field);
+        f.setAccessible(true);
+        f.set(objectref.second, value.second);
+
+        stack.subList(stack_size - 2, stack_size).clear();
+    }
+
     public static void INVOKEVIRTUAL(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             Object[] local,
             String file_name)
