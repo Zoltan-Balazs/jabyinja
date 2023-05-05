@@ -711,70 +711,7 @@ class ClassFile {
                 }
                 case INVOKESPECIAL -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    CP_Info methodRef = CONSTANT_POOL.get(index - 1);
-                    String className = getNameOfClass(methodRef.getClassIndex());
-                    String memberName = getNameOfMember(methodRef.getNameAndTypeIndex());
-
-                    Class<?> classClass = null;
-
-                    try {
-                        classClass = Class.forName(className.replace("/", "."));
-                    } catch (Exception e) {
-                        File f = new File(FILE_NAME);
-                        URL[] cp = { new File(new File(new File(f.getParent()).getParent()).getParent()).toURI()
-                                .toURL() };
-                        URLClassLoader urlcl = new URLClassLoader(cp);
-                        classClass = urlcl.loadClass(className.replace("/", "."));
-                    }
-
-                    if (memberName.equals("<init>")) {
-                        CP_Info methodDescription = CONSTANT_POOL
-                                .get(CONSTANT_POOL.get(methodRef.getNameAndTypeIndex() - 1).getDescriptorIndex() - 1);
-                        String methodDescArgs = new String(methodDescription.getBytes(), StandardCharsets.UTF_8);
-                        List<Class<?>> arguments = stringToTypes(
-                                methodDescArgs.substring(methodDescArgs.indexOf("(") + 1,
-                                        methodDescArgs.indexOf(")")));
-
-                        List<Pair<Class<?>, Object>> args = new ArrayList<>();
-                        int stackSize = stack.size();
-                        for (int i = stackSize - arguments.size(); i < stackSize; ++i) {
-                            args.add(stack.get(i));
-                        }
-                        List<Object> arg = new ArrayList<Object>();
-                        List<Class<?>> type = new ArrayList<Class<?>>();
-                        for (var a : args) {
-                            Class<?> a_type = a.first;
-                            Object curr_arg = a.second;
-                            if (a_type == int.class) {
-                                arg.add((int) curr_arg);
-                            } else if (a_type == float.class) {
-                                arg.add((float) curr_arg);
-                            } else if (a_type == double.class) {
-                                arg.add((double) curr_arg);
-                            } else if (a_type == long.class) {
-                                arg.add((long) curr_arg);
-                            } else {
-                                arg.add(a_type.cast(curr_arg));
-                            }
-                            type.add(a.first);
-                        }
-
-                        Class<?>[] types = new Class<?>[type.size()];
-                        for (int j = 0; j < type.size(); ++j) {
-                            types[j] = (Class<?>) type.get(j);
-                        }
-
-                        Object[] initArgs = new Object[arg.size()];
-                        for (int j = 0; j < arg.size(); ++j) {
-                            initArgs[j] = (Object) arg.get(j);
-                        }
-
-                        Constructor<?> init = classClass.getConstructor(types);
-                        stack.removeAll(stack);
-                        stack.add(new Pair<Class<?>, Object>(classClass, init.newInstance(initArgs)));
-                    } else {
-
-                    }
+                    Instructions.INVOKESPECIAL(stack, CONSTANT_POOL, index, local, FILE_NAME);
                 }
                 case INVOKESTATIC -> {
                     // TODO: Recursive call.. push back to stack
