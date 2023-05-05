@@ -901,6 +901,29 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(int.class, Array.getLength(arrayref.second)));
     }
 
+    // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.5.checkcast
+    public static void CHECKCAST(List<Pair<Class<?>, Object>> stack, short index, String file_name)
+            throws ClassNotFoundException {
+        String name_of_class = ClassFile.getNameOfMember(index);
+
+        Class<?> reference_to_class = null;
+        if (ClassFile.isClassBuiltIn(name_of_class)) {
+            reference_to_class = Class.forName(name_of_class.replace("/", "."));
+        } else {
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+        }
+
+        Pair<Class<?>, Object> objectRef = stack.get(stack.size() - 1);
+        if (objectRef == null) {
+            return;
+        }
+
+        try {
+            reference_to_class.isAssignableFrom(objectRef.second.getClass());
+        } catch (Exception e) {
+            throw new ClassCastException(e.getMessage());
+        }
+    }
     public static void WIDE(byte[] code, CodeIndex codeIndex, List<Pair<Class<?>, Object>> stack, Object[] local,
             Opcode instruction) {
         short index = -1;
