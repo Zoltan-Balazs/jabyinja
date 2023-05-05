@@ -1239,15 +1239,24 @@ class Instructions_Helper {
         Class<?> returned_class = null;
         try {
             File f = new File(file_name);
-            int length = class_name.split("/").length;
+            int length = 0;
+            if (class_name.contains("/")) {
+                length = class_name.split("/").length;
+            } else {
+                length = class_name.split("\\.").length;
+            }
             for (int i = 0; i < length; ++i) {
                 f = new File(f.getParent());
-            }
 
-            URL[] cp = { f.toURI().toURL() };
-            URLClassLoader urlcl = new URLClassLoader(cp);
-            returned_class = urlcl.loadClass(class_name.replace("/", "."));
-            urlcl.close();
+                URL[] cp = { f.toURI().toURL() };
+                URLClassLoader urlcl = new URLClassLoader(cp);
+                try {
+                    returned_class = urlcl.loadClass(class_name.replace("/", "."));
+                } catch (Exception e) {
+
+                }
+                urlcl.close();
+            }
         } catch (Exception e) {
             return null;
         }
