@@ -207,17 +207,19 @@ class ClassFile {
             reference_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
             return true;
         } catch (Throwable e) {
+            boolean doesMethodExist = false;
             for (Method method : reference_to_class.getDeclaredMethods()) {
-                if (method.getName().equals(name_and_type_of_member)) {
+                if (method.getName().equals(name_and_type_of_member) && !doesMethodExist) {
                     for (int i = 0; i < method.getParameterTypes().length; ++i) {
                         Class<?> type = method.getParameterTypes()[i];
                         if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
                             return false;
                         }
                     }
+                    doesMethodExist = true;
                 }
             }
-            return true;
+            return doesMethodExist;
         }
     }
 
