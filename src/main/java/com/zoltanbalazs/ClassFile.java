@@ -775,7 +775,7 @@ class ClassFile {
                 }
                 case ANEWARRAY -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.ANEWARRAY(stack, CONSTANT_POOL, index, this);
+                    Instructions.ANEWARRAY(stack, CONSTANT_POOL, index, FILE_NAME, this);
                 }
                 case ARRAYLENGTH -> {
                     Instructions.ARRAYLENGTH(stack);
@@ -806,7 +806,7 @@ class ClassFile {
                 case MULTIANEWARRAY -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
                     byte dimensions = code[codeIndex.Next()];
-                    Instructions.MULTIANEWARRAY(stack, CONSTANT_POOL, index, dimensions, this);
+                    Instructions.MULTIANEWARRAY(stack, CONSTANT_POOL, index, dimensions, FILE_NAME, this);
                 }
                 case IFNULL -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);

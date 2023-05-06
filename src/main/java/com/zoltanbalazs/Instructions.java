@@ -1040,13 +1040,20 @@ public class Instructions {
     }
 
     public static void ANEWARRAY(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
-            ClassFile cf)
+            String file_name, ClassFile cf)
             throws ClassNotFoundException {
         ConstantPoolTag tag = constant_pool.get((index & 0xFF) + 1).tag;
 
         Class<?> arrayType = null;
-        if (tag == ConstantPoolTag.CONSTANT_Utf8 || tag == ConstantPoolTag.CONSTANT_Fieldref) {
-            arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
+        if (tag == ConstantPoolTag.CONSTANT_Utf8 || tag == ConstantPoolTag.CONSTANT_Fieldref
+                || tag == ConstantPoolTag.CONSTANT_Class) {
+            String name_of_class = cf.getNameOfClass(index);
+            if (ClassFile.isClassBuiltIn(name_of_class)) {
+                arrayType = Class.forName(name_of_class.replace("/", "."));
+            } else {
+                arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            }
+            // arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
         } else {
             arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
         }
@@ -1186,15 +1193,23 @@ public class Instructions {
     }
 
     public static void MULTIANEWARRAY(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
-            byte dimensions, ClassFile cf)
+            byte dimensions, String file_name, ClassFile cf)
             throws ClassNotFoundException {
         ConstantPoolTag tag = constant_pool.get((index & 0xFF) + 1).tag;
 
         Class<?> arrayType = null;
         Class<?> hackyType = null;
-        if (tag == ConstantPoolTag.CONSTANT_Utf8 || tag == ConstantPoolTag.CONSTANT_Fieldref) {
-            arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
-            hackyType = Class.forName(cf.getNameOfClass(index).replace("/", ".").replaceAll("\\[+", "["));
+        if (tag == ConstantPoolTag.CONSTANT_Utf8 || tag == ConstantPoolTag.CONSTANT_Fieldref
+                || tag == ConstantPoolTag.CONSTANT_Class) {
+            String name_of_class = cf.getNameOfClass(index);
+            if (ClassFile.isClassBuiltIn(name_of_class)) {
+                arrayType = Class.forName(name_of_class.replace("/", "."));
+                hackyType = Class.forName(name_of_class.replace("/", ".").replaceAll("\\[+", "["));
+            } else {
+                arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+                hackyType = arrayType;
+            }
+            // arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
         } else {
             arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
         }
