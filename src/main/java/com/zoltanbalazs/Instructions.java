@@ -726,16 +726,33 @@ public class Instructions {
                     Object[] values = new Object[nonStaticParams];
                     int ctr = 0;
                     for (int i = 0; i < fields.length; ++i) {
-                        if (!java.lang.reflect.Modifier.isStatic(fields[i].getModifiers())) {
-                            fields[i].setAccessible(true);
-                            values[ctr++] = fields[i].get(objectref.second);
+                        try {
+                            if (!java.lang.reflect.Modifier.isStatic(fields[i].getModifiers())) {
+                                fields[i].setAccessible(true);
+                                values[ctr++] = fields[i].get(objectref.second);
+                            }
+                        } catch (Exception e) {
+
                         }
                     }
 
                     try {
                         obj = ctor.newInstance(values);
                     } catch (Exception e) {
+                        int params = ctor.getParameterCount();
+                        values = new Object[params];
+                        ctr = 0;
+                        for (int i = 0; i < fields.length; ++i) {
+                            try {
+                                if (!java.lang.reflect.Modifier.isStatic(fields[i].getModifiers())) {
+                                    fields[i].setAccessible(true);
+                                    values[ctr++] = fields[i].get(objectref.second);
+                                }
+                            } catch (Exception ee) {
 
+                            }
+                        }
+                        obj = ctor.newInstance(values);
                     }
 
                     if (obj != null) {
@@ -754,11 +771,22 @@ public class Instructions {
 
                 local[objectRefIdx] = obj;
             } catch (Exception e) {
-                method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class,
-                        name_and_type_of_member,
-                        types_of_function_paramaters,
-                        method_arguments, arguments_on_stack);
+                if (obj == null) {
+                    obj = objectref.first;
+
+                    method = Instructions_Helper.GET_CORRECT_METHOD(objectref.first.getClass(),
+                            name_and_type_of_member,
+                            types_of_function_paramaters,
+                            method_arguments, arguments_on_stack);
+                } else {
+                    method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class,
+                            name_and_type_of_member,
+                            types_of_function_paramaters,
+                            method_arguments, arguments_on_stack);
+                }
+
                 method.setAccessible(true);
+
                 result = method.invoke(obj, arguments_as_objects);
 
                 local[objectRefIdx] = obj;
