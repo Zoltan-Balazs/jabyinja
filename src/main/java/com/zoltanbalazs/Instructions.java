@@ -1395,7 +1395,7 @@ class Instructions_Helper {
             } else if (argument_type == long.class) {
                 arguments_of_function.add((long) current_argument);
             } else {
-                if (!argument_type.equals(current_argument)) {
+                if (!argument_type.equals(current_argument) && argument_type != boolean.class) {
                     arguments_of_function.add(argument_type.cast(current_argument));
                 } else {
                     arguments_of_function.add(current_argument);
