@@ -406,7 +406,12 @@ public class Instructions {
     }
 
     public static void IF1I(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
-        int value = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        int value;
+        if (stack.get(stack.size() - 1).first == Boolean.class || stack.get(stack.size() - 1).first == boolean.class) {
+            value = (boolean) stack.remove(stack.size() - 1).second ? 1 : 0;
+        } else {
+            value = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        }
 
         switch (type) {
             case IFEQ -> {
