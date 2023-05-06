@@ -158,7 +158,19 @@ public class CP_Info {
 		return new byte[] {};
 	}
 
+	public byte getReferenceKind() {
+		return -1;
+	}
+
+	public short getReferenceIndex() {
+		return -1;
+	}
+
 	public short getNameIndex() {
+		return -1;
+	}
+
+	public short getBootStrapMethodAttributeIndex() {
 		return -1;
 	}
 
@@ -426,6 +438,16 @@ class CONSTANT_MethodHandle_Info extends CP_Info {
 	public short reference_index;
 
 	@Override
+	public byte getReferenceKind() {
+		return reference_kind;
+	}
+
+	@Override
+	public short getReferenceIndex() {
+		return reference_index;
+	}
+
+	@Override
 	public String toString() {
 		return "CONSTANT_MethodHandle_Info: " + reference_kind + " - " + reference_index;
 	}
@@ -433,6 +455,11 @@ class CONSTANT_MethodHandle_Info extends CP_Info {
 
 class CONSTANT_MethodType_Info extends CP_Info {
 	public short descriptor_index;
+
+	@Override
+	public short getDescriptorIndex() {
+		return descriptor_index;
+	}
 
 	@Override
 	public String toString() {
@@ -447,6 +474,11 @@ class CONSTANT_InvokeDynamic_Info extends CP_Info {
 	@Override
 	public short getNameAndTypeIndex() {
 		return name_and_type_index;
+	}
+
+	@Override
+	public short getBootStrapMethodAttributeIndex() {
+		return bootstrap_method_attr_index;
 	}
 
 	@Override
