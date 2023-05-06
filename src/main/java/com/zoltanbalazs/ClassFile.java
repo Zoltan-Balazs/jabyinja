@@ -722,14 +722,8 @@ class ClassFile {
                     Instructions.GETSTATIC(stack, CONSTANT_POOL, index, FILE_NAME, this);
                 }
                 case PUTSTATIC -> {
-                    // TODO
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    CP_Info fieldRef = CONSTANT_POOL.get(index - 1);
-                    String className = getNameOfClass(fieldRef.getClassIndex());
-                    String memberName = getNameOfMember(fieldRef.getNameAndTypeIndex());
-
-                    System.out.println(className);
-                    System.out.println(memberName);
+                    Instructions.PUTSTATIC(stack, CONSTANT_POOL, index, FILE_NAME, this);
                 }
                 case GETFIELD -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
