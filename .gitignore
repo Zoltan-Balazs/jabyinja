@@ -11,4 +11,5 @@ thesis/images/*
 !thesis/images/
 !thesis/text/
 !src/test/
+!src/test/java/com/zoltanbalazs/Own/*.class
 !thesis/images/elte_cimer_szines.eps
