@@ -133,6 +133,13 @@ $ just co
 $ java -jar target/jabyinja-*.jar <optional class file>
 ```
 
+If you need to alter the classpath (i.e. you would normally run `java -cp ..` to launch the file) you might get an exception, in this case you need to alter the classpath
+
+```sh
+$ mvn package
+$ java -cp target/classes:<your own classpaths> com.zoltanbalazs.Main <optional class file>
+```
+
 ## Generating a PDF from the thesis
 
 *Ignore any warnings*
