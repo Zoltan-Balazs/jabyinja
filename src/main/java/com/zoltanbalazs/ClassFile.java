@@ -718,16 +718,8 @@ class ClassFile {
                     return new Pair<Class<?>, Object>(void.class, null);
                 }
                 case GETSTATIC -> {
-                    // TODO
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    CP_Info fieldRef = CONSTANT_POOL.get(index - 1);
-                    String className = getNameOfClass(fieldRef.getClassIndex());
-                    String memberName = getNameOfMember(fieldRef.getNameAndTypeIndex());
-
-                    Class<?> systemClass = Class.forName(className.replace("/", "."));
-                    Field outField = systemClass.getField(memberName);
-
-                    stack.add(new Pair<Class<?>, Object>(systemClass, outField.get(null)));
+                    Instructions.GETSTATIC(stack, CONSTANT_POOL, index, FILE_NAME, this);
                 }
                 case PUTSTATIC -> {
                     // TODO

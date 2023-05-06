@@ -565,6 +565,26 @@ public class Instructions {
         }
     }
 
+    public static void GETSTATIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
+            String file_name, ClassFile cf)
+            throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        CP_Info reference_to_field = constant_pool.get(index - 1);
+        String name_of_class = cf.getNameOfClass(reference_to_field.getClassIndex());
+        String name_of_field = cf.getNameOfMember(reference_to_field.getNameAndTypeIndex());
+
+        Class<?> reference_to_class = null;
+        if (ClassFile.isClassBuiltIn(name_of_class)) {
+            reference_to_class = Class.forName(name_of_class.replace("/", "."));
+        } else {
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+        }
+
+        Field outField = reference_to_class.getDeclaredField(name_of_field);
+        outField.setAccessible(true);
+        Object field = outField.get(null);
+        stack.add(new Pair<Class<?>, Object>(field.getClass(), field));
+    }
+
     public static void GETFIELD(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             ClassFile cf)
             throws NoSuchFieldException, IllegalAccessException {
