@@ -34,9 +34,9 @@ class BoostrapMethod_Helper {
             BoostrapMethod tmp = new BoostrapMethod();
             tmp.bootstrap_method_ref = ClassFile_Helper.readShort(in);
             tmp.num_bootstrap_arguments = ClassFile_Helper.readShort(in);
-            tmp.boostrap_arguments = new short[tmp.num_bootstrap_arguments];
+            tmp.bootstrap_arguments = new short[tmp.num_bootstrap_arguments];
             for (int j = 0; j < tmp.num_bootstrap_arguments; ++j) {
-                tmp.boostrap_arguments[j] = ClassFile_Helper.readShort(in);
+                tmp.bootstrap_arguments[j] = ClassFile_Helper.readShort(in);
             }
             bootstrapMethods.add(tmp);
         }
@@ -48,19 +48,19 @@ class BoostrapMethod_Helper {
 class BoostrapMethod {
     public short bootstrap_method_ref;
     public short num_bootstrap_arguments;
-    public short[] boostrap_arguments;
+    public short[] bootstrap_arguments;
 
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
 
-        str.append("Code:\n");
+        str.append("Bootstrap Method:\n");
         str.append("\bootstrap_method_ref = " + bootstrap_method_ref + "\n");
         str.append("\num_bootstrap_arguments = " + num_bootstrap_arguments + "\n");
 
         if (num_bootstrap_arguments != 0) {
             str.append("\tbootstrap_methods: \n");
-            for (short args : boostrap_arguments) {
+            for (short args : bootstrap_arguments) {
                 str.append("\t\t" + args + "\n");
             }
         }
