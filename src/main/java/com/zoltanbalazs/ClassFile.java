@@ -87,6 +87,7 @@ class ClassFile {
     private List<Attribute_Info> ATTRIBUTES;
 
     private List<BootstrapMethods_Attribute> BOOTSTRAP_METHODS = new ArrayList<>();
+    private List<Object> LOCKS = new ArrayList<>();
 
     private List<CallSite> callSites = new ArrayList<>();
     private List<Pair<Class<?>, Object>> stack = new ArrayList<>();
@@ -791,10 +792,12 @@ class ClassFile {
                     Instructions.INSTANCEOF(stack, index, FILE_NAME, this);
                 }
                 case MONITORENTER -> {
-                    // TODO
+                    Object objectref = stack.remove(stack.size() - 1).second;
+                    LOCKS.add(objectref);
                 }
                 case MONITOREXIT -> {
-                    // TODO
+                    Object objectref = stack.remove(stack.size() - 1);
+                    LOCKS.remove(objectref);
                 }
                 case WIDE -> {
                     Opcode newOpcode = Opcode.opcodeRepresentation(code[codeIndex.Next()]);
