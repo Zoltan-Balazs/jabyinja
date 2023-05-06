@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
+import java.lang.invoke.CallSite;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -68,26 +68,29 @@ class CodeIndex {
 class ClassFile {
     private static final byte[] MAGIC_NUMBER = HexFormat.of().parseHex("CAFEBABE");
 
-    private static String FILE_NAME = "";
-    private static boolean VALID_CLASS_FILE = false;
-    private static short MINOR_VERSION;
-    private static short MAJOR_VERSION;
-    private static short CONSTANT_POOL_COUNT;
-    private static List<CP_Info> CONSTANT_POOL;
-    private static List<Access_Flags> ACCESS_FLAGS;
-    private static short THIS_CLASS;
-    private static short SUPER_CLASS;
-    private static short INTERFACES_COUNT;
-    private static List<Interface> INTERFACES;
-    private static short FIELDS_COUNT;
-    private static List<Field_Info> FIELDS;
-    private static short METHODS_COUNT;
-    private static List<Method_Info> METHODS;
-    private static short ATTRIBUTES_COUNT;
-    private static List<Attribute_Info> ATTRIBUTES;
+    private String FILE_NAME = "";
+    private boolean VALID_CLASS_FILE = false;
+    private short MINOR_VERSION;
+    private short MAJOR_VERSION;
+    private short CONSTANT_POOL_COUNT;
+    private List<CP_Info> CONSTANT_POOL;
+    private List<Access_Flags> ACCESS_FLAGS;
+    private short THIS_CLASS;
+    private short SUPER_CLASS;
+    private short INTERFACES_COUNT;
+    private List<Interface> INTERFACES;
+    private short FIELDS_COUNT;
+    private List<Field_Info> FIELDS;
+    private short METHODS_COUNT;
+    private List<Method_Info> METHODS;
+    private short ATTRIBUTES_COUNT;
+    private List<Attribute_Info> ATTRIBUTES;
 
-    private static List<Pair<Class<?>, Object>> stack = new ArrayList<>();
-    private static Object[] local = new Object[65535];
+    private List<BootstrapMethods_Attribute> BOOTSTRAP_METHODS = new ArrayList<>();
+
+    private List<CallSite> callSites = new ArrayList<>();
+    private List<Pair<Class<?>, Object>> stack = new ArrayList<>();
+    private Object[] local = new Object[65535];
 
     public ClassFile(String fileName, String[] mainArgs) {
         FILE_NAME = fileName;
@@ -118,6 +121,12 @@ class ClassFile {
             METHODS = Method_Helper.readMethods(classFileData, METHODS_COUNT);
             ATTRIBUTES_COUNT = ClassFile_Helper.readShort(classFileData);
             ATTRIBUTES = Attribute_Helper.readAttributes(classFileData, ATTRIBUTES_COUNT);
+
+            List<Attribute_Info> bootstrap_methods_tmp = findAttributesByName(ATTRIBUTES, "BootstrapMethods");
+            for (Attribute_Info boostrap_attribute_tmp : bootstrap_methods_tmp) {
+                BOOTSTRAP_METHODS
+                        .add(BootstrapMethods_Attribute_Helper.readBootStrapMethodAttributes(boostrap_attribute_tmp));
+            }
         } catch (FileNotFoundException e) {
             System.err.println("The file '" + fileName + "' cannot be found!");
         } catch (InvalidClassFileException e) {
@@ -161,23 +170,23 @@ class ClassFile {
         return attr;
     }
 
-    public static String getNameOfClass(short class_index) {
+    public String getNameOfClass(short class_index) {
         return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(class_index - 1).getNameIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
-    public static String getNameOfMember(short name_and_type_index) {
+    public String getNameOfMember(short name_and_type_index) {
         return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getNameIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
-    public static String getDescriptionOfMethod(short name_and_type_index) {
+    public String getDescriptionOfMethod(short name_and_type_index) {
         return new String(
                 CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getDescriptorIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
-    public static List<Class<?>> getArguments(String method_descriptions) throws ClassNotFoundException {
+    public List<Class<?>> getArguments(String method_descriptions) throws ClassNotFoundException {
         return stringToTypes(
                 method_descriptions.substring(method_descriptions.indexOf("(") + 1,
                         method_descriptions.indexOf(")")));
@@ -212,7 +221,7 @@ class ClassFile {
         }
     }
 
-    public static int getNumberOfArguments(short name_and_type_index) throws ClassNotFoundException {
+    public int getNumberOfArguments(short name_and_type_index) throws ClassNotFoundException {
         String descriptor = getDescriptionOfMethod(name_and_type_index);
         return getArguments(descriptor).size();
     }
@@ -732,30 +741,30 @@ class ClassFile {
                 }
                 case GETFIELD -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.GETFIELD(stack, CONSTANT_POOL, index);
+                    Instructions.GETFIELD(stack, CONSTANT_POOL, index, this);
                 }
                 case PUTFIELD -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.PUTFIELD(stack, CONSTANT_POOL, index);
+                    Instructions.PUTFIELD(stack, CONSTANT_POOL, index, this);
                 }
                 case INVOKEVIRTUAL -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.INVOKEVIRTUAL(stack, CONSTANT_POOL, index, local, FILE_NAME);
+                    Instructions.INVOKEVIRTUAL(stack, CONSTANT_POOL, index, local, FILE_NAME, this);
                 }
                 case INVOKESPECIAL -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.INVOKESPECIAL(stack, CONSTANT_POOL, index, local, FILE_NAME);
+                    Instructions.INVOKESPECIAL(stack, CONSTANT_POOL, index, local, FILE_NAME, this);
                 }
                 case INVOKESTATIC -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.INVOKESTATIC(stack, CONSTANT_POOL, index, local, FILE_NAME);
+                    Instructions.INVOKESTATIC(stack, CONSTANT_POOL, index, local, FILE_NAME, this);
                 }
                 case INVOKEINTERFACE -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
                     byte count = code[codeIndex.Next()]; // TODO: Unsigned byte...
                     codeIndex.Next();
 
-                    Instructions.INVOKEINTERFACE(stack, CONSTANT_POOL, index, count, local, FILE_NAME);
+                    Instructions.INVOKEINTERFACE(stack, CONSTANT_POOL, index, count, local, FILE_NAME, this);
                 }
                 case INVOKEDYNAMIC -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
@@ -764,11 +773,12 @@ class ClassFile {
                     codeIndex.Next();
                     codeIndex.Next();
 
-                    Instructions.INVOKEDYNAMIC(stack, CONSTANT_POOL, index, local, FILE_NAME);
+                    Instructions.INVOKEDYNAMIC(stack, CONSTANT_POOL, index, local, BOOTSTRAP_METHODS, callSites,
+                            FILE_NAME, this);
                 }
                 case NEW -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.NEW(stack, CONSTANT_POOL, index, local, FILE_NAME);
+                    Instructions.NEW(stack, CONSTANT_POOL, index, local, FILE_NAME, this);
                 }
                 case NEWARRAY -> {
                     byte atype = code[codeIndex.Next()];
@@ -776,7 +786,7 @@ class ClassFile {
                 }
                 case ANEWARRAY -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.ANEWARRAY(stack, CONSTANT_POOL, index);
+                    Instructions.ANEWARRAY(stack, CONSTANT_POOL, index, this);
                 }
                 case ARRAYLENGTH -> {
                     Instructions.ARRAYLENGTH(stack);
@@ -786,11 +796,11 @@ class ClassFile {
                 }
                 case CHECKCAST -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.CHECKCAST(stack, index, FILE_NAME);
+                    Instructions.CHECKCAST(stack, index, FILE_NAME, this);
                 }
                 case INSTANCEOF -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.INSTANCEOF(stack, index, FILE_NAME);
+                    Instructions.INSTANCEOF(stack, index, FILE_NAME, this);
                 }
                 case MONITORENTER -> {
                     // TODO
@@ -805,7 +815,7 @@ class ClassFile {
                 case MULTIANEWARRAY -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
                     byte dimensions = code[codeIndex.Next()];
-                    Instructions.MULTIANEWARRAY(stack, CONSTANT_POOL, index, dimensions);
+                    Instructions.MULTIANEWARRAY(stack, CONSTANT_POOL, index, dimensions, this);
                 }
                 case IFNULL -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
@@ -834,7 +844,7 @@ class ClassFile {
         return new Pair<Integer, String>(1 + endIdx + 1, type.replace("/", "."));
     }
 
-    public static Pair<Integer, Class<?>> stringToType(String argument) throws ClassNotFoundException {
+    public Pair<Integer, Class<?>> stringToType(String argument) throws ClassNotFoundException {
         switch (argument.charAt(0)) {
             case 'B' -> {
                 return new Pair<Integer, Class<?>>(1, byte.class);
@@ -897,7 +907,7 @@ class ClassFile {
         }
     }
 
-    public static List<Class<?>> stringToTypes(String arguments) throws ClassNotFoundException {
+    public List<Class<?>> stringToTypes(String arguments) throws ClassNotFoundException {
         List<Class<?>> argTypes = new ArrayList<Class<?>>();
 
         int idx = 0;

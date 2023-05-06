@@ -565,10 +565,11 @@ public class Instructions {
         }
     }
 
-    public static void GETFIELD(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index)
+    public static void GETFIELD(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
+            ClassFile cf)
             throws NoSuchFieldException, IllegalAccessException {
         CP_Info reference_to_field = constant_pool.get(index - 1);
-        String name_of_field = ClassFile.getNameOfMember(reference_to_field.getNameAndTypeIndex());
+        String name_of_field = cf.getNameOfMember(reference_to_field.getNameAndTypeIndex());
 
         int stack_size = stack.size();
         Pair<Class<?>, Object> objectref = stack.get(stack_size - 1);
@@ -582,10 +583,11 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(field.getClass(), field));
     }
 
-    public static void PUTFIELD(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index)
+    public static void PUTFIELD(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
+            ClassFile cf)
             throws NoSuchFieldException, IllegalAccessException {
         CP_Info reference_to_field = constant_pool.get(index - 1);
-        String name_of_field = ClassFile.getNameOfMember(reference_to_field.getNameAndTypeIndex());
+        String name_of_field = cf.getNameOfMember(reference_to_field.getNameAndTypeIndex());
 
         int stack_size = stack.size();
         Pair<Class<?>, Object> objectref = stack.get(stack_size - 2);
@@ -600,15 +602,15 @@ public class Instructions {
 
     public static void INVOKEVIRTUAL(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             Object[] local,
-            String file_name)
+            String file_name, ClassFile cf)
             throws ClassNotFoundException, MalformedURLException, IOException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException, InstantiationException {
         CP_Info reference_to_method = constant_pool.get(index - 1);
-        String name_of_class = ClassFile.getNameOfClass(reference_to_method.getClassIndex());
-        String name_and_type_of_member = ClassFile.getNameOfMember(reference_to_method.getNameAndTypeIndex());
-        String description_of_method = ClassFile.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
+        String name_of_class = cf.getNameOfClass(reference_to_method.getClassIndex());
+        String name_and_type_of_member = cf.getNameOfMember(reference_to_method.getNameAndTypeIndex());
+        String description_of_method = cf.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
 
-        List<Class<?>> method_arguments = ClassFile.getArguments(description_of_method);
+        List<Class<?>> method_arguments = cf.getArguments(description_of_method);
         int number_of_method_arguments = method_arguments.size();
 
         int stack_size = stack.size();
@@ -721,12 +723,12 @@ public class Instructions {
     }
 
     public static void INVOKESPECIAL(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
-            Object[] local, String file_name)
+            Object[] local, String file_name, ClassFile cf)
             throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
             ClassNotFoundException {
         CP_Info reference_to_method = constant_pool.get(index - 1);
-        String name_of_class = ClassFile.getNameOfClass(reference_to_method.getClassIndex());
-        String name_and_type_of_member = ClassFile.getNameOfMember(reference_to_method.getNameAndTypeIndex());
+        String name_of_class = cf.getNameOfClass(reference_to_method.getClassIndex());
+        String name_and_type_of_member = cf.getNameOfMember(reference_to_method.getNameAndTypeIndex());
 
         Class<?> reference_to_class = null;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
@@ -736,8 +738,8 @@ public class Instructions {
         }
 
         if (name_and_type_of_member.equals("<init>")) {
-            String description_of_method = ClassFile.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
-            List<Class<?>> method_arguments = ClassFile.getArguments(description_of_method);
+            String description_of_method = cf.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
+            List<Class<?>> method_arguments = cf.getArguments(description_of_method);
             int number_of_method_arguments = method_arguments.size();
 
             int stack_size = stack.size();
@@ -768,14 +770,14 @@ public class Instructions {
     }
 
     public static void INVOKESTATIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
-            Object[] local, String file_name)
+            Object[] local, String file_name, ClassFile cf)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         CP_Info reference_to_method = constant_pool.get(index - 1);
-        String name_of_class = ClassFile.getNameOfClass(reference_to_method.getClassIndex());
-        String name_and_type_of_member = ClassFile.getNameOfMember(reference_to_method.getNameAndTypeIndex());
-        String description_of_method = ClassFile.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
+        String name_of_class = cf.getNameOfClass(reference_to_method.getClassIndex());
+        String name_and_type_of_member = cf.getNameOfMember(reference_to_method.getNameAndTypeIndex());
+        String description_of_method = cf.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
 
-        List<Class<?>> method_arguments = ClassFile.getArguments(description_of_method);
+        List<Class<?>> method_arguments = cf.getArguments(description_of_method);
         int number_of_method_arguments = method_arguments.size();
 
         int stack_size = stack.size();
@@ -825,15 +827,15 @@ public class Instructions {
     public static void INVOKEINTERFACE(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             byte count,
             Object[] local,
-            String file_name)
+            String file_name, ClassFile cf)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         // TODO
         CP_Info reference_to_interface = (CONSTANT_InterfaceMethodref_Info) constant_pool.get(index - 1);
-        String name_of_class = ClassFile.getNameOfClass(reference_to_interface.getClassIndex());
-        String name_and_type_of_member = ClassFile.getNameOfMember(reference_to_interface.getNameAndTypeIndex());
-        String description_of_method = ClassFile.getDescriptionOfMethod(reference_to_interface.getNameAndTypeIndex());
+        String name_of_class = cf.getNameOfClass(reference_to_interface.getClassIndex());
+        String name_and_type_of_member = cf.getNameOfMember(reference_to_interface.getNameAndTypeIndex());
+        String description_of_method = cf.getDescriptionOfMethod(reference_to_interface.getNameAndTypeIndex());
 
-        List<Class<?>> method_arguments = ClassFile.getArguments(description_of_method);
+        List<Class<?>> method_arguments = cf.getArguments(description_of_method);
 
         int stack_size = stack.size();
         List<Pair<Class<?>, Object>> arguments_on_stack = stack.subList(stack_size - count + 1,
@@ -877,11 +879,11 @@ public class Instructions {
     }
 
     public static void INVOKEDYNAMIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
-            Object[] local,
-            String file_name) throws ClassNotFoundException {
+            Object[] local, List<BootstrapMethods_Attribute> bootstrap_methods, List<CallSite> call_sites,
+            String file_name, ClassFile cf) throws ClassNotFoundException {
         CP_Info reference_to_method = constant_pool.get(index - 1);
-        String description_of_method = ClassFile.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
-        List<Class<?>> method_arguments = ClassFile.getArguments(description_of_method);
+        String description_of_method = cf.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
+        List<Class<?>> method_arguments = cf.getArguments(description_of_method);
         int number_of_method_arguments = method_arguments.size();
 
         int stack_size = stack.size();
@@ -909,8 +911,8 @@ public class Instructions {
     }
 
     public static void NEW(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index, Object[] local,
-            String file_name) throws ClassNotFoundException {
-        String name_of_class = ClassFile.getNameOfMember(index);
+            String file_name, ClassFile cf) throws ClassNotFoundException {
+        String name_of_class = cf.getNameOfMember(index);
         Class<?> reference_to_class = null;
 
         if (ClassFile.isClassBuiltIn(name_of_class)) {
@@ -929,13 +931,14 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(arrayType, Array.newInstance(arrayType, count)));
     }
 
-    public static void ANEWARRAY(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index)
+    public static void ANEWARRAY(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
+            ClassFile cf)
             throws ClassNotFoundException {
         ConstantPoolTag tag = constant_pool.get((index & 0xFF) + 1).tag;
 
         Class<?> arrayType = null;
         if (tag == ConstantPoolTag.CONSTANT_Utf8 || tag == ConstantPoolTag.CONSTANT_Fieldref) {
-            arrayType = Class.forName(ClassFile.getNameOfClass(index).replace("/", "."));
+            arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
         } else {
             arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
         }
@@ -950,9 +953,9 @@ public class Instructions {
     }
 
     // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.5.checkcast
-    public static void CHECKCAST(List<Pair<Class<?>, Object>> stack, short index, String file_name)
+    public static void CHECKCAST(List<Pair<Class<?>, Object>> stack, short index, String file_name, ClassFile cf)
             throws ClassNotFoundException {
-        String name_of_class = ClassFile.getNameOfMember(index);
+        String name_of_class = cf.getNameOfMember(index);
 
         Class<?> reference_to_class = null;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
@@ -974,14 +977,14 @@ public class Instructions {
     }
 
     // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.5.instanceof
-    public static void INSTANCEOF(List<Pair<Class<?>, Object>> stack, short index, String file_name)
+    public static void INSTANCEOF(List<Pair<Class<?>, Object>> stack, short index, String file_name, ClassFile cf)
             throws ClassNotFoundException {
         Pair<Class<?>, Object> objectRef = stack.remove(stack.size() - 1);
 
         if (objectRef == null) {
             stack.add(new Pair<Class<?>, Object>(int.class, 0));
         } else {
-            String name_of_class = ClassFile.getNameOfMember(index);
+            String name_of_class = cf.getNameOfMember(index);
             Class<?> reference_to_class = null;
             if (ClassFile.isClassBuiltIn(name_of_class)) {
                 reference_to_class = Class.forName(name_of_class.replace("/", "."));
@@ -1063,15 +1066,15 @@ public class Instructions {
     }
 
     public static void MULTIANEWARRAY(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
-            byte dimensions)
+            byte dimensions, ClassFile cf)
             throws ClassNotFoundException {
         ConstantPoolTag tag = constant_pool.get((index & 0xFF) + 1).tag;
 
         Class<?> arrayType = null;
         Class<?> hackyType = null;
         if (tag == ConstantPoolTag.CONSTANT_Utf8 || tag == ConstantPoolTag.CONSTANT_Fieldref) {
-            arrayType = Class.forName(ClassFile.getNameOfClass(index).replace("/", "."));
-            hackyType = Class.forName(ClassFile.getNameOfClass(index).replace("/", ".").replaceAll("\\[+", "["));
+            arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
+            hackyType = Class.forName(cf.getNameOfClass(index).replace("/", ".").replaceAll("\\[+", "["));
         } else {
             arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
         }
@@ -1229,7 +1232,11 @@ class Instructions_Helper {
             } else if (argument_type == long.class) {
                 arguments_of_function.add((long) current_argument);
             } else {
-                arguments_of_function.add(argument_type.cast(current_argument));
+                if (!argument_type.equals(current_argument)) {
+                    arguments_of_function.add(argument_type.cast(current_argument));
+                } else {
+                    arguments_of_function.add(current_argument);
+                }
             }
             type_of_arguments.add(arguments.first);
         }
@@ -1245,9 +1252,7 @@ class Instructions_Helper {
             } else {
                 length = class_name.split("\\.").length;
             }
-            for (int i = 0; i < length; ++i) {
-                f = new File(f.getParent());
-
+            for (int i = 0; i < length + 1; ++i) {
                 URL[] cp = { f.toURI().toURL() };
                 URLClassLoader urlcl = new URLClassLoader(cp);
                 try {
@@ -1256,6 +1261,8 @@ class Instructions_Helper {
 
                 }
                 urlcl.close();
+
+                f = new File(f.getParent());
             }
         } catch (Exception e) {
             return null;
