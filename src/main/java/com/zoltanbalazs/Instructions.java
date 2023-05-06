@@ -811,11 +811,36 @@ public class Instructions {
                 arguments_as_objects[j] = (Object) arguments_of_function.get(j);
             }
 
-            Constructor<?> initConstructor = reference_to_class.getDeclaredConstructor(types_of_function_paramaters);
+            Constructor<?> initConstructor = null;
+            try {
+                initConstructor = reference_to_class.getDeclaredConstructor(types_of_function_paramaters);
+            } catch (Exception e) {
+                for (Constructor<?> ctor : reference_to_class.getDeclaredConstructors()) {
+                    boolean isCorrectConstructors = true;
+
+                    if (ctor.getParameterTypes().length == number_of_method_arguments) {
+                        for (int i = 0; i < ctor.getParameterTypes().length; ++i) {
+                            Class<?> type = ctor.getParameterTypes()[i];
+                            if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
+                                types_of_function_paramaters[i] = Object.class;
+                            }
+                        }
+                    } else {
+                        isCorrectConstructors = false;
+                    }
+
+                    if (isCorrectConstructors) {
+                        initConstructor = ctor;
+                    }
+                }
+            }
+
             initConstructor.setAccessible(true);
             stack.subList(stack_size - number_of_method_arguments - 2, stack_size).clear();
+
             stack.add(
-                    new Pair<Class<?>, Object>(reference_to_class, initConstructor.newInstance(arguments_as_objects)));
+                    new Pair<Class<?>, Object>(reference_to_class,
+                            initConstructor.newInstance(arguments_as_objects)));
         } else {
             // TODO
         }
