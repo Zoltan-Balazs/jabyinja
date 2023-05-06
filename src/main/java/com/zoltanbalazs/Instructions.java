@@ -1060,6 +1060,18 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(int.class, Array.getLength(arrayref.second)));
     }
 
+    public static void ATHROW(List<Pair<Class<?>, Object>> stack) throws Throwable {
+        int stack_size = stack.size() - 1;
+        Object objectref = stack.get(stack_size).second;
+
+        if (objectref instanceof Throwable) {
+            if (0 < stack_size) {
+                stack.subList(0, stack_size - 1).clear();
+            }
+            throw (Throwable) objectref;
+        }
+    }
+
     // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.5.checkcast
     public static void CHECKCAST(List<Pair<Class<?>, Object>> stack, short index, String file_name, ClassFile cf)
             throws ClassNotFoundException {

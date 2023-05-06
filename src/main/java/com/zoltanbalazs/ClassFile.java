@@ -229,7 +229,7 @@ class ClassFile {
     public Pair<Class<?>, Object> executeCode(byte[] code)
             throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException,
             NoSuchMethodException, SecurityException, InstantiationException, IllegalArgumentException,
-            InvocationTargetException {
+            InvocationTargetException, Throwable {
 
         CodeIndex codeIndex = new CodeIndex();
         while (codeIndex.Get() < code.length) {
@@ -778,7 +778,7 @@ class ClassFile {
                     Instructions.ARRAYLENGTH(stack);
                 }
                 case ATHROW -> {
-                    // TODO
+                    Instructions.ATHROW(stack);
                 }
                 case CHECKCAST -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);

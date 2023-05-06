@@ -29,7 +29,7 @@ public class Main {
                 Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
                 CLASS_FILE.executeCode(codeAttribute.code);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
