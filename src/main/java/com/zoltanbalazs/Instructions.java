@@ -2,6 +2,9 @@ package com.zoltanbalazs;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.CallSite;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -934,6 +937,37 @@ public class Instructions {
         String description_of_method = cf.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
         List<Class<?>> method_arguments = cf.getArguments(description_of_method);
         int number_of_method_arguments = method_arguments.size();
+
+        short bootstrap_method_attr_index = reference_to_method.getBootStrapMethodAttributeIndex();
+        BootstrapMethods_Attribute bootstrap_method = bootstrap_methods.get(bootstrap_method_attr_index);
+
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
+
+        MethodType samMethodType = MethodType.fromMethodDescriptorString(new String(constant_pool.get(constant_pool
+                .get(bootstrap_method.bootstrap_methods.get(0).bootstrap_arguments[0] - 1).getDescriptorIndex() - 1)
+                .getBytes(),
+                StandardCharsets.UTF_8), null);
+
+        String invokedName = new String(
+                constant_pool.get(constant_pool.get(constant_pool.get(constant_pool
+                        .get(bootstrap_method.bootstrap_methods.get(0).bootstrap_method_ref - 1).getReferenceIndex()
+                        - 1).getNameAndTypeIndex() - 1).getNameIndex() - 1)
+                        .getBytes(),
+                StandardCharsets.UTF_8);
+
+        MethodType invokedType = MethodType.fromMethodDescriptorString(new String(
+                constant_pool.get(constant_pool.get(constant_pool.get(constant_pool
+                        .get(bootstrap_method.bootstrap_methods.get(0).bootstrap_method_ref - 1).getReferenceIndex()
+                        - 1).getNameAndTypeIndex() - 1).getDescriptorIndex() - 1)
+                        .getBytes(),
+                StandardCharsets.UTF_8), null);
+
+        MethodType instantiatedMethodType = MethodType.fromMethodDescriptorString(new String(
+                constant_pool.get(constant_pool
+                        .get(bootstrap_method.bootstrap_methods.get(0).bootstrap_arguments[2] - 1).getDescriptorIndex()
+                        - 1)
+                        .getBytes(),
+                StandardCharsets.UTF_8), null);
 
         int stack_size = stack.size();
         List<Pair<Class<?>, Object>> arguments_on_stack = new ArrayList<>();
