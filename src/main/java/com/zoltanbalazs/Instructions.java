@@ -712,7 +712,7 @@ public class Instructions {
             result = method.invoke(objectref.second, arguments_as_objects);
         } catch (IllegalArgumentException ie) {
             try {
-                for (Constructor<?> ctor : objectref.first.getConstructors()) {
+                for (Constructor<?> ctor : objectref.first.getDeclaredConstructors()) {
 
                     Field[] fields = objectref.second.getClass().getDeclaredFields();
 
