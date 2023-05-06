@@ -1472,6 +1472,9 @@ class Instructions_Helper {
                         types_of_function_paramaters)) {
                     returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
                             types_of_function_paramaters);
+                } else if (Enum.class.isAssignableFrom(reference_to_class)) {
+                    returnedMethod = Enum.class.getDeclaredMethod(name_and_type_of_member,
+                            types_of_function_paramaters);
                 }
             }
         }
@@ -1483,7 +1486,14 @@ class Instructions_Helper {
             Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments,
             List<Pair<Class<?>, Object>> arguments_on_stack) throws NoSuchMethodException {
         if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
-            reference_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
+            try {
+                reference_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
+            } catch (Exception e) {
+                types_of_function_paramaters = new Class<?>[method_arguments.size()];
+                for (int j = 0; j < method_arguments.size(); ++j) {
+                    types_of_function_paramaters[j] = arguments_on_stack.get(j).first;
+                }
+            }
             return types_of_function_paramaters;
         } else {
             types_of_function_paramaters = new Class<?>[method_arguments.size()];
@@ -1525,6 +1535,9 @@ class Instructions_Helper {
                         types_of_function_paramaters)) {
                     reference_to_class.getDeclaredMethod(name_and_type_of_member,
                             types_of_function_paramaters);
+                    return types_of_function_paramaters;
+                } else if (Enum.class.isAssignableFrom(reference_to_class)) {
+                    Enum.class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
                     return types_of_function_paramaters;
                 }
             }
