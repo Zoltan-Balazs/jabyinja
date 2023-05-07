@@ -127,3 +127,114 @@ Példa forrása: \href{https://www.inf.u-szeged.hu/actacybernetica/}{Acta Cybern
 \State \textbf{return} ${\cal L}_Q$
 \end{algorithmic}
 \end{algorithm}
+
+\section{Classfájl felépítése}
+
+A legegyszerűbb Classfájl ami értelmes, viszont nem futattható:
+
+\begin{center}
+\begin{tabular}{ c c c c c c c c c c c c c c c }
+\stagemagic{CA} & \stagemagic{FE} & \stagemagic{BA} & \stagemagic{BE} & \stageminor{00} & \stageminor{00} & \stagemajor{00} & \stagemajor{00} & \stageconstantsize{00} & \stageconstantsize{00} & \stageaccessflags{00} & \stageaccessflags{00} & \stagethisclass{00} & \stagethisclass{00} & \stagesuperclass{00} \\
+\stagesuperclass{00} & \stageinterfacesize{00} & \stageinterfacesize{00} & \stagefieldsize{00} & \stagefieldsize{00} & \stagemethodsize{00} & \stagemethodsize{00} & \stageattributes{00} & \stageattributes{00}
+\end{tabular}
+\end{center}
+
+Java kódban ennek megfelelője az üres fájl:
+\begin{minted}{java}
+\end{minted}
+
+Classfájl formátumának magyarázata:
+
+\begin{itemize}
+\setlength\itemsep{-5px}
+\item \stagemagic{CA FE BA BE}: Mágikus szám, amely minden Class fájl elején megtalálható
+\item \stageminor{00 00} \stagemajor{00 00}: Class fájl \lstinline{Minor} és \lstinline{Major} verziószáma, egy táblázatnak megfelelően a fordítóprogram verziója
+\item \stageconstantsize{00 00}: A Constant Pool mérete (+1, mivel 1-től indexelt, itt nem számít)
+\item \stageaccessflags{00 00}: Hozzáférési zászlók ()
+\item \stagethisclass{00 00}: \lstinline{This} osztály indexe a Constant Pool-ban
+\item \stagesuperclass{00 00}: \lstinline{Super} osztály indexe a Constant Pool-ban
+\item \stageinterfacesize{00 00}: Interfészek száma
+\item \stagefieldsize{00 00}: Adattagok száma
+\item \stagemethodsize{00 00}: Függvények száma
+\item \stageattributes{00 00}: Osztály attribútumainak száma
+\end{itemize}
+
+\pagebreak
+
+A legegyszerűbb Classfájl amit a $Jabyinja$ program le tud futtatni (a beépített \lstinline{java} program nem képes ezt lefuttatni, mivel nincsenek benne osztályok, a JVM specifikáció alapján az osztályok elhanyagolhatóak):
+
+\begin{center}
+\begin{tabular}{ c c c c c c c c c c c c c c c }
+\stagemagic{CA} & \stagemagic{FE} & \stagemagic{BA} & \stagemagic{BE} & \stageminor{00} & \stageminor{00} & \stagemajor{00} & \stagemajor{00} & \stageconstantsize{00} & \stageconstantsize{04} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{43} & \stageconstantpool{6F} \\
+\stageconstantpool{64} & \stageconstantpool{65} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{6D} & \stageconstantpool{61} & \stageconstantpool{69} & \stageconstantpool{6E} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{03} & \stageconstantpool{28} & \stageconstantpool{29} & \stageconstantpool{56} \\
+\stageaccessflags{00} & \stageaccessflags{21} & \stagethisclass{00} & \stagethisclass{00} & \stagesuperclass{00} & \stagesuperclass{00} & \stageinterfacesize{00} & \stageinterfacesize{00} & \stagefieldsize{00} & \stagefieldsize{00} & \stagemethodsize{00} & \stagemethodsize{01} & \stagemethods{00} & \stagemethods{09} & \stagemethods{00} \\ 
+\stagemethods{02} & \stagemethods{00} & \stagemethods{03} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{0D} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} \\
+\stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{01} & \stagemethods{B1} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stageattributes{00} & \stageattributes{00}
+\end{tabular}
+\end{center}
+
+Java kód megfelelője:
+\begin{minted}{java}
+public static void main() {
+    return;
+}
+\end{minted}
+
+Classfájl formátumának magyarázata:
+
+\begin{itemize}
+\setlength\itemsep{-5px}
+\item \stagemagic{CA FE BA BE}: Mágikus szám, amely minden Classfájl elején megtalálható
+\item \stageminor{00 00} \stagemajor{00 00}: Classfájl \lstinline{Minor} és \lstinline{Major} verziószáma, egy táblázatnak megfelelően a \lstinline{javac} fordítóprogram verziója
+\item \stageconstantsize{00 04}: A Constant Pool mérete (+1, mivel 1-től indexelt)
+\item \stageconstantpool{01 00 04 43 6F 64 65 01 00 04 6D 61 69 6E 01 00 03 28 29 56}: Constant Pool
+\begin{itemize}
+    \setlength\itemsep{-5px}
+    \item \stagemajor{01} \stageminor{00 04} \stageconstantsize{43 6F 64 65} \\
+    \stagemajor{01}: Constant Pool Info érték \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 04}: 4 hosszú \\
+    \stageconstantsize{43 6F 64 65}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{Code}
+    \item \stagemajor{01} \stageminor{00 04} \stageconstantsize{6D 61 69 6E} \\
+    \stagemajor{01}: Constant Pool Info érték \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 04}: 4 hosszú \\
+    \stageconstantsize{6D 61 69 6E}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{main}
+    \item \stagemajor{01} \stageminor{00 03} \stageconstantsize{28 29 56} \\
+    \stagemajor{01}: Constant Pool Info érték \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 03}: 3 hosszú \\
+    \stageconstantsize{28 29 56}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{()V}
+\end{itemize}
+\item \stageaccessflags{00 21}: Hozzáférési zászlók \lstinline{(Public, Super)} - elhanyagolhatóak ebben az esetben
+\item \stagethisclass{00 00}: \lstinline{This} osztály indexe a Constant Pool-ban
+\item \stagesuperclass{00 00}: \lstinline{Super} osztály indexe a Constant Pool-ban
+\item \stageinterfacesize{00 00}: Interfészek száma
+\item \stagefieldsize{00 00}: Adattagok száma
+\item \stagemethodsize{00 01}: Függvények száma
+\item \stagemethods{00 09 00 02 00 03 00 01 00 01 00 00 00 0D 00 00 00 00 00 00 00 01 B1 00 00 00 00}: Függvények
+\begin{itemize}
+    \setlength\itemsep{-5px}
+    \item \stagemajor{00 09} \stageminor{00 02} \stageconstantsize{00 03} \stageconstantpool{00 01} \stageaccessflags{00 01 00 00 00 0D 00 00 00 00 00 00 00 01 B1 00 00 00 00} \\
+    \stagemajor{00 09}: Hozzáférési zászlók \lstinline{(Public, Static)} \\
+    \stageminor{00 02}: Constant Poolban lévő indexe a függvénynek: \lstinline{main} \\
+    \stageconstantsize{00 03}: Függvény leírása (bemeneti paraméterek, visszatérési érték): \lstinline{()V} \\
+    \stageconstantpool{00 01}: Függvény attribútumainak száma \\
+    \stageaccessflags{00 01 00 00 00 0D 00 00 00 00 00 00 00 01 B1 00 00 00 00}: Attribútumok
+    \begin{itemize}
+        \setlength\itemsep{-5px}
+        \item[•] \stagemajor{00 01} \stageminor{00 00 00 0D} \stageconstantsize{00 00 00 00 00 00 00 01 B1 00 00 00 00} \\
+        \stagemajor{00 01}: Constant Pool-ban lévő indexe az attribútumnak: \lstinline{Code} \\
+        \stageminor{00 00 00 0D}: Attribútum hossza (\lstinline{0D} = 13 bájt) \\
+        \stageconstantsize{00 00 00 00 00 00 00 01 B1 00 00 00 00}: Attribútum
+            \begin{itemize}
+            \setlength\itemsep{0px}
+                \item[–] \stagemajor{00 00} \stageminor{00 00} \stageconstantsize{00 00 00 01} \stageconstantpool{B1} \stageaccessflags{00 00} \stagethisclass{00 00} \\
+                \stagemajor{00 00}: Stack mérete  \\
+                \stageminor{00 00}: Lokális változók száma \\
+                \stageconstantsize{00 00 00 01}: Kód hossza \\
+                \stageconstantpool{B1}: Kód \lstinline{(B1 = return)}  \\
+                \stageaccessflags{00 00}: Kivételek száma \\
+                \stagethisclass{00 00}: Attribútum attribútumainak száma
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\item \stageattributes{00 00}: Osztály attribútumainak száma
+\end{itemize}

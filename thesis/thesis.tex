@@ -9,7 +9,7 @@
 
 % The minted package is also supported for source highlighting
 % See minted-intregration.tex for example
-%\usepackage[newfloat]{minted}
+\usepackage[newfloat]{minted}
 
 % Document's metadata
 \title{Java bytecode interpreter Javában} % title
@@ -42,10 +42,25 @@
 % List of todos (not in the final document)
 %\listoftodos[\todolabel]
 
+\definecolor{Java}{RGB}{99, 69, 51}
+\newcommand{\stagemagic}[1]{\textcolor{brown}{#1}}
+\newcommand{\stageminor}[1]{\textcolor{orange}{#1}}
+\newcommand{\stagemajor}[1]{\textcolor{red}{#1}}
+\newcommand{\stageconstantsize}[1]{\textcolor{green}{#1}}
+\newcommand{\stageconstantpool}[1]{\textcolor{teal}{#1}}
+\newcommand{\stageaccessflags}[1]{\textcolor{blue}{#1}}
+\newcommand{\stagethisclass}[1]{\textcolor{magenta}{#1}}
+\newcommand{\stagesuperclass}[1]{\textcolor{violet}{#1}}
+\newcommand{\stageinterfacesize}[1]{\textcolor{cyan}{#1}}
+\newcommand{\stagefieldsize}[1]{\textcolor{orange}{#1}}
+\newcommand{\stagemethodsize}[1]{\textcolor{red}{#1}}
+\newcommand{\stagemethods}[1]{\textcolor{purple}{#1}}
+\newcommand{\stageattributes}[1]{\textcolor{lime}{#1}}
+
 % Title page (mandatory)
 \maketitle
 % Topic declaration page (mandatory) - can also be attached instead
-%\includepdf{temabejelento.pdf}
+\includepdf{thesisreport.pdf}
 
 % Table of contents (mandatory)
 \tableofcontents
