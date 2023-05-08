@@ -180,3 +180,856 @@ Classfájl formátumának magyarázata:
 \end{compactitem}
 \item \stageattributes{00 00}: Osztály attribútumainak száma
 \end{compactitem}
+
+\section{Bytecode utasítások}
+
+Az összes bytecode utasítás implementálva van, ezekről az alábbi táblázatban röviden pár dolog le van írva, nemlegesen a hex kódjuk, extra értékek utánuk, illetve hogy a stack-et hogyan változtatják
+\begin{center}
+	\begin{longtable}{ | p{0.3\textwidth} | p{0.075\textwidth} | p{0.175\textwidth} | p{0.45\textwidth} | }
+		
+		\hline
+		\multicolumn{4}{|c|}{\textbf{Bytecode utasítások}}
+		\\ \hline
+		
+		\emph{Neve} & \emph{HEX} & \emph{Paraméterek} & \emph{Stack}
+		\\ \hline \hline 
+		\endfirsthead % első oldal fejléce
+		
+		\hline
+		\emph{Neve} & \emph{HEX} & \emph{Paraméterek} & \emph{Stack}
+		\\ \hline \hline
+		\endhead % többi oldal fejléce
+		
+        \emph{NOP}
+		& 00 & &
+		\\ \hline
+
+		\emph{ACONST\_NULL}
+		& 01 & & → NULL
+		\\ \hline
+		
+		\emph{ICONST\_M1}
+		& 02 & & → -1
+		\\ \hline
+		
+		\emph{ICONST\_0}
+		& 03 & & → 0
+		\\ \hline
+
+        \emph{ICONST\_1}
+		& 04 & & → 1
+		\\ \hline
+
+        \emph{ICONST\_2}
+		& 05 & & → 2
+		\\ \hline
+
+        \emph{ICONST\_3}
+		& 06 & & → 3
+		\\ \hline
+
+        \emph{ICONST\_4}
+		& 07 & & → 4
+		\\ \hline
+
+        \emph{ICONST\_5}
+		& 08 & & → 5
+		\\ \hline
+
+        \emph{LCONST\_0}
+		& 09 & & → 0L
+		\\ \hline
+
+        \emph{LCONST\_1}
+		& 0A & & → 1L
+		\\ \hline
+		
+        \emph{FCONST\_0}
+		& 0B & & → 0.0f
+		\\ \hline
+
+        \emph{FCONST\_1}
+		& 0C & & → 1.0f
+		\\ \hline
+
+        \emph{FCONST\_2}
+		& 0D & & → 2.0f
+		\\ \hline
+
+        \emph{DCONST\_0}
+		& 0E & & → 0.0
+		\\ \hline
+
+        \emph{DCONST\_1}
+		& 0F & & → 1.0
+		\\ \hline
+
+        \emph{BIPUSH}
+		& 10 & \lstinline|u8 value| & → \lstinline|value|
+		\\ \hline
+
+        \emph{SIPUSH}
+		& 11 & \lstinline|u16 value| & → \lstinline|value|
+		\\ \hline
+
+        \emph{LDC}
+		& 12 & \lstinline|u8 index| & → \lstinline|CONSTANT_POOL[index]|
+		\\ \hline
+
+        \emph{LDC\_W}
+		& 13 & \lstinline|u16 index| & → \lstinline|CONSTANT_POOL[index]|
+		\\ \hline
+
+        \emph{LDC2\_W}
+		& 14 & \lstinline|u16 index| & → \lstinline|CONSTANT_POOL[index]|
+		\\ \hline
+
+        \emph{ILOAD}
+		& 15 & \lstinline|u8 index| & → \lstinline|LOCAL[index]|
+		\\ \hline
+
+        \emph{LLOAD}
+		& 16 & \lstinline|u8 index| & → \lstinline|LOCAL[index]|
+		\\ \hline
+
+        \emph{FLOAD}
+		& 17 & \lstinline|u8 index| & → \lstinline|LOCAL[index]|
+		\\ \hline
+
+        \emph{DLOAD}
+		& 18 & \lstinline|u8 index| & → \lstinline|LOCAL[index]|
+		\\ \hline
+
+        \emph{ALOAD}
+		& 19 & \lstinline|u8 index| & → \lstinline|LOCAL[index]|
+		\\ \hline
+
+        \emph{ILOAD\_0}
+		& 1A & & → \lstinline|LOCAL[0]|
+		\\ \hline
+
+        \emph{ILOAD\_1}
+		& 1B & & → \lstinline|LOCAL[1]|
+		\\ \hline
+
+        \emph{ILOAD\_2}
+		& 1C & & → \lstinline|LOCAL[2]|
+		\\ \hline
+
+        \emph{ILOAD\_3}
+		& 1D & & → \lstinline|LOCAL[3]|
+		\\ \hline
+        
+        \emph{LLOAD\_0}
+		& 1E & & → \lstinline|LOCAL[0]|
+		\\ \hline
+
+        \emph{LLOAD\_1}
+		& 1F & & → \lstinline|LOCAL[1]|
+		\\ \hline
+
+        \emph{LLOAD\_2}
+		& 20 & & → \lstinline|LOCAL[2]|
+		\\ \hline
+
+        \emph{LLOAD\_3}
+		& 21 & & → \lstinline|LOCAL[3]|
+		\\ \hline
+
+        \emph{FLOAD\_0}
+		& 22 & & → \lstinline|LOCAL[0]|
+		\\ \hline
+
+        \emph{FLOAD\_1}
+		& 23 & & → \lstinline|LOCAL[1]|
+		\\ \hline
+
+        \emph{FLOAD\_2}
+		& 24 & & → \lstinline|LOCAL[2]|
+		\\ \hline
+
+        \emph{FLOAD\_3}
+		& 25 & & → \lstinline|LOCAL[3]|
+		\\ \hline
+        
+        \emph{DLOAD\_0}
+		& 26 & & → \lstinline|LOCAL[0]|
+		\\ \hline
+
+        \emph{DLOAD\_1}
+		& 27 & & → \lstinline|LOCAL[1]|
+		\\ \hline
+
+        \emph{DLOAD\_2}
+		& 28 & & → \lstinline|LOCAL[2]|
+		\\ \hline
+
+        \emph{DLOAD\_3}
+		& 29 & & → \lstinline|LOCAL[3]|
+		\\ \hline
+        
+        \emph{ALOAD\_0}
+		& 2A & & → \lstinline|LOCAL[0]|
+		\\ \hline
+
+        \emph{ALOAD\_1}
+		& 2B & & → \lstinline|LOCAL[1]|
+		\\ \hline
+
+        \emph{ALOAD\_2}
+		& 2C & & → \lstinline|LOCAL[2]|
+		\\ \hline
+
+        \emph{ALOAD\_3}
+		& 2D & & → \lstinline|LOCAL[3]|
+		\\ \hline
+        
+        \emph{IALOAD}
+		& 2E & & \lstinline|arrayref, index| → \lstinline|value|
+		\\ \hline
+
+        \emph{LALOAD}
+		& 2F & & \lstinline|arrayref, index| → \lstinline|value|
+		\\ \hline
+
+        \emph{FALOAD}
+		& 30 & & \lstinline|arrayref, index| → \lstinline|value|
+		\\ \hline
+
+        \emph{DALOAD}
+		& 31 & & \lstinline|arrayref, index| → \lstinline|value|
+		\\ \hline
+        
+        \emph{AALOAD}
+		& 32 & & \lstinline|arrayref, index| → \lstinline|value|
+		\\ \hline
+
+        \emph{BALOAD}
+		& 33 & & \lstinline|arrayref, index| → \lstinline|value|
+		\\ \hline
+
+        \emph{CALOAD}
+		& 34 & & \lstinline|arrayref, index| → \lstinline|value|
+		\\ \hline
+
+        \emph{SALOAD}
+		& 35 & & \lstinline|arrayref, index| → \lstinline|value|
+		\\ \hline
+
+        \emph{ISTORE}
+		& 36 & \lstinline|u8 index| & \lstinline|value| →
+		\\ \hline
+
+        \emph{LSTORE}
+		& 37 & \lstinline|u8 index| & \lstinline|value| →
+		\\ \hline
+
+        \emph{FSTORE}
+		& 38 & \lstinline|u8 index| & \lstinline|value| →
+		\\ \hline
+
+        \emph{DSTORE}
+		& 39 & \lstinline|u8 index| & \lstinline|value| →
+		\\ \hline
+        
+        \emph{ASTORE}
+		& 3A & \lstinline|u8 index| & \lstinline|objectref| →
+		\\ \hline
+
+        \emph{ISTORE\_0}
+		& 3B & & \lstinline|value| →
+		\\ \hline
+
+        \emph{ISTORE\_1}
+		& 3C & & \lstinline|value| →
+		\\ \hline
+
+        \emph{ISTORE\_2}
+		& 3D & & \lstinline|value| →
+		\\ \hline
+
+        \emph{ISTORE\_3}
+		& 3E & & \lstinline|value| →
+		\\ \hline
+
+        \emph{LSTORE\_0}
+		& 3F & & \lstinline|value| →
+		\\ \hline
+
+        \emph{LSTORE\_1}
+		& 40 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{LSTORE\_2}
+		& 41 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{LSTORE\_3}
+		& 42 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{FSTORE\_0}
+		& 43 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{FSTORE\_1}
+		& 44 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{FSTORE\_2}
+		& 45 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{FSTORE\_3}
+		& 46 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{DSTORE\_0}
+		& 47 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{DSTORE\_1}
+		& 48 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{DSTORE\_2}
+		& 49 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{DSTORE\_3}
+		& 4A & & \lstinline|value| →
+		\\ \hline
+
+        \emph{ASTORE\_0}
+		& 4B & & \lstinline|value| →
+		\\ \hline
+
+        \emph{ASTORE\_1}
+		& 4C & & \lstinline|value| →
+		\\ \hline
+
+        \emph{ASTORE\_2}
+		& 4D & & \lstinline|value| →
+		\\ \hline
+
+        \emph{ASTORE\_3}
+		& 4E & & \lstinline|value| →
+		\\ \hline
+
+        \emph{IASTORE}
+		& 4F & & \lstinline|arrayref, index, value| →
+		\\ \hline
+
+        \emph{LASTORE}
+		& 50 & & \lstinline|arrayref, index, value| →
+		\\ \hline
+
+        \emph{FASTORE}
+		& 51 & & \lstinline|arrayref, index, value| →
+		\\ \hline
+
+        \emph{DASTORE}
+		& 52 & & \lstinline|arrayref, index, value| →
+		\\ \hline
+
+        \emph{AASTORE}
+		& 53 & & \lstinline|arrayref, index, value| →
+		\\ \hline
+
+        \emph{BASTORE}
+		& 54 & & \lstinline|arrayref, index, value| →
+		\\ \hline
+
+        \emph{CASTORE}
+		& 55 & & \lstinline|arrayref, index, value| →
+		\\ \hline
+
+        \emph{SASTORE}
+		& 56 & & \lstinline|arrayref, index, value| →
+		\\ \hline
+
+        \emph{POP}
+		& 57 & & \lstinline|value| →
+		\\ \hline
+
+        \emph{POP2}
+		& 58 & & \lstinline|{value2, value1}| →
+		\\ \hline
+
+        \emph{DUP}
+		& 59 & & \lstinline|value| → \lstinline|value, value|
+		\\ \hline
+
+        \emph{DUP\_X1}
+		& 5A & & \lstinline|{value2, value1}| → \\
+        & & & \lstinline|value1, {value2, value1}|
+		\\ \hline
+
+        \emph{DUP\_X2}
+		& 5B & & \lstinline|value3, value2, value1| → \\
+        & & & \lstinline|value1, value3, value2, value1|
+		\\ \hline
+
+        \emph{DUP2}
+		& 5C & & \lstinline|{value2, value1}| → \\
+        & & & \lstinline|{value2, value1}, {value2, value1}|
+		\\ \hline
+
+        \emph{DUP2\_X1}
+		& 5D & & \lstinline|value3, {value2, value1}| → \\
+        & & & \lstinline|{value2, value1}, value3, {value2, value1}|
+		\\ \hline
+
+        \emph{DUP2\_X2}
+		& 5E & & \lstinline|{value4, value3}, {value2, value1}| → \\
+        & & & \lstinline|{value2, value1}, {value4, value3}, {value2, value1}|
+		\\ \hline
+
+        \emph{SWAP}
+		& 5F & & \lstinline|value2, value1| → \lstinline|value1, value2|
+		\\ \hline
+        
+        \emph{IADD}
+		& 60 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LADD}
+		& 61 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{FADD}
+		& 62 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{DADD}
+		& 63 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+        
+        \emph{ISUB}
+		& 64 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LSUB}
+		& 65 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{FSUB}
+		& 66 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{DSUB}
+		& 67 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+        
+        \emph{IMUL}
+		& 68 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LMUL}
+		& 69 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{FMUL}
+		& 6A & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{DMUL}
+		& 6B & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+        
+        \emph{IDIV}
+		& 6C & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LDIV}
+		& 6D & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{FDIV}
+		& 6E & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{DDIV}
+		& 6F & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+        
+        \emph{IREM}
+		& 70 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LREM}
+		& 71 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{FREM}
+		& 72 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{DREM}
+		& 73 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+        
+        \emph{INEG}
+		& 74 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{LNEG}
+		& 75 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{FNEG}
+		& 76 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{DNEG}
+		& 77 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{ISHL}
+		& 78 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LSHL}
+		& 79 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{ISHR}
+		& 7A & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LSHR}
+		& 7B & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{IUSHR}
+		& 7C & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LUSHR}
+		& 7D & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{IAND}
+		& 7E & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LAND}
+		& 7F & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{IOR}
+		& 80 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LOR}
+		& 81 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{IXOR}
+		& 82 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{LXOR}
+		& 83 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{IINC}
+		& 84 & \lstinline|u8 index, | & \lstinline|..| → \lstinline|..| \\
+        & & \lstinline|u8 const| &
+		\\ \hline
+
+        \emph{I2L}
+		& 85 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{I2F}
+		& 86 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{I2D}
+		& 87 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{L2I}
+		& 88 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{L2F}
+		& 89 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{L2D}
+		& 8A & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{F2I}
+		& 8B & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{F2L}
+		& 8C & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{F2D}
+		& 8D & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{D2I}
+		& 8E & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{D2L}
+		& 8F & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{D2F}
+		& 90 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{I2B}
+		& 91 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{I2C}
+		& 92 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{I2S}
+		& 93 & & \lstinline|value| → \lstinline|result|
+		\\ \hline
+
+        \emph{LCMP}
+		& 94 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{FCMPL}
+		& 95 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{FCMPG}
+		& 96 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{DCMPL}
+		& 97 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{DCMPG}
+		& 98 & & \lstinline|value1, value2| → \lstinline|result|
+		\\ \hline
+
+        \emph{IFEQ}
+		& 99 & \lstinline|u16 branch| & \lstinline|value| →
+		\\ \hline
+
+        \emph{IFNE}
+		& 9A & \lstinline|u16 branch| & \lstinline|value| →
+		\\ \hline
+
+        \emph{IFLT}
+		& 9B & \lstinline|u16 branch| & \lstinline|value| →
+		\\ \hline
+
+        \emph{IFGE}
+		& 9C & \lstinline|u16 branch| & \lstinline|value| →
+		\\ \hline
+
+        \emph{IFGT}
+		& 9D & \lstinline|u16 branch| & \lstinline|value| →
+		\\ \hline
+
+        \emph{IFLE}
+		& 9E & \lstinline|u16 branch| & \lstinline|value| →
+		\\ \hline
+
+        \emph{IF\_ICMPEQ}
+		& 9F & \lstinline|u16 branch| & \lstinline|value1, value2| →
+		\\ \hline
+
+        \emph{IF\_ICMPNE}
+		& A0 & \lstinline|u16 branch| & \lstinline|value1, value2| →
+		\\ \hline
+
+        \emph{IF\_ICMPLT}
+		& A1 & \lstinline|u16 branch| & \lstinline|value1, value2| →
+		\\ \hline
+
+        \emph{IF\_ICMPGE}
+		& A2 & \lstinline|u16 branch| & \lstinline|value1, value2| →
+		\\ \hline
+
+        \emph{IF\_ICMPGT}
+		& A3 & \lstinline|u16 branch| & \lstinline|value1, value2| →
+		\\ \hline
+
+        \emph{IF\_ICMPLE}
+		& A4 & \lstinline|u16 branch| & \lstinline|value1, value2| →
+		\\ \hline
+
+        \emph{IF\_ACMPEQ}
+		& A5 & \lstinline|u16 branch| & \lstinline|value1, value2| →
+		\\ \hline
+
+        \emph{IF\_ACMPNE}
+		& A6 & \lstinline|u16 branch| & \lstinline|value1, value2| →
+		\\ \hline
+
+        \emph{GOTO}
+		& A7 & \lstinline|u16 branch| & \lstinline|..| → \lstinline|..|
+		\\ \hline
+
+        \emph{JSR}
+		& A8 & \lstinline|u16 branch| & → \lstinline|address|
+		\\ \hline
+
+        \emph{RET}
+		& A9 & \lstinline|u8 index| & \lstinline|..| → \lstinline|..|
+		\\ \hline
+
+        \emph{TABLESWITCH}
+		& AA & \lstinline|[0-3] byte padding, | & \\
+        & & \lstinline|u32 default, | & \\
+        & & \lstinline|u32 low, | & \lstinline|index| → \\
+        & & \lstinline|u32 high, | & \\
+        & & \lstinline|jump offsets| & 
+		\\ \hline
+
+        \emph{LOOKUPSWITCH}
+		& AB & \lstinline|[0-3] byte padding, | & \\
+        & & \lstinline|u32 default, | & \\
+        & & \lstinline|u32 npairs, | & \lstinline|key| → \\
+        & & \lstinline|match-offset pairs| & 
+		\\ \hline
+
+        \emph{IRETURN}
+		& AC & & \lstinline|value| →
+		\\ \hline
+
+        \emph{LRETURN}
+		& AD & & \lstinline|value| →
+		\\ \hline
+
+        \emph{FRETURN}
+		& AE & & \lstinline|value| →
+		\\ \hline
+
+        \emph{DRETURN}
+		& AF & & \lstinline|value| →
+		\\ \hline
+
+        \emph{ARETURN}
+		& B0 & & \lstinline|objectref| →
+		\\ \hline
+
+        \emph{RETURN}
+		& B1 & & \lstinline|..| →
+		\\ \hline
+
+        \emph{GETSTATIC}
+		& B2 & \lstinline|u16 index| & → \lstinline|value|
+		\\ \hline
+
+        \emph{PUTSTATIC}
+		& B3 & \lstinline|u16 index| & \lstinline|value| → 
+		\\ \hline
+
+        \emph{GETFIELD}
+		& B4 & \lstinline|u16 index| & \lstinline|objectref| → \lstinline|value|
+		\\ \hline
+
+        \emph{PUTFLIED}
+		& B5 & \lstinline|u16 index| & \lstinline|objectref, value| → 
+		\\ \hline
+
+        \emph{INVOKEVIRTUAL}
+		& B6 & \lstinline|u16 index| & \lstinline|objectref, [args]| → \lstinline|result|
+		\\ \hline
+
+        \emph{INVOKESPECIAL}
+		& B7 & \lstinline|u16 index| & \lstinline|objectref, [args]| → \lstinline|result|
+		\\ \hline
+
+        \emph{INVOKESTATIC}
+		& B8 & \lstinline|u16 index| & \lstinline|[args]| → \lstinline|result|
+		\\ \hline
+
+        \emph{INVOKEINTERFACE}
+		& B9 & \lstinline|u16 index| & \lstinline|objectref, [args]| → \lstinline|result| \\
+        & & \lstinline|u8 count, 0| &
+		\\ \hline
+
+        \emph{INVOKEDYNAMIC}
+		& BA & \lstinline|u16 index, | & \lstinline|[args]| → \lstinline|result| \\
+        & & \lstinline|0, 0| &
+		\\ \hline
+
+        \emph{NEW}
+		& BB & \lstinline|u16 index| & → \lstinline|objectref|
+		\\ \hline
+
+        \emph{NEWARRAY}
+		& BC & \lstinline|u8 atype| & \lstinline|count| → \lstinline|arrayref|
+		\\ \hline
+
+        \emph{ANEWARRAY}
+		& BD & \lstinline|u16 index| & \lstinline|count| → \lstinline|arrayref|
+		\\ \hline
+
+        \emph{ARRAYLENGTH}
+		& BE & \lstinline|u16 index| & \lstinline|arrayref| → \lstinline|length|
+		\\ \hline
+
+        \emph{ATHROW}
+		& BF & & \lstinline|objectref| → \lstinline|objectref|
+		\\ \hline
+
+        \emph{CHECKCAST}
+		& C0 & \lstinline|u16 index| & \lstinline|objectref| → \lstinline|objectref|
+		\\ \hline
+
+        \emph{INSTANCEOF}
+		& C1 & \lstinline|u16 index| & \lstinline|objectref| → \lstinline|result|
+		\\ \hline
+
+        \emph{MONITORENTER}
+		& C2 & \lstinline|u16 index| & \lstinline|objectref| →
+		\\ \hline
+
+        \emph{MONITOREXIT}
+		& C3 & \lstinline|u16 index| & \lstinline|objectref| →
+		\\ \hline
+
+        \emph{WIDE}
+		& C4 & \lstinline|u8 opcode| & \\
+        & & \lstinline|u16 index| & \\
+        & & \lstinline|vagy| & \lstinline|mint az adott utasitas| \\
+        & & \lstinline|u8 opcode,| & \\
+        & & \lstinline|u16 index,| & \\
+        & & \lstinline|u16 count| & 
+		\\ \hline
+
+        \emph{MULTIANEWARRAY}
+		& C5 & \lstinline|u16 index, | & \lstinline|[counts]| → \lstinline|arrayref| \\
+        & & \lstinline|u8 dimensions| & 
+		\\ \hline
+
+        \emph{IFNULL}
+		& C6 & \lstinline|u16 branch| & \lstinline|value| →
+		\\ \hline
+
+        \emph{IFNONNULL}
+		& C7 & \lstinline|u16 branch| & \lstinline|value| →
+		\\ \hline
+
+        \emph{GOTO\_W}
+		& C8 & \lstinline|u32 branch| & \lstinline|..| → \lstinline|..|
+		\\ \hline
+        
+        \emph{JSR\_W}
+		& C9 & \lstinline|u32 branch| & → \lstinline|address|
+		\\ \hline
+		
+		\caption{A JVM Bytecode különböző utasításai}
+		\label{tab:example-3}		
+	\end{longtable}
+\end{center}
