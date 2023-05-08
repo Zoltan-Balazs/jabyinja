@@ -91,7 +91,7 @@ class ClassFile {
 
     private List<CallSite> callSites = new ArrayList<>();
     private List<Pair<Class<?>, Object>> stack = new ArrayList<>();
-    private Object[] local = new Object[65535];
+    public Object[] local = new Object[65535];
 
     public ClassFile(String fileName, String[] mainArgs) {
         FILE_NAME = fileName;
@@ -861,7 +861,7 @@ class ClassFile {
                     return new Pair<Integer, Class<?>>(className.first, Class.forName(className.second));
                 } else {
                     return new Pair<Integer, Class<?>>(className.first,
-                            Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(FILE_NAME, className.second));
+                            Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(FILE_NAME, className.second).second);
                 }
 
             }

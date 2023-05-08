@@ -584,7 +584,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
         }
 
         Field outField = reference_to_class.getDeclaredField(name_of_field);
@@ -604,7 +604,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
         }
 
         int stack_size = stack.size();
@@ -677,11 +677,14 @@ public class Instructions {
             types_of_function_paramaters[j] = Object.class;
         }
 
+        String new_filename = "";
         Class<?> reference_to_class = null;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            reference_to_class = returned.second;
+            new_filename = returned.first;
         }
 
         Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
@@ -698,6 +701,7 @@ public class Instructions {
 
         Pair<Class<?>, Object> objectref = stack.get(stack_size - number_of_method_arguments - 1);
         Object result = null;
+        Class<?> returnType = void.class;
         Object obj = null;
 
         int objectRefIdx = -1;
@@ -709,7 +713,41 @@ public class Instructions {
 
         try {
             method.setAccessible(true);
-            result = method.invoke(objectref.second, arguments_as_objects);
+
+            if (ClassFile.isClassBuiltIn(name_of_class)) {
+                result = method.invoke(objectref.second, arguments_as_objects);
+                if (result != null) {
+                    returnType = result.getClass();
+                }
+            } else {
+                ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+
+                Method_Info fn_method = new Method_Info();
+                List<Attribute_Info> attributes = new ArrayList<>();
+
+                try {
+                    fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member);
+                    attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                for (int i = 0; i < 65535; ++i) {
+                    CLASS_FILE.local[i] = cf.local[i];
+                }
+
+                for (Attribute_Info attribute : attributes) {
+                    try {
+                        Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+
+                        Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute.code);
+                        result = returnResult.second;
+                        returnType = returnResult.first;
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } catch (IllegalArgumentException ie) {
             try {
                 for (Constructor<?> ctor : objectref.first.getDeclaredConstructors()) {
@@ -767,7 +805,40 @@ public class Instructions {
                 method = obj.getClass().getDeclaredMethod(name_and_type_of_member,
                         types_of_function_paramaters);
                 method.setAccessible(true);
-                result = method.invoke(obj, arguments_as_objects);
+                if (ClassFile.isClassBuiltIn(name_of_class)) {
+                    result = method.invoke(objectref.second, arguments_as_objects);
+                    if (result != null) {
+                        returnType = result.getClass();
+                    }
+                } else {
+                    ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+
+                    Method_Info fn_method = new Method_Info();
+                    List<Attribute_Info> attributes = new ArrayList<>();
+
+                    try {
+                        fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member);
+                        attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    for (int i = 0; i < 65535; ++i) {
+                        CLASS_FILE.local[i] = cf.local[i];
+                    }
+
+                    for (Attribute_Info attribute : attributes) {
+                        try {
+                            Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+
+                            Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute.code);
+                            result = returnResult.second;
+                            returnType = returnResult.first;
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
 
                 local[objectRefIdx] = obj;
             } catch (Exception e) {
@@ -787,7 +858,40 @@ public class Instructions {
 
                 method.setAccessible(true);
 
-                result = method.invoke(obj, arguments_as_objects);
+                if (ClassFile.isClassBuiltIn(name_of_class)) {
+                    result = method.invoke(objectref.second, arguments_as_objects);
+                    if (result != null) {
+                        returnType = result.getClass();
+                    }
+                } else {
+                    ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+
+                    Method_Info fn_method = new Method_Info();
+                    List<Attribute_Info> attributes = new ArrayList<>();
+
+                    try {
+                        fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member);
+                        attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
+                    } catch (Exception ee) {
+                        e.printStackTrace();
+                    }
+
+                    for (int i = 0; i < 65535; ++i) {
+                        CLASS_FILE.local[i] = cf.local[i];
+                    }
+
+                    for (Attribute_Info attribute : attributes) {
+                        try {
+                            Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+
+                            Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute.code);
+                            result = returnResult.second;
+                            returnType = returnResult.first;
+                        } catch (Throwable ee) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
 
                 local[objectRefIdx] = obj;
             }
@@ -796,7 +900,7 @@ public class Instructions {
         stack.subList(stack_size - number_of_method_arguments - 1, stack_size).clear();
 
         if (result != null) {
-            stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
+            stack.add(new Pair<Class<?>, Object>(returnType, result));
         } else if (obj != null) {
             local[objectRefIdx] = obj;
         }
@@ -814,7 +918,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
         }
 
         if (name_and_type_of_member.equals("<init>")) {
@@ -899,11 +1003,14 @@ public class Instructions {
             types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
         }
 
+        String new_filename = "";
         Class<?> reference_to_class = null;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            reference_to_class = returned.second;
+            new_filename = returned.first;
         }
 
         Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
@@ -916,8 +1023,42 @@ public class Instructions {
         }
 
         method.setAccessible(true);
-        Object result = method.invoke(name_of_class.replace("/", "."), arguments_as_objects);
-        Class<?> returnType = method.getReturnType();
+        Object result = null;
+        Class<?> returnType = void.class;
+        if (ClassFile.isClassBuiltIn(name_of_class)) {
+            result = method.invoke(name_of_class.replace("/", "."), arguments_as_objects);
+            if (result != null) {
+                returnType = result.getClass();
+            }
+        } else {
+            ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+
+            Method_Info fn_method = new Method_Info();
+            List<Attribute_Info> attributes = new ArrayList<>();
+
+            try {
+                fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member);
+                attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            for (int i = 0; i < 65535; ++i) {
+                CLASS_FILE.local[i] = cf.local[i];
+            }
+
+            for (Attribute_Info attribute : attributes) {
+                try {
+                    Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+
+                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute.code);
+                    result = returnResult.second;
+                    returnType = returnResult.first;
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         if (0 <= stack_size - number_of_method_arguments) {
             stack.subList(stack_size - number_of_method_arguments, stack_size).clear();
@@ -954,11 +1095,14 @@ public class Instructions {
             types_of_function_paramaters[j] = Object.class;
         }
 
+        String new_filename = "";
         Class<?> reference_to_class = null;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            reference_to_class = returned.second;
+            new_filename = returned.first;
         }
 
         Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
@@ -974,12 +1118,47 @@ public class Instructions {
         }
 
         Pair<Class<?>, Object> objectref = stack.get(stack_size - count);
-        Object result = method.invoke(objectref.second, arguments_as_objects);
+        Object result = null;
+        Class<?> returnType = void.class;
+        if (ClassFile.isClassBuiltIn(name_of_class)) {
+            result = method.invoke(objectref.second, arguments_as_objects);
+            if (result != null) {
+                returnType = result.getClass();
+            }
+        } else {
+            ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+
+            Method_Info fn_method = new Method_Info();
+            List<Attribute_Info> attributes = new ArrayList<>();
+
+            try {
+                fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member);
+                attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            for (int i = 0; i < 65535; ++i) {
+                CLASS_FILE.local[i] = cf.local[i];
+            }
+
+            for (Attribute_Info attribute : attributes) {
+                try {
+                    Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+
+                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute.code);
+                    result = returnResult.second;
+                    returnType = returnResult.first;
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         stack.subList(stack_size - count, stack_size).clear();
 
         if (result != null) {
-            stack.add(new Pair<Class<?>, Object>(result.getClass(), result));
+            stack.add(new Pair<Class<?>, Object>(returnType, result));
         }
     }
 
@@ -1054,7 +1233,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
         }
 
         stack.add(new Pair<Class<?>, Object>(reference_to_class, reference_to_class));
@@ -1079,7 +1258,7 @@ public class Instructions {
             if (ClassFile.isClassBuiltIn(name_of_class)) {
                 arrayType = Class.forName(name_of_class.replace("/", "."));
             } else {
-                arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+                arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
             }
             // arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
         } else {
@@ -1116,7 +1295,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
         }
 
         Pair<Class<?>, Object> objectRef = stack.get(stack.size() - 1);
@@ -1144,7 +1323,7 @@ public class Instructions {
             if (ClassFile.isClassBuiltIn(name_of_class)) {
                 reference_to_class = Class.forName(name_of_class.replace("/", "."));
             } else {
-                reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+                reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
             }
 
             Class<?> type = objectRef.first;
@@ -1234,7 +1413,7 @@ public class Instructions {
                 arrayType = Class.forName(name_of_class.replace("/", "."));
                 hackyType = Class.forName(name_of_class.replace("/", ".").replaceAll("\\[+", "["));
             } else {
-                arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+                arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
                 hackyType = arrayType;
             }
             // arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
@@ -1405,8 +1584,8 @@ class Instructions_Helper {
         }
     }
 
-    public static Class<?> LOAD_CLASS_FROM_OTHER_FILE(String file_name, String class_name) {
-        Class<?> returned_class = null;
+    public static Pair<String, Class<?>> LOAD_CLASS_FROM_OTHER_FILE(String file_name, String class_name) {
+        Pair<String, Class<?>> returned = null;
         try {
             File f = new File(file_name);
             int length = 0;
@@ -1419,7 +1598,8 @@ class Instructions_Helper {
                 URL[] cp = { f.toURI().toURL() };
                 URLClassLoader urlcl = new URLClassLoader(cp);
                 try {
-                    returned_class = urlcl.loadClass(class_name.replace("/", "."));
+                    returned = new Pair<String, Class<?>>(f.getPath() + "/" + class_name + ".class",
+                            urlcl.loadClass(class_name.replace("/", ".")));
                 } catch (Exception e) {
 
                 }
@@ -1430,7 +1610,7 @@ class Instructions_Helper {
         } catch (Exception e) {
             return null;
         }
-        return returned_class;
+        return returned;
     }
 
     public static Method GET_CORRECT_METHOD(Class<?> reference_to_class, String name_and_type_of_member,
