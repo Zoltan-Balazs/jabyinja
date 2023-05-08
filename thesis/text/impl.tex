@@ -70,7 +70,87 @@ Példa forrása: \href{https://www.inf.u-szeged.hu/actacybernetica/}{Acta Cybern
 \end{algorithmic}
 \end{algorithm}
 
-\section{Classfájl felépítése}
+\section{Classfájltól, benne levő metódus futtatásáig}
+
+A fő osztály a \lstinline{ClassFile}, ez felel számos dologért, többek között egy Classfájl beolvasáért, a megfelelő adattagok beállításával. A \lstinline{ClassFile} osztálynak egy konstruktora van, mégpedig:
+\begin{minted}{java}
+public ClassFile(String fileName, String[] mainArgs)
+\end{minted}
+Tehát az első paraméter a beolvasandó classfájl neve, a második pedig a \lstinline{main} metódusnak adott argumentumok.
+
+Az implementáció alapján nem kötött a \lstinline{main} metódus használata belépési pontként, tehát a 2.\ argumentum lehet \lstinline{null} is.
+
+A konstruktor meghívása egyidejüleg meghívja a \lstinline{readClassFile} függvényt is:
+\begin{minted}{java}
+public void readClassFile(String fileName)
+\end{minted}
+Ez a függvény egy adott fájlnévre beolvassa a Classfájlban tárolt adatokat megfelelő változókba.
+(Ezen felül egy \lstinline{VALID_CLASS_FILE} változót is beállít; feltétellezük hogy ha a mágikus szám \lstinline{(CA FE BA BE)} megtalálható a fájl elején, akkor az adott fájl egy valid Classfájl, ellenkező esetben egy \lstinline{InvalidClassFileException}-t dob a beolvasó függvény.)
+
+A beolvasás után (tehát az objektum létrehozása után) érdemes a belépési függvényt (általában \lstinline{main}) megkeresni a \lstinline{findMethodsByName} metódussal:
+\begin{minted}{java}
+public Method_Info findMethodsByName(String methodName)
+\end{minted}
+Ez egy adott függvénynévre a megfelelő nevü metódust visszaadja a beolvasott fájlból (ha nem talál ilyet akkor \lstinline{null}-t ad vissza).
+Egy példa a használatára:
+\begin{minted}{java}
+ClassFile CLASS_FILE = new ClassFile("Main.class", null);
+Method_Info method = CLASS_FILE.findMethodsByName("main");
+\end{minted}
+
+A függvény megtalálása után ajánlott a \lstinline{Code} attribútumot megtalálni, ebben, többek között, található a futtatandó bytecode is. A segédfüggvény erre a \lstinline{findAttributesByName}:
+\begin{minted}{java}
+public List<Attribute_Info> findAttributesByName(List<Attribute_Info> attributes, String attributeName)
+\end{minted}
+Mivel egy attribútumból több is lehet, egy listát kapunk vissza (a \lstinline{Code}-ból csak egy lesz), bemeneti paraméterként az attribútumnév mellett a megfelelü függvény attribútumait is át kell adnuk, például:
+\begin{minted}{java}
+List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
+\end{minted}
+(Ha nem talál ilyen nevezetű attribútumot akkor üres listát ad vissza.)
+
+A megfelelüen beolvasott attribútum után, a megtalált attribútumok között ajanlott végigmenni, a \lstinline{List} implementálja az \lstinline{Iterable}-t, így egy for ciklussal elegánsan megtehetjük ezt:
+\begin{minted}{java}
+for (Attribute_Info attribute : attributes)
+\end{minted}
+
+Mivel \lstinline{Code} attribútumokról beszélünk, ezért a következő ajánlott dolog hogy ebből az attribútumból olvassuk be az adatokat. Ehhez a \lstinline{Code_Attribute_Helper} osztály \lstinline{readCodeAttributes} metódusa megfelelő:
+\begin{minted}{java}
+public static Code_Attribute readCodeAttributes(Attribute_Info attribute) throws IOException
+\end{minted}
+A függvény egy attribútumot vár (például az előbbi kódrészlet \lstinline{attribute} változóját), majd pedig beolvassa a specifikációnak megfelelően a \lstinline{Code_Attribute}-ot, és visszaadja azt, ha valamiért nem sikerült a beolvasás akkor \lstinline{IOException}-t dob a függvény.
+\begin{minted}{java}
+Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+\end{minted}
+
+Ezt a beolvasott attribútumot a \lstinline{ClassFile} osztály fel tudja használni az \lstinline{executeCode} metódusával, mely egy \lstinline{byte[]} változót vár bemeneti paraméterként, ami a \lstinline{Code_Attribute} része:
+\begin{minted}{java}
+public Pair<Class<?>, Object> executeCode(byte[] code)
+	throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException,
+	NoSuchMethodException, SecurityException, InstantiationException, IllegalArgumentException,
+	InvocationTargetException, Throwable
+\end{minted}
+A reflekció miatt számos hibát dob vissza a függvény, ha nem helyes a kód formátuma akkor \lstinline{IOException}-t dob a függvény, a \lstinline{Throwable} az \lstinline{ATHROW} bytecode instrukció miatt szükséges (ekkor egy hibát dob vissza a metódusunk).
+Visszatérési értéke \lstinline{Pair<Class<?>, Object>}, a számos \lstinline{RETURN} utasítás miatt (ezeket a stack-en szükséges elhelyezünk)
+Példa a használatára:
+\begin{minted}{java}
+CLASS_FILE.executeCode(codeAttribute.code);
+\end{minted}
+
+Ezzel el is jutottunk egy Classfájl beolvasásától, az abban lévő adott függvény bytecodejának futtatásáig, több teendőnk nincsen, a program az adott függvényben levő külön függvényhívásokat automatikusan elvégzi.
+
+A teljes példakód:
+\begin{minted}{java}
+ClassFile CLASS_FILE = new ClassFile("Main.class", null);
+Method_Info method = CLASS_FILE.findMethodsByName("main");
+List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
+
+for (Attribute_Info attribute : attributes) {
+	Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+	CLASS_FILE.executeCode(codeAttribute.code);
+}
+\end{minted}
+
+\section{Pár minta Classfájl felépítése}
 
 A legegyszerűbb Classfájl ami értelmes, viszont nem futattható:
 
@@ -181,7 +261,7 @@ Classfájl formátumának magyarázata:
 \item \stageattributes{00 00}: Osztály attribútumainak száma
 \end{compactitem}
 
-\section{Bytecode utasítások}
+\section{JVM Bytecode utasítások}
 
 Az összes bytecode utasítás implementálva van, ezekről az alábbi táblázatban röviden pár dolog le van írva, nemlegesen a hex kódjuk, extra értékek utánuk, illetve hogy a stack-et hogyan változtatják
 \begin{center}
