@@ -90,7 +90,7 @@ class ClassFile {
     private List<Object> LOCKS = new ArrayList<>();
 
     private List<CallSite> callSites = new ArrayList<>();
-    private List<Pair<Class<?>, Object>> stack = new ArrayList<>();
+    public List<Pair<Class<?>, Object>> stack = new ArrayList<>();
     public Object[] local = new Object[65535];
 
     public ClassFile(String fileName, String[] mainArgs) {
@@ -796,7 +796,7 @@ class ClassFile {
                     LOCKS.add(objectref);
                 }
                 case MONITOREXIT -> {
-                    Object objectref = stack.remove(stack.size() - 1);
+                    Object objectref = stack.remove(stack.size() - 1).second;
                     LOCKS.remove(objectref);
                 }
                 case WIDE -> {
