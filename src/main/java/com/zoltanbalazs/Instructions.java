@@ -712,9 +712,8 @@ public class Instructions {
         }
 
         try {
-            method.setAccessible(true);
-
             if (ClassFile.isClassBuiltIn(name_of_class)) {
+                method.setAccessible(true);
                 result = method.invoke(objectref.second, arguments_as_objects);
                 if (result != null) {
                     returnType = result.getClass();
@@ -735,6 +734,7 @@ public class Instructions {
                 for (int i = 0; i < 65535; ++i) {
                     CLASS_FILE.local[i] = cf.local[i];
                 }
+                CLASS_FILE.stack = cf.stack;
 
                 for (Attribute_Info attribute : attributes) {
                     try {
@@ -804,8 +804,8 @@ public class Instructions {
 
                 method = obj.getClass().getDeclaredMethod(name_and_type_of_member,
                         types_of_function_paramaters);
-                method.setAccessible(true);
                 if (ClassFile.isClassBuiltIn(name_of_class)) {
+                    method.setAccessible(true);
                     result = method.invoke(objectref.second, arguments_as_objects);
                     if (result != null) {
                         returnType = result.getClass();
@@ -826,6 +826,7 @@ public class Instructions {
                     for (int i = 0; i < 65535; ++i) {
                         CLASS_FILE.local[i] = cf.local[i];
                     }
+                    CLASS_FILE.stack = cf.stack;
 
                     for (Attribute_Info attribute : attributes) {
                         try {
@@ -856,9 +857,8 @@ public class Instructions {
                             method_arguments, arguments_on_stack);
                 }
 
-                method.setAccessible(true);
-
                 if (ClassFile.isClassBuiltIn(name_of_class)) {
+                    method.setAccessible(true);
                     result = method.invoke(objectref.second, arguments_as_objects);
                     if (result != null) {
                         returnType = result.getClass();
@@ -879,6 +879,7 @@ public class Instructions {
                     for (int i = 0; i < 65535; ++i) {
                         CLASS_FILE.local[i] = cf.local[i];
                     }
+                    CLASS_FILE.stack = cf.stack;
 
                     for (Attribute_Info attribute : attributes) {
                         try {
@@ -1022,10 +1023,10 @@ public class Instructions {
             arguments_as_objects[j] = (Object) arguments_of_function.get(j);
         }
 
-        method.setAccessible(true);
         Object result = null;
         Class<?> returnType = void.class;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
+            method.setAccessible(true);
             result = method.invoke(name_of_class.replace("/", "."), arguments_as_objects);
             if (result != null) {
                 returnType = result.getClass();
@@ -1043,9 +1044,12 @@ public class Instructions {
                 e.printStackTrace();
             }
 
-            for (int i = 0; i < 65535; ++i) {
-                CLASS_FILE.local[i] = cf.local[i];
+            for (int i = 0; i < number_of_method_arguments; ++i) {
+                // TODO
             }
+            CLASS_FILE.local[0] = CLASS_FILE.local[1] = ((long[]) cf.local[1])[0];
+            CLASS_FILE.local[2] = CLASS_FILE.local[3] = ((long[]) cf.local[1])[1];
+            CLASS_FILE.stack = cf.stack;
 
             for (Attribute_Info attribute : attributes) {
                 try {
@@ -1121,6 +1125,7 @@ public class Instructions {
         Object result = null;
         Class<?> returnType = void.class;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
+            method.setAccessible(true);
             result = method.invoke(objectref.second, arguments_as_objects);
             if (result != null) {
                 returnType = result.getClass();
@@ -1141,6 +1146,7 @@ public class Instructions {
             for (int i = 0; i < 65535; ++i) {
                 CLASS_FILE.local[i] = cf.local[i];
             }
+            CLASS_FILE.stack = cf.stack;
 
             for (Attribute_Info attribute : attributes) {
                 try {
