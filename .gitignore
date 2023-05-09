@@ -1,7 +1,6 @@
 *.class
 *.jar
 target/
-test/
 .vscode/
 thesis/*
 thesis/images/*
