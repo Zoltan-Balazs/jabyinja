@@ -832,7 +832,11 @@ public class Instructions {
 
                             }
                         }
-                        obj = ctor.newInstance(values);
+                        try {
+                            obj = ctor.newInstance(values);
+                        } catch (Exception ee) {
+
+                        }
                     }
 
                     if (obj != null) {
@@ -840,8 +844,10 @@ public class Instructions {
                     }
                 }
 
-                if (obj == null) {
+                if (obj == null && objectRefIdx != -1) {
                     obj = local[objectRefIdx];
+                } else if (obj == null) {
+                    obj = objectref.first;
                 }
 
                 method = obj.getClass().getDeclaredMethod(name_and_type_of_member,
@@ -1688,7 +1694,8 @@ class Instructions_Helper {
                 for (Method method : reference_to_class.getDeclaredMethods()) {
                     boolean isCorrectMethod = true;
 
-                    if (method.getName().equals(name_and_type_of_member)) {
+                    if (method.getName().equals(name_and_type_of_member)
+                            && method.getParameterTypes().length == types_of_function_paramaters.length) {
                         for (int i = 0; i < method.getParameterTypes().length; ++i) {
                             Class<?> type = method.getParameterTypes()[i];
                             if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
@@ -1717,7 +1724,8 @@ class Instructions_Helper {
                     for (Method method : reference_to_class.getDeclaredMethods()) {
                         boolean isCorrectMethod = true;
 
-                        if (method.getName().equals(name_and_type_of_member)) {
+                        if (method.getName().equals(name_and_type_of_member)
+                                && method.getParameterTypes().length == types_of_function_paramaters.length) {
                             for (int i = 0; i < method.getParameterTypes().length; ++i) {
                                 Class<?> type = method.getParameterTypes()[i];
                                 if (!type.getName().equals(types_of_function_paramaters[i].getName())) {

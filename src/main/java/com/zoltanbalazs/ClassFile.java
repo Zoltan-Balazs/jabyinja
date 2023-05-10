@@ -221,7 +221,9 @@ class ClassFile {
         } catch (Throwable e) {
             boolean doesMethodExist = false;
             for (Method method : reference_to_class.getDeclaredMethods()) {
-                if (method.getName().equals(name_and_type_of_member) && !doesMethodExist) {
+                if (method.getName().equals(name_and_type_of_member)
+                        && method.getParameterTypes().length == types_of_function_paramaters.length
+                        && !doesMethodExist) {
                     for (int i = 0; i < method.getParameterTypes().length; ++i) {
                         Class<?> type = method.getParameterTypes()[i];
                         if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
