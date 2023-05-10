@@ -1298,7 +1298,7 @@ public class Instructions {
     public static void ANEWARRAY(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             String file_name, ClassFile cf)
             throws ClassNotFoundException {
-        ConstantPoolTag tag = constant_pool.get((index & 0xFF)).tag;
+        ConstantPoolTag tag = constant_pool.get((index & 0xFF) - 1).tag;
 
         Class<?> arrayType = null;
         if (tag == ConstantPoolTag.CONSTANT_Utf8 || tag == ConstantPoolTag.CONSTANT_Fieldref
