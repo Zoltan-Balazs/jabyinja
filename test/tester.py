@@ -17,6 +17,7 @@ class CLI_COLOR:
 
 java_command = "java -cp target/test-classes/ "
 jabyinja_command = "java -jar target/jabyinja-*.jar "
+# jabyinja_command = "java -cp target/classes/:target/test-classes/ com.zoltanbalazs.Main "
 
 base_dir = "target/test-classes/"
 
@@ -25,7 +26,7 @@ own_tests = [
     "com/zoltanbalazs/Own/Dup2",
     "com/zoltanbalazs/Own/Functional",
     "com/zoltanbalazs/Own/Inheritence",
-    "com/zoltanbalazs/Own/Instaceof",
+    "com/zoltanbalazs/Own/Instanceof",
     "com/zoltanbalazs/Own/Multianewarray",
     "com/zoltanbalazs/Own/Nested",
     "com/zoltanbalazs/Own/Ownclass",
@@ -53,7 +54,8 @@ pti_basic_tests = [
     "com/zoltanbalazs/PTI/_11/_01/FlyingMain",
     "com/zoltanbalazs/PTI/_11/_02/Main",
     "com/zoltanbalazs/PTI/_11/_03/AnimalMain",
-    "com/zoltanbalazs/PTI/_12/_01/KisZH",
+    "com/zoltanbalazs/PTI/_11/_04/AnimalMain",
+    "com/zoltanbalazs/PTI/_12/KisZH",
 ]
 
 
