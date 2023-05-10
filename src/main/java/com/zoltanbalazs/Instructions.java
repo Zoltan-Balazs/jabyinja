@@ -913,7 +913,12 @@ public class Instructions {
         stack.subList(stack_size - number_of_method_arguments - 1, stack_size).clear();
 
         if (result != null) {
-            stack.add(new Pair<Class<?>, Object>(returnType, result));
+            if (returnType == int.class && description_of_method
+                    .substring(description_of_method.indexOf(")", 0) + 1, description_of_method.length()).equals("Z")) {
+                stack.add(new Pair<Class<?>, Object>(boolean.class, ((Number) result).intValue() == 1 ? true : false));
+            } else {
+                stack.add(new Pair<Class<?>, Object>(returnType, result));
+            }
         } else if (obj != null) {
             local[objectRefIdx] = obj;
         }
