@@ -677,8 +677,15 @@ public class Instructions {
         int number_of_method_arguments = method_arguments.size();
 
         int stack_size = stack.size();
+        Pair<Class<?>, Object> objectref = stack.get(stack_size - number_of_method_arguments - 1);
+
         List<Pair<Class<?>, Object>> arguments_on_stack = stack.subList(stack_size - number_of_method_arguments,
                 stack_size);
+
+        if (objectref.second.getClass().getName() != name_of_class && !isINVOKESPECIAL
+                && !ClassFile.isClassBuiltIn(name_of_class)) {
+            name_of_class = objectref.second.getClass().getName().replace(".", "/");
+        }
 
         List<Object> arguments_of_function = new ArrayList<Object>();
         List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
@@ -710,7 +717,6 @@ public class Instructions {
             arguments_as_objects[j] = (Object) arguments_of_function.get(j);
         }
 
-        Pair<Class<?>, Object> objectref = stack.get(stack_size - number_of_method_arguments - 1);
         Object result = null;
         Class<?> returnType = void.class;
         Object obj = null;
@@ -1092,8 +1098,14 @@ public class Instructions {
         List<Class<?>> method_arguments = cf.getArguments(description_of_method);
 
         int stack_size = stack.size();
+        Pair<Class<?>, Object> objectref = stack.get(stack_size - count);
+
         List<Pair<Class<?>, Object>> arguments_on_stack = stack.subList(stack_size - count + 1,
                 stack_size);
+
+        if (objectref.second.getClass().getName() != name_of_class && !ClassFile.isClassBuiltIn(name_of_class)) {
+            name_of_class = objectref.second.getClass().getName().replace(".", "/");
+        }
 
         List<Object> arguments_of_function = new ArrayList<Object>();
         List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
@@ -1125,7 +1137,6 @@ public class Instructions {
             arguments_as_objects[j] = (Object) arguments_of_function.get(j);
         }
 
-        Pair<Class<?>, Object> objectref = stack.get(stack_size - count);
         Object result = null;
         Class<?> returnType = void.class;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
