@@ -18,7 +18,7 @@ public class Main {
         List<Attribute_Info> attributes = new ArrayList<>();
 
         try {
-            method = CLASS_FILE.findMethodsByName("main");
+            method = CLASS_FILE.findMethodsByName("main", null);
             attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
         } catch (Exception e) {
             e.printStackTrace();
