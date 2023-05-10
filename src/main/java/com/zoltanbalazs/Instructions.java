@@ -1026,18 +1026,18 @@ public class Instructions {
             new_filename = returned.first;
         }
 
-        Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
-                types_of_function_paramaters,
-                method_arguments, arguments_on_stack);
-
-        Object[] arguments_as_objects = new Object[arguments_of_function.size()];
-        for (int j = 0; j < arguments_of_function.size(); ++j) {
-            arguments_as_objects[j] = (Object) arguments_of_function.get(j);
-        }
-
         Object result = null;
         Class<?> returnType = void.class;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
+            Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
+                    types_of_function_paramaters,
+                    method_arguments, arguments_on_stack);
+
+            Object[] arguments_as_objects = new Object[arguments_of_function.size()];
+            for (int j = 0; j < arguments_of_function.size(); ++j) {
+                arguments_as_objects[j] = (Object) arguments_of_function.get(j);
+            }
+
             method.setAccessible(true);
             result = method.invoke(name_of_class.replace("/", "."), arguments_as_objects);
             if (result != null) {
