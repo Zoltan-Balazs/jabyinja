@@ -1174,9 +1174,9 @@ public class Instructions {
 
         stack.subList(stack_size - count, stack_size).clear();
 
-        if (result != null) {
-            stack.add(new Pair<Class<?>, Object>(returnType, result));
-        }
+        // if (result != null) {
+        stack.add(new Pair<Class<?>, Object>(returnType, result));
+        // }
     }
 
     public static void INVOKEDYNAMIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
