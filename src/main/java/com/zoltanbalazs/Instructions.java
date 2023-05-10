@@ -626,7 +626,12 @@ public class Instructions {
         int stack_size = stack.size();
         Pair<Class<?>, Object> objectref = stack.get(stack_size - 1);
 
-        Field f = objectref.second.getClass().getDeclaredField(name_of_field);
+        Field f = null;
+        try {
+            f = objectref.second.getClass().getDeclaredField(name_of_field);
+        } catch (NoSuchFieldException nfe) {
+            f = objectref.second.getClass().getSuperclass().getDeclaredField(name_of_field);
+        }
 
         stack.subList(stack_size - 1, stack_size).clear();
 
@@ -645,7 +650,13 @@ public class Instructions {
         Pair<Class<?>, Object> objectref = stack.get(stack_size - 2);
         Pair<Class<?>, Object> value = stack.get(stack_size - 1);
 
-        Field f = objectref.second.getClass().getDeclaredField(name_of_field);
+        Field f = null;
+        try {
+            f = objectref.second.getClass().getDeclaredField(name_of_field);
+        } catch (NoSuchFieldException nfe) {
+            f = objectref.second.getClass().getSuperclass().getDeclaredField(name_of_field);
+        }
+
         f.setAccessible(true);
         f.set(objectref.second, value.second);
 
