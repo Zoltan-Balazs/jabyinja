@@ -1625,7 +1625,20 @@ class Instructions_Helper {
                 f = new File(f.getParent());
             }
         } catch (Exception e) {
-            return null;
+            try {
+                File f = new File(file_name.split(class_name.split("/")[0])[0] + class_name + ".class");
+                URL[] cp = { f.toURI().toURL() };
+                URLClassLoader urlcl = new URLClassLoader(cp);
+                try {
+                    returned = new Pair<String, Class<?>>(f.getPath() + "/" + class_name + ".class",
+                            urlcl.loadClass(class_name.replace("/", ".")));
+                } catch (Exception ee) {
+
+                }
+                urlcl.close();
+            } catch (Exception ee) {
+                return null;
+            }
         }
         return returned;
     }
