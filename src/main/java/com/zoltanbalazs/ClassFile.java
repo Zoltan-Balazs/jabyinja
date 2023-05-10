@@ -738,7 +738,7 @@ class ClassFile {
                 }
                 case INVOKEVIRTUAL -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.INVOKEVIRTUAL(stack, CONSTANT_POOL, index, local, FILE_NAME, this);
+                    Instructions.INVOKEVIRTUAL(stack, CONSTANT_POOL, index, local, FILE_NAME, this, false);
                 }
                 case INVOKESPECIAL -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);

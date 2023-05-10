@@ -665,7 +665,7 @@ public class Instructions {
 
     public static void INVOKEVIRTUAL(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             Object[] local,
-            String file_name, ClassFile cf)
+            String file_name, ClassFile cf, boolean isINVOKESPECIAL)
             throws ClassNotFoundException, MalformedURLException, IOException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException, InstantiationException {
         CP_Info reference_to_method = constant_pool.get(index - 1);
@@ -1016,7 +1016,7 @@ public class Instructions {
                     new Pair<Class<?>, Object>(reference_to_class,
                             initConstructor.newInstance(arguments_as_objects)));
         } else {
-            // TODO
+            INVOKEVIRTUAL(stack, constant_pool, index, local, file_name, cf, true);
         }
     }
 
