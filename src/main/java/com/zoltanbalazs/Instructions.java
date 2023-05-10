@@ -742,10 +742,11 @@ public class Instructions {
                     e.printStackTrace();
                 }
 
-                for (int i = 0; i < 65535; ++i) {
-                    CLASS_FILE.local[i] = cf.local[i];
+                CLASS_FILE.local[0] = objectref.second;
+                int localIdx = 1;
+                for (int i = stack_size - number_of_method_arguments; i < stack_size; ++i) {
+                    CLASS_FILE.local[localIdx++] = stack.get(i).second;
                 }
-                CLASS_FILE.stack = cf.stack;
 
                 for (Attribute_Info attribute : attributes) {
                     try {
@@ -834,10 +835,7 @@ public class Instructions {
                         e.printStackTrace();
                     }
 
-                    for (int i = 0; i < 65535; ++i) {
-                        CLASS_FILE.local[i] = cf.local[i];
-                    }
-                    CLASS_FILE.stack = cf.stack;
+                    CLASS_FILE.local[0] = objectref.second;
 
                     for (Attribute_Info attribute : attributes) {
                         try {
@@ -887,10 +885,7 @@ public class Instructions {
                         e.printStackTrace();
                     }
 
-                    for (int i = 0; i < 65535; ++i) {
-                        CLASS_FILE.local[i] = cf.local[i];
-                    }
-                    CLASS_FILE.stack = cf.stack;
+                    CLASS_FILE.local[0] = objectref.second;
 
                     for (Attribute_Info attribute : attributes) {
                         try {
@@ -1055,12 +1050,10 @@ public class Instructions {
                 e.printStackTrace();
             }
 
-            for (int i = 0; i < number_of_method_arguments; ++i) {
-                // TODO
+            int localIdx = 0;
+            for (int i = stack_size - number_of_method_arguments; i < stack_size; ++i) {
+                CLASS_FILE.local[localIdx++] = stack.get(i).second;
             }
-            CLASS_FILE.local[0] = CLASS_FILE.local[1] = ((long[]) cf.local[1])[0];
-            CLASS_FILE.local[2] = CLASS_FILE.local[3] = ((long[]) cf.local[1])[1];
-            CLASS_FILE.stack = cf.stack;
 
             for (Attribute_Info attribute : attributes) {
                 try {
@@ -1157,7 +1150,6 @@ public class Instructions {
             for (int i = 0; i < 65535; ++i) {
                 CLASS_FILE.local[i] = cf.local[i];
             }
-            CLASS_FILE.stack = cf.stack;
 
             for (Attribute_Info attribute : attributes) {
                 try {
