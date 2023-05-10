@@ -3,15 +3,9 @@ import tempfile
 
 
 class CLI_COLOR:
-    PURPLE = '\033[95m'
-    CYAN = '\033[96m'
-    DARKCYAN = '\033[36m'
-    BLUE = '\033[94m'
     GREEN = '\033[92m'
-    YELLOW = '\033[93m'
     RED = '\033[91m'
     BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
     END = '\033[0m'
 
 
@@ -61,9 +55,14 @@ pti_basic_tests = [
     "com/zoltanbalazs/PTI/_12/KisZH",
 ]
 
+passed_tests = 0
+failed_tests = 0
+
 
 def tester(test_files):
     longest_name = max(test_files, key=len)
+    global passed_tests
+    global failed_tests
 
     for test_file in test_files:
         jabyinja_file = tempfile.TemporaryFile()
@@ -91,9 +90,11 @@ def tester(test_files):
         if is_valid:
             print("\t - " + CLI_COLOR.BOLD + test_file + ": " + (' ' * align_length) +
                   CLI_COLOR.GREEN + "PASSED" + CLI_COLOR.END)
+            passed_tests += 1
         else:
             print("\t - " + CLI_COLOR.BOLD + test_file + ": " + (' ' * align_length) +
                   CLI_COLOR.RED + "FAILED" + CLI_COLOR.END)
+            failed_tests += 1
 
         jabyinja_file.close()
         java_file.close()
@@ -106,3 +107,10 @@ if __name__ == '__main__':
 
     print(CLI_COLOR.BOLD + "ELTE PTI Basic files: " + CLI_COLOR.END)
     tester(pti_basic_tests)
+    print()
+
+    print(CLI_COLOR.BOLD + "TOTAL:" + CLI_COLOR.END)
+    print("\t" + CLI_COLOR.BOLD + CLI_COLOR.GREEN + "PASSED: " + CLI_COLOR.END +
+          CLI_COLOR.BOLD + str(passed_tests) + CLI_COLOR.END)
+    print("\t" + CLI_COLOR.BOLD + CLI_COLOR.RED + "FAILED: " + CLI_COLOR.END +
+          CLI_COLOR.BOLD + str(failed_tests) + CLI_COLOR.END)
