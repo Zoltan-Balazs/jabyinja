@@ -742,7 +742,31 @@ public class Instructions {
                 List<Attribute_Info> attributes = new ArrayList<>();
 
                 try {
-                    fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member);
+                    fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
+
+                    if (fn_method == null) {
+                        name_of_class = cf.getNameOfClass(reference_to_method.getClassIndex());
+
+                        Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+                                name_of_class);
+                        reference_to_class = returned.second;
+                        new_filename = returned.first;
+
+                        CLASS_FILE = new ClassFile(new_filename, null);
+                        fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
+
+                        if (fn_method == null) {
+                            name_of_class = objectref.second.getClass().getSuperclass().getName().replace(".", "/");
+
+                            returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+                                    name_of_class);
+                            reference_to_class = returned.second;
+                            new_filename = returned.first;
+
+                            CLASS_FILE = new ClassFile(new_filename, null);
+                            fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
+                        }
+                    }
                     attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
                 } catch (Exception e) {
                     e.printStackTrace();
