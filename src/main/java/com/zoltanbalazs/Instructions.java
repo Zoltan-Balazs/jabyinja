@@ -1030,6 +1030,8 @@ public class Instructions {
             }
         } else if (obj != null) {
             local[objectRefIdx] = obj;
+        } else {
+            stack.add(new Pair<Class<?>, Object>(String.class, "null"));
         }
     }
 
