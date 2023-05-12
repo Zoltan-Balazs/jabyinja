@@ -1,5 +1,9 @@
+import random
+import string
 import subprocess
 import tempfile
+from enum import Enum
+from subprocess import PIPE, Popen
 
 
 class CLI_COLOR:
@@ -7,6 +11,24 @@ class CLI_COLOR:
     RED = '\033[91m'
     BOLD = '\033[1m'
     END = '\033[0m'
+
+
+class TEST_TYPE(Enum):
+    STANDARD = 0x0001,
+    ARGS = 0x0010,
+    STDIN = 0x0100,
+    FILEIO = 0x1000,
+
+
+class ARG_TYPES(Enum):
+    BYTE = "byte"
+    SHORT = "short",
+    INT = "short",
+    LONG = "long",
+    FLOAT = "float",
+    DOUBLE = "double",
+    CHAR = "char",
+    STRING = "string",
 
 
 java_command = "java -cp target/test-classes/ "
@@ -55,58 +77,139 @@ pti_basic_tests = [
     "com/zoltanbalazs/PTI/_12/KisZH",
 ]
 
+pti_args_tests = [
+    ("com/zoltanbalazs/PTI/_01/GCD", [ARG_TYPES.SHORT, ARG_TYPES.SHORT]),
+    ("com/zoltanbalazs/PTI/_01/Greet", [str]),
+    ("com/zoltanbalazs/PTI/_01/Odd", [ARG_TYPES.INT]),
+    ("com/zoltanbalazs/PTI/_01/PerfectNum", [ARG_TYPES.SHORT]),
+    ("com/zoltanbalazs/PTI/_01/PerfectNumRange", [ARG_TYPES.BYTE]),
+    ("com/zoltanbalazs/PTI/_01/TwoNum", [ARG_TYPES.INT, ARG_TYPES.INT]),
+]
+
+pti_stdin_tests = [
+    ("com/zoltanbalazs/PTI/_01/Euler", [ARG_TYPES.INT]),
+    ("com/zoltanbalazs/PTI/_01/Factorial", [ARG_TYPES.SHORT]),
+    ("com/zoltanbalazs/PTI/_01/Half", [ARG_TYPES.INT, ARG_TYPES.INT]),
+    ("com/zoltanbalazs/PTI/_01/Sqrt", [ARG_TYPES.INT]),
+    ("com/zoltanbalazs/PTI/_01/SquareRoot",
+     [ARG_TYPES.DOUBLE, ARG_TYPES.DOUBLE]),
+]
+
 passed_tests = 0
 failed_tests = 0
 
 
-def tester(test_files):
+def tester(test_files, test_type):
     longest_name = max(test_files, key=len)
     global passed_tests
     global failed_tests
 
+    number_of_tests = 1
+    if test_type == TEST_TYPE.ARGS or test_type == TEST_TYPE.STDIN:
+        number_of_tests = random.randint(3, 10)
+
     for test_file in test_files:
-        jabyinja_file = tempfile.TemporaryFile()
-        java_file = tempfile.TemporaryFile()
+        all_valid = True
 
-        subprocess.call(jabyinja_command + base_dir + test_file +
-                        ".class", shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
+        for _ in range(number_of_tests):
+            jabyinja_file = tempfile.TemporaryFile()
+            java_file = tempfile.TemporaryFile()
 
-        subprocess.call(java_command + test_file.replace("/",
-                        "."), shell=True, stdout=java_file, stderr=java_file)
+            args = ""
+            if (test_type == TEST_TYPE.ARGS or test_type == TEST_TYPE.STDIN) and type(test_file) is tuple:
+                tmp_args = []
+                (test_file, test_arg_types) = (test_file[0], test_file[1])
+                for arg in test_arg_types:
+                    if arg == ARG_TYPES.BYTE:
+                        tmp_args.append(random.randint(-2 ** 7, 2 ** 7 - 1))
+                    elif arg == ARG_TYPES.SHORT:
+                        tmp_args.append(random.randint(-2 ** 15, 2 ** 15 - 1))
+                    elif arg == ARG_TYPES.INT:
+                        tmp_args.append(random.randint(-2 ** 31, 2 ** 31 - 1))
+                    elif arg == ARG_TYPES.DOUBLE:
+                        tmp_args.append(round(random.uniform(-100, 100), 15))
+                    elif arg == str:
+                        tmp_args.append(''.join(random.choice(
+                            string.ascii_letters) for _ in range(20)))
 
-        jabyinja_file.seek(0)
-        java_file.seek(0)
+                args = " ".join(str(arg) for arg in tmp_args)
+                args += " "
+            elif test_type == TEST_TYPE.ARGS or test_type == TEST_TYPE.STDIN:
+                tmp_args = []
+                for arg in test_arg_types:
+                    if arg == ARG_TYPES.BYTE:
+                        tmp_args.append(random.randint(-2 ** 7, 2 ** 7 - 1))
+                    elif arg == ARG_TYPES.SHORT:
+                        tmp_args.append(random.randint(-2 ** 15, 2 ** 15 - 1))
+                    elif arg == ARG_TYPES.INT:
+                        tmp_args.append(random.randint(-2 ** 31, 2 ** 31 - 1))
+                    elif arg == ARG_TYPES.DOUBLE:
+                        tmp_args.append(round(random.uniform(-100, 100), 15))
+                    elif arg == str:
+                        tmp_args.append(''.join(random.choice(
+                            string.ascii_letters) for _ in range(20)))
 
-        jabyinja_file_content = jabyinja_file.readlines()
-        java_file_content = java_file.readlines()
+                args = " ".join(str(arg) for arg in tmp_args)
+                args += " "
 
-        # print(jabyinja_file_content)
-        # print(java_file_content)
-        # print()
+            if test_type == TEST_TYPE.STDIN:
+                Popen([jabyinja_command.split(" ")[0], "-jar", ' '.join(jabyinja_command.split(" ")[2:]).strip().replace('*', '0.9.1'), base_dir + test_file +
+                      ".class"], stdin=PIPE, stdout=jabyinja_file, stderr=jabyinja_file).communicate(input=str.encode(args))
 
-        is_valid = (jabyinja_file_content == java_file_content)
+                Popen([java_command.split(" ")[0], "-cp", ' '.join(java_command.split(" ")[2:]) + ' ' + test_file.replace(
+                    "/", ".")], stdin=PIPE, stdout=java_file, stderr=java_file).communicate(input=str.encode(args))
+            else:
+                subprocess.call(jabyinja_command + base_dir + test_file +
+                                ".class " + args, shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
 
-        align_length = len(longest_name) - len(test_file)
-        if is_valid:
-            print("\t - " + CLI_COLOR.BOLD + test_file + ": " + (' ' * align_length) +
-                  CLI_COLOR.GREEN + "PASSED" + CLI_COLOR.END)
+                subprocess.call(java_command + test_file.replace("/",
+                                ".") + " " + args, shell=True, stdout=java_file, stderr=java_file)
+
+            jabyinja_file.seek(0)
+            java_file.seek(0)
+
+            jabyinja_file_content = jabyinja_file.readlines()
+            java_file_content = java_file.readlines()
+
+            print(jabyinja_file_content)
+            print(java_file_content)
+            print()
+
+            is_valid = (jabyinja_file_content == java_file_content)
+
+            align_length = len(longest_name) - len(test_file)
+            if is_valid:
+                print("\t - " + CLI_COLOR.BOLD + test_file + " " + args + (' ' * align_length) +
+                      CLI_COLOR.GREEN + "PASSED" + CLI_COLOR.END)
+            else:
+                print("\t - " + CLI_COLOR.BOLD + test_file + " " + args + (' ' * align_length) +
+                      CLI_COLOR.RED + "FAILED" + CLI_COLOR.END)
+                all_valid = False
+
+            jabyinja_file.close()
+            java_file.close()
+
+        if all_valid:
             passed_tests += 1
         else:
-            print("\t - " + CLI_COLOR.BOLD + test_file + ": " + (' ' * align_length) +
-                  CLI_COLOR.RED + "FAILED" + CLI_COLOR.END)
             failed_tests += 1
-
-        jabyinja_file.close()
-        java_file.close()
 
 
 if __name__ == '__main__':
     print(CLI_COLOR.BOLD + "Own files: " + CLI_COLOR.END)
-    tester(own_tests)
+    tester(own_tests, TEST_TYPE.STANDARD)
     print()
 
     print(CLI_COLOR.BOLD + "ELTE PTI Basic files: " + CLI_COLOR.END)
-    tester(pti_basic_tests)
+    tester(pti_basic_tests, TEST_TYPE.STANDARD)
+    print()
+
+    print(CLI_COLOR.BOLD + "ELTE PTI Args files: " + CLI_COLOR.END)
+    tester(pti_args_tests, TEST_TYPE.ARGS)
+    print()
+
+    print(CLI_COLOR.BOLD + "ELTE PTI STDIN files: " + CLI_COLOR.END)
+    tester(pti_stdin_tests, TEST_TYPE.STDIN)
     print()
 
     print(CLI_COLOR.BOLD + "TOTAL:" + CLI_COLOR.END)
