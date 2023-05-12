@@ -28,7 +28,7 @@ public class Main {
             try {
                 Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                CLASS_FILE.executeCode(codeAttribute.code);
+                CLASS_FILE.executeCode(codeAttribute);
             } catch (Throwable e) {
                 e.printStackTrace();
             }

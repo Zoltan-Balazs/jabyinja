@@ -242,10 +242,11 @@ class ClassFile {
         return getArguments(descriptor).size();
     }
 
-    public Pair<Class<?>, Object> executeCode(byte[] code)
+    public Pair<Class<?>, Object> executeCode(Code_Attribute attribute)
             throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException,
             NoSuchMethodException, SecurityException, InstantiationException, IllegalArgumentException,
             InvocationTargetException, Throwable {
+        byte[] code = attribute.code;
 
         CodeIndex codeIndex = new CodeIndex();
         while (codeIndex.Get() < code.length) {
