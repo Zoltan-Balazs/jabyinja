@@ -822,6 +822,11 @@ public class Instructions {
                 int localIdx = 1;
                 for (int i = stack_size - number_of_method_arguments; i < stack_size; ++i) {
                     CLASS_FILE.local[localIdx++] = stack.get(i).second;
+                    if (stack.get(i).first == long.class || stack.get(i).first == Long.class
+                            || stack.get(i).first == double.class
+                            || stack.get(i).first == Double.class) {
+                        CLASS_FILE.local[localIdx++] = stack.get(i).second;
+                    }
                 }
 
                 for (Attribute_Info attribute : attributes) {
@@ -1164,6 +1169,11 @@ public class Instructions {
             int localIdx = 0;
             for (int i = stack_size - number_of_method_arguments; i < stack_size; ++i) {
                 CLASS_FILE.local[localIdx++] = stack.get(i).second;
+                if (stack.get(i).first == long.class || stack.get(i).first == Long.class
+                        || stack.get(i).first == double.class
+                        || stack.get(i).first == Double.class) {
+                    CLASS_FILE.local[localIdx++] = stack.get(i).second;
+                }
             }
 
             for (Attribute_Info attribute : attributes) {
@@ -1263,8 +1273,15 @@ public class Instructions {
                 e.printStackTrace();
             }
 
-            for (int i = 0; i < 65535; ++i) {
-                CLASS_FILE.local[i] = cf.local[i];
+            CLASS_FILE.local[0] = objectref.second;
+            int localIdx = 1;
+            for (int i = stack_size - method_arguments.size(); i < stack_size; ++i) {
+                CLASS_FILE.local[localIdx++] = stack.get(i).second;
+                if (stack.get(i).first == long.class || stack.get(i).first == Long.class
+                        || stack.get(i).first == double.class
+                        || stack.get(i).first == Double.class) {
+                    CLASS_FILE.local[localIdx++] = stack.get(i).second;
+                }
             }
 
             for (Attribute_Info attribute : attributes) {
