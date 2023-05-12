@@ -795,7 +795,7 @@ class ClassFile {
                     Instructions.ARRAYLENGTH(stack);
                 }
                 case ATHROW -> {
-                    Instructions.ATHROW(stack);
+                    Instructions.ATHROW(stack, CONSTANT_POOL, attribute.exception_table, codeIndex);
                 }
                 case CHECKCAST -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);

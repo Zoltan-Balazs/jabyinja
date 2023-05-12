@@ -1423,7 +1423,9 @@ public class Instructions {
         stack.add(new Pair<Class<?>, Object>(int.class, Array.getLength(arrayref.second)));
     }
 
-    public static void ATHROW(List<Pair<Class<?>, Object>> stack) throws Throwable {
+    public static void ATHROW(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool,
+            List<Exception_Table> exceptions, CodeIndex codeIndex)
+            throws Throwable {
         int stack_size = stack.size() - 1;
         Object objectref = stack.get(stack_size).second;
 
@@ -1431,7 +1433,21 @@ public class Instructions {
             if (0 < stack_size) {
                 stack.subList(0, stack_size - 1).clear();
             }
-            throw (Throwable) objectref;
+            boolean exception_thrown = false;
+            for (Exception_Table exception : exceptions) {
+                String exception_name = new String(constant_pool
+                        .get(constant_pool.get(exception.catch_type - 1).getNameIndex() - 1)
+                        .getBytes(), StandardCharsets.UTF_8);
+                if (objectref.getClass().getName().equals(exception_name.replace("/", "."))
+                        && exception.start_pc <= codeIndex.Get()
+                        && codeIndex.Get() <= exception.end_pc) {
+                    codeIndex.Set(exception.handler_pc);
+                    exception_thrown = true;
+                }
+            }
+            if (!exception_thrown) {
+                throw (Throwable) objectref;
+            }
         }
     }
 
