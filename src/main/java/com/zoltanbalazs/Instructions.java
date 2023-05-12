@@ -1072,19 +1072,26 @@ public class Instructions {
             } catch (Exception e) {
                 for (Constructor<?> ctor : reference_to_class.getDeclaredConstructors()) {
                     boolean isCorrectConstructors = true;
+                    boolean hadToassign = false;
+
+                    for (int j = 0; j < type_of_arguments.size(); ++j) {
+                        types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
+                    }
 
                     if (ctor.getParameterTypes().length == number_of_method_arguments) {
                         for (int i = 0; i < ctor.getParameterTypes().length; ++i) {
                             Class<?> type = ctor.getParameterTypes()[i];
-                            if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
+                            if (!type.getName().equals(types_of_function_paramaters[i].getName())
+                                    && !type.isAssignableFrom(types_of_function_paramaters[i])) {
                                 types_of_function_paramaters[i] = Object.class;
+                                hadToassign = true;
                             }
                         }
                     } else {
                         isCorrectConstructors = false;
                     }
 
-                    if (isCorrectConstructors) {
+                    if (isCorrectConstructors && !(hadToassign && ctor != null)) {
                         initConstructor = ctor;
                     }
                 }
