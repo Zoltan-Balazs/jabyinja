@@ -220,6 +220,10 @@ class ClassFile {
             return true;
         } catch (Throwable e) {
             boolean doesMethodExist = false;
+            while (reference_to_class.getDeclaredMethods().length == 0) {
+                reference_to_class = reference_to_class.getSuperclass();
+            }
+
             for (Method method : reference_to_class.getDeclaredMethods()) {
                 if (method.getName().equals(name_and_type_of_member)
                         && method.getParameterTypes().length == types_of_function_paramaters.length

@@ -1798,6 +1798,10 @@ class Instructions_Helper {
 
         if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
             try {
+                while (reference_to_class.getDeclaredMethods().length == 0) {
+                    reference_to_class = reference_to_class.getSuperclass();
+                }
+
                 returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
                         types_of_function_paramaters);
             } catch (Exception e) {
