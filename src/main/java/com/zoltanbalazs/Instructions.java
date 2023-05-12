@@ -116,7 +116,11 @@ public class Instructions {
     }
 
     public static void ISTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
-        local[index] = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        if (stack.get(stack.size() - 1).first == Character.class) {
+            local[index] = (int) ((Character) stack.remove(stack.size() - 1).second);
+        } else {
+            local[index] = ((Number) stack.remove(stack.size() - 1).second).intValue();
+        }
     }
 
     public static void LSTORE(List<Pair<Class<?>, Object>> stack, Object[] local, int index) {
