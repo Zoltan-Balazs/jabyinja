@@ -2,6 +2,10 @@ package com.zoltanbalazs.Own;
 
 public class Athrow {
     public static void main(String[] args) throws Exception {
-        throw new Exception("This is a text exception");
+        try {
+            throw new Exception("This is a test exception message");
+        } catch (Exception e) {
+            System.out.println("An exception was throw " + e.getMessage());
+        }
     }
 }
