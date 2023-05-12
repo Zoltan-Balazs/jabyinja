@@ -171,9 +171,9 @@ def tester(test_files, test_type):
             jabyinja_file_content = jabyinja_file.readlines()
             java_file_content = java_file.readlines()
 
-            print(jabyinja_file_content)
-            print(java_file_content)
-            print()
+            # print(jabyinja_file_content)
+            # print(java_file_content)
+            # print()
 
             is_valid = (jabyinja_file_content == java_file_content)
 
