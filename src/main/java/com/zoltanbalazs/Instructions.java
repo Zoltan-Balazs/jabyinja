@@ -1301,7 +1301,7 @@ public class Instructions {
                 try {
                     Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute.code);
+                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
                     result = returnResult.second;
                     returnType = returnResult.first;
                 } catch (Throwable e) {
