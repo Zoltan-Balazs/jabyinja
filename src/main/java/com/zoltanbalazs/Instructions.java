@@ -1073,7 +1073,12 @@ public class Instructions {
         } else if (obj != null) {
             local[objectRefIdx] = obj;
         } else {
-            stack.add(new Pair<Class<?>, Object>(String.class, "null"));
+            Class<?> return_type = cf.stringToType(description_of_method
+                    .substring(description_of_method.indexOf(")") + 1, description_of_method.length())).second;
+
+            if (return_type == String.class) {
+                stack.add(new Pair<Class<?>, Object>(String.class, "null"));
+            }
         }
     }
 
