@@ -149,7 +149,10 @@ def tester(test_files, line_length, test_type):
                     elif arg == ARG_TYPES.DOUBLE:
                         tmp_args.append(round(random.uniform(0, 100), 15))
                     elif arg == ARG_TYPES.CHAR:
-                        tmp_args.append(random.choice(string.printable))
+                        char = random.choice(string.printable)
+                        while char == ' ':
+                            char = random.choice(string.printable)
+                        tmp_args.append(char)
                     elif arg == str:
                         tmp_args.append(''.join(random.choice(
                             string.printable) for _ in range(20)))
