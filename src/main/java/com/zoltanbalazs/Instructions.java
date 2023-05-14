@@ -1616,12 +1616,12 @@ public class Instructions {
 
         switch (type) {
             case IFNULL -> {
-                if (value == null) {
+                if (value == null && value != "null") {
                     codeIndex.Inc(offset - 2 - 1);
                 }
             }
             case IFNONNULL -> {
-                if (value != null) {
+                if (value != null && value != "null") {
                     codeIndex.Inc(offset - 2 - 1);
                 }
             }
