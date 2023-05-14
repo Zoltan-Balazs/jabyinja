@@ -1089,31 +1089,77 @@ public class Instructions {
         CP_Info reference_to_method = constant_pool.get(index - 1);
         String name_of_class = cf.getNameOfClass(reference_to_method.getClassIndex());
         String name_and_type_of_member = cf.getNameOfMember(reference_to_method.getNameAndTypeIndex());
+        String description_of_method = cf.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
 
+        List<Class<?>> method_arguments = cf.getArguments(description_of_method);
+        int number_of_method_arguments = method_arguments.size();
+
+        int stack_size = stack.size();
+        Pair<Class<?>, Object> objectref = stack.get(stack_size - number_of_method_arguments - 1);
+
+        List<Pair<Class<?>, Object>> arguments_on_stack = stack.subList(stack_size - number_of_method_arguments,
+                stack_size);
+
+        List<Object> arguments_of_function = new ArrayList<Object>();
+        List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
+        Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
+        Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
+        for (int j = 0; j < type_of_arguments.size(); ++j) {
+            types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
+        }
+
+        if (name_of_class.equals("java/lang/Object")) {
+            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(cf.FILE_NAME,
+                    cf.CLASS_NAME);
+            Class<?> reference_to_class = returned.second;
+            String new_filename = returned.first;
+            Class<?> resolved_class = null;
+
+            File f = new File(new_filename);
+            int length = 0;
+            if (reference_to_class.getName().contains("/")) {
+                length = reference_to_class.getName().split("/").length;
+            } else {
+                length = reference_to_class.getName().split("\\.").length;
+            }
+            for (int i = 0; i < length + 1 && resolved_class == null; ++i) {
+                URL[] cp = { f.toURI().toURL() };
+                URLClassLoader urlcl = new URLClassLoader(cp);
+                try {
+                    resolved_class = urlcl.loadClass(reference_to_class.getName());
+                } catch (Exception eee) {
+
+                }
+                urlcl.close();
+
+                f = new File(f.getParent());
+            }
+            stack.clear();
+
+            try {
+                stack.add(
+                        new Pair<Class<?>, Object>(reference_to_class,
+                                resolved_class.newInstance()));
+
+                local[0] = stack.get(0).second;
+            } catch (Exception e) {
+                cf.MUST_INITIALIZE = true;
+            }
+
+            return;
+        }
+
+        String new_filename = "";
         Class<?> reference_to_class = null;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            reference_to_class = returned.second;
+            new_filename = returned.first;
         }
 
-        if (name_and_type_of_member.equals("<init>")) {
-            String description_of_method = cf.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
-            List<Class<?>> method_arguments = cf.getArguments(description_of_method);
-            int number_of_method_arguments = method_arguments.size();
-
-            int stack_size = stack.size();
-            List<Pair<Class<?>, Object>> arguments_on_stack = stack.subList(stack_size - number_of_method_arguments,
-                    stack_size);
-
-            List<Object> arguments_of_function = new ArrayList<Object>();
-            List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
-            Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
-            Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
-            for (int j = 0; j < type_of_arguments.size(); ++j) {
-                types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
-            }
-
+        if (ClassFile.isClassBuiltIn(name_of_class) && name_and_type_of_member.equals("<init>")) {
             Object[] arguments_as_objects = new Object[arguments_of_function.size()];
             for (int j = 0; j < arguments_of_function.size(); ++j) {
                 arguments_as_objects[j] = (Object) arguments_of_function.get(j);
@@ -1122,40 +1168,291 @@ public class Instructions {
             Constructor<?> initConstructor = null;
             try {
                 initConstructor = reference_to_class.getDeclaredConstructor(types_of_function_paramaters);
-            } catch (Exception e) {
-                for (Constructor<?> ctor : reference_to_class.getDeclaredConstructors()) {
-                    boolean isCorrectConstructors = true;
-                    boolean hadToassign = false;
+            } catch (Throwable e) {
+                try {
+                    for (Constructor<?> ctor : reference_to_class.getDeclaredConstructors()) {
+                        boolean isCorrectConstructors = true;
+                        boolean hadToassign = false;
 
-                    for (int j = 0; j < type_of_arguments.size(); ++j) {
-                        types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
-                    }
-
-                    if (ctor.getParameterTypes().length == number_of_method_arguments) {
-                        for (int i = 0; i < ctor.getParameterTypes().length; ++i) {
-                            Class<?> type = ctor.getParameterTypes()[i];
-                            if (!type.getName().equals(types_of_function_paramaters[i].getName())
-                                    && !type.isAssignableFrom(types_of_function_paramaters[i])) {
-                                types_of_function_paramaters[i] = Object.class;
-                                hadToassign = true;
-                            }
+                        for (int j = 0; j < type_of_arguments.size(); ++j) {
+                            types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
                         }
+
+                        if (ctor.getParameterTypes().length == number_of_method_arguments) {
+                            for (int i = 0; i < ctor.getParameterTypes().length; ++i) {
+                                Class<?> type = ctor.getParameterTypes()[i];
+                                if (!type.getName().equals(types_of_function_paramaters[i].getName())
+                                        && !type.isAssignableFrom(types_of_function_paramaters[i])) {
+                                    types_of_function_paramaters[i] = Object.class;
+                                    hadToassign = true;
+                                }
+                            }
+                        } else {
+                            isCorrectConstructors = false;
+                        }
+
+                        if (isCorrectConstructors && !(hadToassign && ctor != null)) {
+                            initConstructor = ctor;
+                        }
+                    }
+                } catch (Throwable ee) {
+                    // TODO
+                    Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+                            ee.getMessage());
+                    reference_to_class = returned.second;
+                    new_filename = returned.first;
+                    Class<?> resolved_class = null;
+
+                    File f = new File(new_filename);
+                    int length = 0;
+                    if (reference_to_class.getName().contains("/")) {
+                        length = reference_to_class.getName().split("/").length;
                     } else {
-                        isCorrectConstructors = false;
+                        length = reference_to_class.getName().split("\\.").length;
+                    }
+                    for (int i = 0; i < length + 1; ++i) {
+                        URL[] cp = { f.toURI().toURL() };
+                        URLClassLoader urlcl = new URLClassLoader(cp);
+                        try {
+                            resolved_class = urlcl.loadClass(reference_to_class.getName());
+                        } catch (Exception eee) {
+
+                        }
+                        urlcl.close();
+
+                        f = new File(f.getParent());
                     }
 
-                    if (isCorrectConstructors && !(hadToassign && ctor != null)) {
-                        initConstructor = ctor;
+                    ClassLoader correct_loader = resolved_class.getClassLoader();
+
+                    Thread.currentThread().setContextClassLoader(correct_loader);
+                    Thread.currentThread().getContextClassLoader().loadClass(resolved_class.getName())
+                            .getDeclaredConstructors();
+                    for (Constructor<?> ctor : reference_to_class.getDeclaredConstructors()) {
+                        boolean isCorrectConstructors = true;
+                        boolean hadToassign = false;
+
+                        for (int j = 0; j < type_of_arguments.size(); ++j) {
+                            types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
+                        }
+
+                        if (ctor.getParameterTypes().length == number_of_method_arguments) {
+                            for (int i = 0; i < ctor.getParameterTypes().length; ++i) {
+                                Class<?> type = ctor.getParameterTypes()[i];
+                                if (!type.getName().equals(types_of_function_paramaters[i].getName())
+                                        && !type.isAssignableFrom(types_of_function_paramaters[i])) {
+                                    types_of_function_paramaters[i] = Object.class;
+                                    hadToassign = true;
+                                }
+                            }
+                        } else {
+                            isCorrectConstructors = false;
+                        }
+
+                        if (isCorrectConstructors && !(hadToassign && ctor != null)) {
+                            initConstructor = ctor;
+                        }
                     }
                 }
             }
 
-            initConstructor.setAccessible(true);
-            stack.subList(stack_size - number_of_method_arguments - 2, stack_size).clear();
+            if (initConstructor != null) {
+                initConstructor.setAccessible(true);
+                stack.subList(stack_size - number_of_method_arguments - 2, stack_size).clear();
 
-            stack.add(
-                    new Pair<Class<?>, Object>(reference_to_class,
-                            initConstructor.newInstance(arguments_as_objects)));
+                stack.add(
+                        new Pair<Class<?>, Object>(reference_to_class,
+                                initConstructor.newInstance(arguments_as_objects)));
+            }
+        } else if (name_and_type_of_member.equals("<init>")) {
+            ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+            CLASS_FILE.MUST_INITIALIZE = true;
+
+            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+                    name_of_class);
+            reference_to_class = returned.second;
+            new_filename = returned.first;
+            Class<?> resolved_class = null;
+
+            File f = new File(new_filename);
+            int length = 0;
+            if (reference_to_class.getName().contains("/")) {
+                length = reference_to_class.getName().split("/").length;
+            } else {
+                length = reference_to_class.getName().split("\\.").length;
+            }
+            for (int i = 0; i < length + 1 && resolved_class == null; ++i) {
+                URL[] cp = { f.toURI().toURL() };
+                URLClassLoader urlcl = new URLClassLoader(cp);
+                try {
+                    resolved_class = urlcl.loadClass(reference_to_class.getName());
+                } catch (Exception eee) {
+
+                }
+                urlcl.close();
+
+                f = new File(f.getParent());
+            }
+
+            ClassLoader correct_loader = resolved_class.getClassLoader();
+            // Thread.currentThread().setContextClassLoader(correct_loader);
+
+            // stack.add(
+            // new Pair<Class<?>, Object>(reference_to_class,
+            // correct_loader.loadClass(name_of_class).newInstance()));
+
+            Method_Info fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member,
+                    description_of_method);
+            List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
+
+            CLASS_FILE.local[0] = objectref.second;
+            int localIdx = 1;
+            int methodArgumentsIdx = 0;
+            for (int i = stack_size - number_of_method_arguments; i < stack_size; ++i) {
+                CLASS_FILE.local[localIdx++] = stack.get(i).second;
+                if (stack.get(i).first == long.class || stack.get(i).first == double.class
+                        || method_arguments.get(methodArgumentsIdx) == long.class
+                        || method_arguments.get(methodArgumentsIdx) == double.class) {
+                    CLASS_FILE.local[localIdx++] = stack.get(i).second;
+                    methodArgumentsIdx++;
+                }
+            }
+
+            for (Attribute_Info attribute : attributes) {
+                try {
+                    Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+
+                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
+
+                    objectref = new Pair<Class<?>, Object>(CLASS_FILE.local[0].getClass(), CLASS_FILE.local[0]);
+                    // stack.add(objectref);
+
+                    if (file_name.contains(name_of_class) || cf.IN_MAIN_METHOD) {
+                        objectref = new Pair<Class<?>, Object>(CLASS_FILE.local[0].getClass(),
+                                CLASS_FILE.local[0]);
+                    } else if (CLASS_FILE.MUST_INITIALIZE) {
+                        returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(cf.FILE_NAME,
+                                cf.CLASS_NAME);
+                        reference_to_class = returned.second;
+                        new_filename = returned.first;
+                        resolved_class = null;
+
+                        f = new File(new_filename);
+                        length = 0;
+                        if (reference_to_class.getName().contains("/")) {
+                            length = reference_to_class.getName().split("/").length;
+                        } else {
+                            length = reference_to_class.getName().split("\\.").length;
+                        }
+                        for (int i = 0; i < length + 1; ++i) {
+                            URL[] cp = { f.toURI().toURL() };
+                            URLClassLoader urlcl = new URLClassLoader(cp);
+                            try {
+                                resolved_class = urlcl.loadClass(reference_to_class.getName());
+                            } catch (Exception eee) {
+
+                            }
+                            urlcl.close();
+
+                            f = new File(f.getParent());
+                        }
+
+                        try {
+                            Object[] argumets_as_objects = new Object[number_of_method_arguments];
+                            int idx = 0;
+                            for (int i = stack_size - number_of_method_arguments; i < stack_size; ++i) {
+                                argumets_as_objects[idx++] = stack.get(i).second;
+                            }
+
+                            Constructor<?> initConstructor = null;
+                            for (Constructor<?> ctor : resolved_class.getDeclaredConstructors()) {
+                                if (ctor.getParameterCount() == number_of_method_arguments) {
+                                    types_of_function_paramaters = ctor.getParameterTypes();
+                                    boolean isCorrectConstructors = true;
+                                    boolean hadToassign = false;
+                                    if (types_of_function_paramaters.length == number_of_method_arguments) {
+                                        for (int i = 0; i < types_of_function_paramaters.length; ++i) {
+                                            if (types_of_function_paramaters[i] != argumets_as_objects[i]
+                                                    .getClass()
+                                                    && !types_of_function_paramaters[i]
+                                                            .isAssignableFrom(argumets_as_objects[i]
+                                                                    .getClass())) {
+                                                types_of_function_paramaters[i] = Object.class;
+                                                hadToassign = true;
+                                            }
+                                        }
+                                    } else {
+                                        isCorrectConstructors = false;
+                                    }
+
+                                    if (isCorrectConstructors && !(hadToassign && initConstructor != null)) {
+                                        initConstructor = ctor;
+                                    }
+                                }
+                            }
+                            objectref = new Pair<Class<?>, Object>(reference_to_class,
+                                    initConstructor.newInstance(argumets_as_objects));
+                        } catch (Throwable ee) {
+                            returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(cf.FILE_NAME,
+                                    ee.getMessage());
+                            if (returned == null) {
+                                return;
+                            }
+                            reference_to_class = returned.second;
+                            new_filename = returned.first;
+
+                            Class<?> dependent_class = null;
+
+                            f = new File(new_filename);
+                            length = 0;
+                            if (reference_to_class.getName().contains("/")) {
+                                length = reference_to_class.getName().split("/").length;
+                            } else {
+                                length = reference_to_class.getName().split("\\.").length;
+                            }
+                            for (int i = 0; i < length + 1; ++i) {
+                                URL[] cp = { f.toURI().toURL() };
+                                URLClassLoader urlcl = new URLClassLoader(cp);
+                                try {
+                                    dependent_class = urlcl.loadClass(reference_to_class.getName());
+                                } catch (Exception eee) {
+
+                                }
+                                urlcl.close();
+
+                                f = new File(f.getParent());
+                            }
+
+                            correct_loader = dependent_class.getClassLoader();
+
+                            Thread.currentThread().setContextClassLoader(correct_loader);
+
+                            resolved_class.newInstance();
+
+                            System.out.println(resolved_class);
+                        }
+
+                    }
+
+                    // stack.clear();
+                    boolean assigned = false;
+                    for (int i = 0; i < 65535 && !assigned; ++i) {
+                        if (local[i] == null || local[i].getClass().getName().equals("Object")
+                                || (local[i].getClass().getName().equals("[Ljava.lang.String;")
+                                        && ((String[]) local[i]).length == 0)) {
+                            local[i] = objectref.second;
+                            assigned = true;
+                        }
+                    }
+
+                    // stack.subList(stack_size - number_of_method_arguments - 2,
+                    // stack_size).clear();
+                    stack.add(objectref);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+
         } else {
             INVOKEVIRTUAL(stack, constant_pool, index, local, file_name, cf, true);
         }
