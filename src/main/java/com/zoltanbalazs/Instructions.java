@@ -1250,7 +1250,7 @@ public class Instructions {
         Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
         Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
         for (int j = 0; j < type_of_arguments.size(); ++j) {
-            types_of_function_paramaters[j] = Object.class;
+            types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
         }
 
         String new_filename = "";
@@ -1272,7 +1272,7 @@ public class Instructions {
 
         Object[] arguments_as_objects = new Object[arguments_of_function.size()];
         for (int j = 0; j < arguments_of_function.size(); ++j) {
-            arguments_as_objects[j] = (Object) arguments_of_function.get(j);
+            arguments_as_objects[j] = /* (Object) */ arguments_of_function.get(j);
         }
 
         Object result = null;
@@ -1322,9 +1322,11 @@ public class Instructions {
 
         stack.subList(stack_size - count, stack_size).clear();
 
-        // if (result != null) {
-        stack.add(new Pair<Class<?>, Object>(returnType, result));
-        // }
+        if (result != null) {
+            stack.add(new Pair<Class<?>, Object>(returnType, result));
+        } else {
+            stack.add(objectref);
+        }
     }
 
     public static void INVOKEDYNAMIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
