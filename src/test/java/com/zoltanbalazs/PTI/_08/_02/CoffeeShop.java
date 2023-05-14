@@ -2,8 +2,6 @@ package com.zoltanbalazs.PTI._08._02;
 
 public class CoffeeShop {
     public static void main(String[] args) {
-        // Beverage test = new Beverage("", -1);
-
         Beverage beer = new Beverage("Beer", 18);
         Beverage orangeJuice = new Beverage("Orange Juice", 0);
 

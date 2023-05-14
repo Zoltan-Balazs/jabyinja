@@ -1,6 +1,6 @@
 package com.zoltanbalazs.PTI._03;
 
-public class Main {
+public class IterletterMain {
     public static void main(String[] args) {
         String original = "Hello world!";
         com.zoltanbalazs.PTI._03.stringutils.IterLetter str = new com.zoltanbalazs.PTI._03.stringutils.IterLetter(

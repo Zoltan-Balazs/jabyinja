@@ -18,8 +18,7 @@ class Calculator {
                     case '-':
                         System.out.println(a - b);
                         break;
-                    case 'x': // Windows-on nem adható át paraméternek könnyen a *, most a szorzást jelölje az
-                              // x
+                    case 'x':
                         System.out.println(a * b);
                         break;
                     case '/':

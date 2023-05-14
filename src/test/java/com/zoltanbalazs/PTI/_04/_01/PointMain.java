@@ -2,7 +2,7 @@ package com.zoltanbalazs.PTI._04._01;
 
 import com.zoltanbalazs.PTI._04._01.util.Point;
 
-public class Main {
+public class PointMain {
     public static void main(String[] args) {
         int num = Integer.parseInt(System.console().readLine("Number of points to enter: "));
         Point[] arr = new Point[num];

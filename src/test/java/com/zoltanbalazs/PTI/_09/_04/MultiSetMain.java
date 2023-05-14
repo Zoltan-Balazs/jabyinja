@@ -2,7 +2,7 @@ package com.zoltanbalazs.PTI._09._04;
 
 import java.util.Map.Entry;
 
-public class Main {
+public class MultiSetMain {
     public static void main(String[] args) {
         MultiSet a = new MultiSet();
         a.put("Teszt");

@@ -3,7 +3,7 @@ package com.zoltanbalazs.PTI._09._02;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
+public class RemoveDiffer {
     public static void main(String[] args) {
         List<String> res = removeStrDifferBeginningAndEnding(new ArrayList<>(List.of("alma", "körte", "", "teszt")));
         for (String i : res) {

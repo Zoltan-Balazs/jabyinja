@@ -16,8 +16,8 @@ class Batman extends Superhero {
     }
 }
 
-public class KisZH {
+public class Extends {
     public static void main(String[] args) {
-        Superhero darkNight = new Batman("Bruce Wayne");
+        new Batman("Bruce Wayne");
     }
 }

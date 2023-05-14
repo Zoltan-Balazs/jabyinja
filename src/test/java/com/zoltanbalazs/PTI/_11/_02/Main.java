@@ -8,9 +8,6 @@ public class Main {
         prp.print();
         prp.reverse();
         prp.print();
-
-        /* ReversablePoint rp = new ReversablePoint(6, 5); */
-
         foo(prp);
     }
 

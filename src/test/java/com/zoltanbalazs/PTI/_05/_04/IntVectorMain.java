@@ -2,7 +2,7 @@ package com.zoltanbalazs.PTI._05._04;
 
 import com.zoltanbalazs.PTI._05._04.util.IntVector;
 
-class IntVectorDemo {
+class IntVectorMain {
     public static void main(String[] args) {
         int[] ns = new int[] { 1, 2, 3 };
         IntVector v = new IntVector(ns);

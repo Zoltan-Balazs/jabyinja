@@ -9,7 +9,6 @@ public class PrintedBook extends Book {
     private Cover cover;
 
     public PrintedBook() {
-        // super();
         this.cover = Cover.Hardcover;
         this.pageNumber += 6;
     }

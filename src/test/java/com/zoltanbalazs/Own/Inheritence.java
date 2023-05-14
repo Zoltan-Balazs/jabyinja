@@ -1,34 +1,31 @@
 package com.zoltanbalazs.Own;
 
-class Cheese {
+class Parent {
 }
 
-class Gorgonzola extends Cheese {
-}
+class Child extends Parent {
+    Parent p;
 
-class NagyonSajtosGorgonzola extends Gorgonzola {
-    Gorgonzola gz;
-
-    public NagyonSajtosGorgonzola() {
-        this.gz = null;
+    public Child() {
+        this.p = null;
     }
 
-    public NagyonSajtosGorgonzola(Gorgonzola gz) {
-        this.gz = gz;
+    public Child(Parent p) {
+        this.p = p;
     }
 
     public void check() {
-        if (gz == null) {
-            System.out.println("This is NOT a Gorgonzola");
+        if (p == null) {
+            System.out.println("This is a Child");
         } else {
-            System.out.println("This is a Gorgonzola");
+            System.out.println("This is a Parent");
         }
     }
 }
 
 public class Inheritence {
     public static void main(String[] args) {
-        new NagyonSajtosGorgonzola().check();
-        new NagyonSajtosGorgonzola(new NagyonSajtosGorgonzola()).check();
+        new Child().check();
+        new Child(new Child()).check();
     }
 }

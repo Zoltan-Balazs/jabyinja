@@ -6,7 +6,6 @@ class Lion extends Animal {
         super(name, habitat);
     }
 
-    // Itt már implementálható
     public void animalSound() {
         System.out.println("Roar!");
     }

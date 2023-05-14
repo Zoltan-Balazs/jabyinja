@@ -1,6 +1,6 @@
 package com.zoltanbalazs.PTI._05._01;
 
-public class KisZH {
+public class Swap {
     public static void main(String[] args) {
         int a = 2, b = 3;
         swap(a, b);

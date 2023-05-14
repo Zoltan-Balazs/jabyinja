@@ -2,7 +2,7 @@ package com.zoltanbalazs.PTI._04._02;
 
 import com.zoltanbalazs.PTI._04._02.utils.DoubleVector;
 
-public class Main {
+public class DoubleVectorMain {
     public static void main(String[] args) {
         double[] arr = new double[] { 1.0, 2.0, 3.0, 5.0 };
         DoubleVector vec = new DoubleVector(arr);

@@ -19,20 +19,13 @@ public class BagMain {
             while ((line = buf.readLine()) != null) {
                 input.add(line);
             }
-
-            // input.remove("");
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
-        } /*
-           * catch (NotInBagException e) {
-           * System.out.println(e.getMessage());
-           * e.printStackTrace();
-           * }
-           */
+        }
 
         for (Entry<String, Integer> e : input.getData().entrySet()) {
             System.out.println(e.getKey() + " - " + e.getValue());

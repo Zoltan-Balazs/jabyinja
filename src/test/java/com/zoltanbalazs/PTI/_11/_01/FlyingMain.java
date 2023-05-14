@@ -1,7 +1,6 @@
 package com.zoltanbalazs.PTI._11._01;
 
 interface Flying {
-    // ....hogy repül?
     public void fly();
 }
 

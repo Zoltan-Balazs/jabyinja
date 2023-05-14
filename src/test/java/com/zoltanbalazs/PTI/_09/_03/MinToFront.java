@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Main {
+public class MinToFront {
     public static void main(String[] args) {
         List<Integer> res = minToFront(new ArrayList<>(List.of(25, 3, 2, 6, 7, 1, 1, 1)));
         for (int i : res) {
