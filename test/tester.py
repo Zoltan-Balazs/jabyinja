@@ -38,8 +38,8 @@ jabyinja_command = "java -jar target/jabyinja-*.jar "
 base_dir = "target/test-classes/"
 
 own_tests = [
-    "com/zoltanbalazs/Own/Athrow",
     "com/zoltanbalazs/Own/ArraylistTest",
+    "com/zoltanbalazs/Own/Athrow",
     "com/zoltanbalazs/Own/Dup2",
     "com/zoltanbalazs/Own/Functional",
     "com/zoltanbalazs/Own/Inheritence",
@@ -47,6 +47,7 @@ own_tests = [
     "com/zoltanbalazs/Own/Multianewarray",
     "com/zoltanbalazs/Own/Nested",
     "com/zoltanbalazs/Own/Ownclass",
+    "com/zoltanbalazs/Own/SwitchAthrow",
     "com/zoltanbalazs/Own/Template",
 ]
 
@@ -63,6 +64,8 @@ pti_basic_tests = [
     "com/zoltanbalazs/PTI/_05/_02/Main",
     "com/zoltanbalazs/PTI/_05/_03/Main",
     "com/zoltanbalazs/PTI/_05/_04/IntVectorDemo",
+    "com/zoltanbalazs/PTI/_06/_02/AddByLine",
+    "com/zoltanbalazs/PTI/_06/_04/Main",
     "com/zoltanbalazs/PTI/_08/_01/BookMain",
     "com/zoltanbalazs/PTI/_08/_02/CoffeeShop",
     "com/zoltanbalazs/PTI/_09/_01/Main",
@@ -70,6 +73,8 @@ pti_basic_tests = [
     "com/zoltanbalazs/PTI/_09/_03/Main",
     "com/zoltanbalazs/PTI/_09/_04/Main",
     "com/zoltanbalazs/PTI/_10/_01/KisZH",
+    "com/zoltanbalazs/PTI/_10/_02/BookMain",
+    "com/zoltanbalazs/PTI/_10/_03/BagMain",
     "com/zoltanbalazs/PTI/_10/_04/Swap",
     "com/zoltanbalazs/PTI/_11/_01/FlyingMain",
     "com/zoltanbalazs/PTI/_11/_02/Main",
@@ -80,7 +85,7 @@ pti_basic_tests = [
 
 pti_args_tests = [
     ("com/zoltanbalazs/PTI/_01/GCD", [ARG_TYPES.SHORT, ARG_TYPES.SHORT]),
-    ("com/zoltanbalazs/PTI/_01/Greet", [str]),
+    ("com/zoltanbalazs/PTI/_01/Greet", [ARG_TYPES.STRING]),
     ("com/zoltanbalazs/PTI/_01/Odd", [ARG_TYPES.INT]),
     ("com/zoltanbalazs/PTI/_01/PerfectNum", [ARG_TYPES.SHORT]),
     ("com/zoltanbalazs/PTI/_01/PerfectNumRange", [ARG_TYPES.BYTE]),
@@ -94,6 +99,12 @@ pti_stdin_tests = [
     ("com/zoltanbalazs/PTI/_01/Sqrt", [ARG_TYPES.INT]),
     ("com/zoltanbalazs/PTI/_01/SquareRoot",
      [ARG_TYPES.DOUBLE, ARG_TYPES.DOUBLE]),
+    ("com/zoltanbalazs/PTI/_06/_01/Calculator",
+     [ARG_TYPES.DOUBLE, ARG_TYPES.CHAR, ARG_TYPES.DOUBLE]),
+]
+
+pti_args_stdin_tests = [
+    ("com/zoltanbalazs/PTI/_06/_03/IsPartOf", [ARG_TYPES.STRING])
 ]
 
 passed_tests = 0
@@ -123,6 +134,7 @@ def tester(test_files, line_length, test_type):
             args = ""
             if test_type == TEST_TYPE.ARGS or test_type == TEST_TYPE.STDIN:
                 tmp_args = []
+
                 for arg in test_arg_types:
                     if arg == ARG_TYPES.BYTE:
                         tmp_args.append(random.randint(-2 ** 7, 2 ** 7 - 1))
@@ -130,20 +142,28 @@ def tester(test_files, line_length, test_type):
                         tmp_args.append(random.randint(-2 ** 15, 2 ** 15 - 1))
                     elif arg == ARG_TYPES.INT:
                         tmp_args.append(random.randint(-2 ** 31, 2 ** 31 - 1))
+                    elif arg == ARG_TYPES.LONG:
+                        tmp_args.append(random.randint(-2 ** 63, 2 ** 63 - 1))
+                    elif arg == ARG_TYPES.FLOAT:
+                        tmp_args.append(round(random.uniform(0, 100), 7))
                     elif arg == ARG_TYPES.DOUBLE:
                         tmp_args.append(round(random.uniform(0, 100), 15))
+                    elif arg == ARG_TYPES.CHAR:
+                        tmp_args.append(random.choice(string.printable))
                     elif arg == str:
                         tmp_args.append(''.join(random.choice(
-                            string.ascii_letters) for _ in range(20)))
+                            string.printable) for _ in range(20)))
 
-                args = " ".join(str(arg) for arg in tmp_args)
-                args += " "
+                for arg in tmp_args:
+                    args = f'{args} \"{str(arg)}\"'
+
+            args = args.strip()
 
             if test_type == TEST_TYPE.STDIN:
-                subprocess.call("echo " + args + " | " + jabyinja_command + base_dir + test_file +
+                subprocess.call("echo \"" + args + "\" | " + jabyinja_command + base_dir + test_file +
                                 ".class", shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
 
-                subprocess.call("echo " + args + " | " + java_command + test_file.replace("/",
+                subprocess.call("echo \"" + args + "\" | " + java_command + test_file.replace("/",
                                 "."), shell=True, stdout=java_file, stderr=java_file)
             else:
                 subprocess.call(jabyinja_command + base_dir + test_file +
@@ -161,6 +181,8 @@ def tester(test_files, line_length, test_type):
             is_valid = (jabyinja_file_content == java_file_content)
 
             if not is_valid:
+                # print(jabyinja_file_content)
+                # print(java_file_content)
                 all_valid = False
 
         jabyinja_file.close()
