@@ -752,6 +752,7 @@ class ClassFile {
                     return stack.get(stackSize - 1);
                 }
                 case RETURN -> {
+                    Instructions.RETURN(this);
                     return new Pair<Class<?>, Object>(void.class, null);
                 }
                 case GETSTATIC -> {

@@ -1638,6 +1638,162 @@ public class Instructions {
         throw new UnsupportedOperationException(
                 "JSR_W is deprecated since Java 7, this program only supports Java 7+ class files");
     }
+
+    public static void RETURN(ClassFile cf) throws Throwable {
+        if (cf.MUST_INITIALIZE) {
+            String class_name = cf.CLASS_NAME.replace("/", ".");
+
+            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(cf.FILE_NAME,
+                    cf.CLASS_NAME);
+            Class<?> reference_to_class = returned.second;
+            String new_filename = returned.first;
+            Class<?> resolved_class = null;
+
+            File f = new File(new_filename);
+            int length = 0;
+            if (reference_to_class.getName().contains("/")) {
+                length = reference_to_class.getName().split("/").length;
+            } else {
+                length = reference_to_class.getName().split("\\.").length;
+            }
+            for (int i = 0; i < length + 1 && resolved_class == null; ++i) {
+                URL[] cp = { f.toURI().toURL() };
+                URLClassLoader urlcl = new URLClassLoader(cp);
+                try {
+                    resolved_class = urlcl.loadClass(reference_to_class.getName());
+                } catch (Exception eee) {
+
+                }
+                urlcl.close();
+
+                f = new File(f.getParent());
+            }
+
+            int numberOfVariables = 0;
+            for (int i = 0; i < cf.stack.size(); i++) {
+                Object currentObject = cf.stack.get(i).second;
+                if (!(currentObject instanceof Class<?>
+                        && class_name.equals(((Class<?>) currentObject).getName()))) {
+                    numberOfVariables++;
+                }
+            }
+
+            Object[] arguments_as_objects = new Object[numberOfVariables];
+            int idx = 0;
+            for (int i = 0; i < cf.stack.size(); i++) {
+                Object currentObject = cf.stack.get(i).second;
+                if (!(currentObject instanceof Class<?>
+                        && class_name.equals(((Class<?>) currentObject).getName()))) {
+                    arguments_as_objects[idx++] = currentObject;
+                }
+            }
+
+            Constructor<?> initConstructor = null;
+            for (Constructor<?> ctor : resolved_class.getDeclaredConstructors()) {
+                if (ctor.getParameterCount() == numberOfVariables) {
+                    initConstructor = ctor;
+                }
+            }
+
+            if (initConstructor == null) {
+                for (int j = 0; j < resolved_class.getDeclaredConstructors().length; j++) {
+                    Constructor<?> ctor = resolved_class.getDeclaredConstructors()[j];
+                    Class<?>[] argumentTypes = ctor.getParameterTypes();
+                    arguments_as_objects = new Object[ctor.getParameterCount()];
+                    int currentArguments = 0;
+                    for (int i = 0; i < cf.stack.size() && currentArguments < ctor.getParameterCount(); i++) {
+                        Object currentObject = cf.stack.get(i).second;
+                        Class<?> currentArgumentType = argumentTypes[currentArguments];
+                        if (currentObject instanceof Object
+                                && (currentObject.getClass().isAssignableFrom(currentArgumentType)
+                                        || (currentArgumentType == int.class
+                                                && currentObject.getClass() == Integer.class)
+                                        || (currentArgumentType == double.class
+                                                && currentObject.getClass() == Double.class))) {
+                            arguments_as_objects[currentArguments] = currentObject;
+                            currentArguments++;
+                        }
+                    }
+                    if (currentArguments == ctor.getParameterCount()
+                            || j == resolved_class.getDeclaredConstructors().length - 1) {
+                        initConstructor = ctor;
+                    }
+                }
+            }
+
+            try {
+                initConstructor.setAccessible(true);
+                initConstructor.newInstance(arguments_as_objects);
+                cf.stack.clear();
+                cf.stack.add(
+                        new Pair<Class<?>, Object>(resolved_class, initConstructor.newInstance(arguments_as_objects)));
+            } catch (Throwable e) {
+                for (int j = 0; j < resolved_class.getDeclaredConstructors().length; j++) {
+                    Constructor<?> ctor = resolved_class.getDeclaredConstructors()[j];
+                    Class<?>[] argumentTypes = ctor.getParameterTypes();
+                    arguments_as_objects = new Object[ctor.getParameterCount()];
+                    int currentArguments = 0;
+                    for (int i = 0; i < cf.stack.size() && currentArguments < ctor.getParameterCount(); i++) {
+                        Object currentObject = cf.stack.get(i).second;
+                        Class<?> currentArgumentType = argumentTypes[currentArguments];
+                        if (currentObject instanceof Object
+                                && (currentObject.getClass().isAssignableFrom(currentArgumentType)
+                                        || (currentArgumentType == int.class
+                                                && currentObject.getClass() == Integer.class)
+                                        || (currentArgumentType == double.class
+                                                && currentObject.getClass() == Double.class))) {
+                            arguments_as_objects[currentArguments] = currentObject;
+                            currentArguments++;
+                        } else if (!(currentObject instanceof Class<?>)) {
+                            if (arguments_as_objects[0] == null || numberOfVariables < 2) {
+                                return;
+                            }
+                            arguments_as_objects[currentArguments] = new int[((Number) arguments_as_objects[0])
+                                    .intValue() * ((Number) arguments_as_objects[1]).intValue()];
+                            currentArguments++;
+                        }
+                    }
+                    if (currentArguments == ctor.getParameterCount()
+                            || j == resolved_class.getDeclaredConstructors().length - 1) {
+                        initConstructor = ctor;
+
+                        argumentTypes = initConstructor.getParameterTypes();
+                        boolean allValid = true;
+                        for (int i = 0; i < argumentTypes.length; ++i) {
+                            if (!arguments_as_objects[i].getClass().getName().equals(argumentTypes[i].getName())) {
+                                allValid = false;
+                            }
+                        }
+                        if (allValid) {
+                            break;
+                        }
+                    }
+                }
+
+                initConstructor.setAccessible(true);
+                cf.stack.clear();
+                try {
+                    cf.stack.add(
+                            new Pair<Class<?>, Object>(resolved_class,
+                                    initConstructor.newInstance(arguments_as_objects)));
+                } catch (Throwable ee) {
+                    return;
+                }
+            }
+
+            cf.local[0] = cf.stack.get(0).second;
+
+            for (var INITIALIZE : cf.STATICS_TO_INITIALIZE) {
+                String name_of_field = INITIALIZE.first.getName();
+                reference_to_class = cf.stack.get(0).second.getClass();
+                Field inField = reference_to_class.getDeclaredField(name_of_field);
+                inField.setAccessible(true);
+                inField.set(reference_to_class, INITIALIZE.second.second);
+            }
+
+            cf.MUST_INITIALIZE = false;
+        }
+    }
 }
 
 class Instructions_Helper {
