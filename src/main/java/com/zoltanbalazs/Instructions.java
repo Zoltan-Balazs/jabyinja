@@ -1583,7 +1583,7 @@ public class Instructions {
     public static void MULTIANEWARRAY(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             byte dimensions, String file_name, ClassFile cf)
             throws ClassNotFoundException {
-        ConstantPoolTag tag = constant_pool.get((index & 0xFF) + 1).tag;
+        ConstantPoolTag tag = constant_pool.get((index & 0xFF) - 1).tag;
 
         Class<?> arrayType = null;
         Class<?> hackyType = null;
@@ -1597,15 +1597,15 @@ public class Instructions {
                 arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
                 hackyType = arrayType;
             }
-            // arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
         } else {
             arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
         }
 
         int[] size = new int[dimensions];
-        for (int i = 0; i < dimensions; ++i) {
-            int count = ((Number) stack.remove(0).second).intValue();
-            size[i] = count;
+        int sizeIdx = 0;
+        for (int i = stack.size() - dimensions; i < stack.size();) {
+            int count = ((Number) stack.remove(i).second).intValue();
+            size[sizeIdx++] = count;
         }
 
         stack.add(new Pair<Class<?>, Object>(arrayType, Array.newInstance(hackyType, size)));
