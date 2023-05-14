@@ -589,16 +589,24 @@ public class Instructions {
 
     public static void GETSTATIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             String file_name, ClassFile cf)
-            throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+            throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, Throwable {
         CP_Info reference_to_field = constant_pool.get(index - 1);
         String name_of_class = cf.getNameOfClass(reference_to_field.getClassIndex());
         String name_of_field = cf.getNameOfMember(reference_to_field.getNameAndTypeIndex());
+
+        RETURN(cf);
 
         Class<?> reference_to_class = null;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
             reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+        }
+
+        for (int i = 0; i < 65535 && cf.local[i] != null; ++i) {
+            if (cf.local[i].getClass().getName().equals(reference_to_class.getName())) {
+                reference_to_class = cf.local[i].getClass();
+            }
         }
 
         Field outField = reference_to_class.getDeclaredField(name_of_field);
@@ -625,6 +633,13 @@ public class Instructions {
         Pair<Class<?>, Object> value = stack.get(stack_size - 1);
 
         Field inField = reference_to_class.getDeclaredField(name_of_field);
+
+        if (cf.MUST_INITIALIZE) {
+            cf.STATICS_TO_INITIALIZE.add(new Pair<Field, Pair<Class<?>, Object>>(inField,
+                    new Pair<Class<?>, Object>(reference_to_class, value.second)));
+            return;
+        }
+
         inField.setAccessible(true);
         inField.set(reference_to_class, value.second);
 
