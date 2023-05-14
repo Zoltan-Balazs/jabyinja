@@ -1425,7 +1425,6 @@ public class Instructions {
             } else {
                 arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
             }
-            // arrayType = Class.forName(cf.getNameOfClass(index).replace("/", "."));
         } else {
             arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
         }
