@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.CallSite;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -87,6 +88,11 @@ class ClassFile {
     public short ATTRIBUTES_COUNT;
     public List<Attribute_Info> ATTRIBUTES;
 
+    public boolean MUST_INITIALIZE = false;
+    public List<Pair<Field, Pair<Class<?>, Object>>> STATICS_TO_INITIALIZE = new ArrayList<>();
+    public List<Pair<String, Pair<Object, Object>>> FIELDS_TO_INITIALIZE = new ArrayList<>();
+    public boolean IN_MAIN_METHOD = false;
+
     public List<BootstrapMethods_Attribute> BOOTSTRAP_METHODS = new ArrayList<>();
     public List<Object> LOCKS = new ArrayList<>();
 
@@ -129,6 +135,9 @@ class ClassFile {
                 BOOTSTRAP_METHODS
                         .add(BootstrapMethods_Attribute_Helper.readBootStrapMethodAttributes(boostrap_attribute_tmp));
             }
+
+            CLASS_NAME = new String(CONSTANT_POOL.get(CONSTANT_POOL.get(THIS_CLASS - 1).getNameIndex() - 1).getBytes(),
+                    StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
             System.err.println("The file '" + fileName + "' cannot be found!");
         } catch (InvalidClassFileException e) {
