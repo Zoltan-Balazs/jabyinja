@@ -1391,14 +1391,52 @@ public class Instructions {
     }
 
     public static void NEW(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index, Object[] local,
-            String file_name, ClassFile cf) throws ClassNotFoundException {
+            String file_name, ClassFile cf)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException,
+            IOException {
         String name_of_class = cf.getNameOfMember(index);
         Class<?> reference_to_class = null;
 
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+                    name_of_class);
+            String new_filename = returned.first;
+            reference_to_class = returned.second;
+
+            Class<?> resolved_class = null;
+
+            File f = new File(new_filename);
+            int length = 0;
+            if (reference_to_class.getName().contains("/")) {
+                length = reference_to_class.getName().split("/").length;
+            } else {
+                length = reference_to_class.getName().split("\\.").length;
+            }
+            for (int i = 0; i < length + 1; ++i) {
+                URL[] cp = { f.toURI().toURL() };
+                URLClassLoader urlcl = new URLClassLoader(cp);
+                try {
+                    resolved_class = urlcl.loadClass(reference_to_class.getName());
+                } catch (Exception eee) {
+
+                }
+                urlcl.close();
+
+
+    public static void NEW(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index, Object[] local,
+            String file_name, ClassFile cf)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException, MalformedURLException,
+            IOException {
+        String name_of_class = cf.getNameOfMember(index);
+        Class<?> reference_to_class = null;
+
+        if (ClassFile.isClassBuiltIn(name_of_class)) {
+            reference_to_class = Class.forName(name_of_class.replace("/", "."));
+        } else {
+            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+                    name_of_class).second;
         }
 
         stack.add(new Pair<Class<?>, Object>(reference_to_class, reference_to_class));
