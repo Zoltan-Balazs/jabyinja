@@ -215,30 +215,36 @@ class ClassFile {
 
     public static boolean doesMethodExists(Class<?> reference_to_class, String name_and_type_of_member,
             Class<?>[] types_of_function_paramaters) {
-        try {
-            reference_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
-            return true;
-        } catch (Throwable e) {
-            boolean doesMethodExist = false;
-            while (reference_to_class.getDeclaredMethods().length == 0) {
-                reference_to_class = reference_to_class.getSuperclass();
-            }
+        Class<?> original_reference = reference_to_class;
+        while (reference_to_class != null) {
+            try {
+                reference_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
+                return true;
+            } catch (Throwable t) {
 
-            for (Method method : reference_to_class.getDeclaredMethods()) {
-                if (method.getName().equals(name_and_type_of_member)
-                        && method.getParameterTypes().length == types_of_function_paramaters.length
-                        && !doesMethodExist) {
-                    for (int i = 0; i < method.getParameterTypes().length; ++i) {
-                        Class<?> type = method.getParameterTypes()[i];
-                        if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
-                            return false;
-                        }
-                    }
-                    doesMethodExist = true;
-                }
             }
-            return doesMethodExist;
+            reference_to_class = reference_to_class.getSuperclass();
         }
+
+        boolean doesMethodExist = false;
+        while (original_reference.getDeclaredMethods().length == 0) {
+            original_reference = original_reference.getSuperclass();
+        }
+
+        for (Method method : original_reference.getDeclaredMethods()) {
+            if (method.getName().equals(name_and_type_of_member)
+                    && method.getParameterTypes().length == types_of_function_paramaters.length
+                    && !doesMethodExist) {
+                for (int i = 0; i < method.getParameterTypes().length; ++i) {
+                    Class<?> type = method.getParameterTypes()[i];
+                    if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
+                        return false;
+                    }
+                }
+                doesMethodExist = true;
+            }
+        }
+        return doesMethodExist;
     }
 
     public int getNumberOfArguments(short name_and_type_index) throws ClassNotFoundException {
