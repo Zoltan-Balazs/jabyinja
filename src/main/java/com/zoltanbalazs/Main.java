@@ -19,6 +19,7 @@ public class Main {
 
         try {
             method = CLASS_FILE.findMethodsByName("main", null);
+            CLASS_FILE.IN_MAIN_METHOD = true;
             attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
         } catch (Exception e) {
             e.printStackTrace();
