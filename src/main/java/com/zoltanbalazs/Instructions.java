@@ -1967,17 +1967,21 @@ class Instructions_Helper {
             Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments,
             List<Pair<Class<?>, Object>> arguments_on_stack) throws NoSuchMethodException {
         Method returnedMethod = null;
+        Class<?> original_reference = reference_to_class;
 
         if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
-            try {
-                while (reference_to_class.getDeclaredMethods().length == 0) {
-                    reference_to_class = reference_to_class.getSuperclass();
-                }
+            while (reference_to_class != null && returnedMethod == null) {
+                try {
+                    returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
+                            types_of_function_paramaters);
+                } catch (Throwable t) {
 
-                returnedMethod = reference_to_class.getDeclaredMethod(name_and_type_of_member,
-                        types_of_function_paramaters);
-            } catch (Exception e) {
-                for (Method method : reference_to_class.getDeclaredMethods()) {
+                }
+                reference_to_class = reference_to_class.getSuperclass();
+            }
+
+            if (returnedMethod == null) {
+                for (Method method : original_reference.getDeclaredMethods()) {
                     boolean isCorrectMethod = true;
 
                     if (method.getName().equals(name_and_type_of_member)
