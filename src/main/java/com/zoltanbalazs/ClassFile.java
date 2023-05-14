@@ -675,59 +675,59 @@ class ClassFile {
                 }
                 case IFEQ -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFEQ);
+                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFEQ, this);
                 }
                 case IFNE -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFNE);
+                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFNE, this);
                 }
                 case IFLT -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFLT);
+                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFLT, this);
                 }
                 case IFGE -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFGE);
+                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFGE, this);
                 }
                 case IFGT -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFGT);
+                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFGT, this);
                 }
                 case IFLE -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFLE);
+                    Instructions.IF1I(codeIndex, offset, stack, Opcode.IFLE, this);
                 }
                 case IF_ICMPEQ -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPEQ);
+                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPEQ, this);
                 }
                 case IF_ICMPNE -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPNE);
+                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPNE, this);
                 }
                 case IF_ICMPLT -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPLT);
+                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPLT, this);
                 }
                 case IF_ICMPGE -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPGE);
+                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPGE, this);
                 }
                 case IF_ICMPGT -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPGT);
+                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPGT, this);
                 }
                 case IF_ICMPLE -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPLE);
+                    Instructions.IF2I(codeIndex, offset, stack, Opcode.IF_ICMPLE, this);
                 }
                 case IF_ACMPEQ -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF2A(codeIndex, offset, stack, Opcode.IF_ACMPEQ);
+                    Instructions.IF2A(codeIndex, offset, stack, Opcode.IF_ACMPEQ, this);
                 }
                 case IF_ACMPNE -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.IF2A(codeIndex, offset, stack, Opcode.IF_ACMPNE);
+                    Instructions.IF2A(codeIndex, offset, stack, Opcode.IF_ACMPNE, this);
                 }
                 case GOTO -> {
                     short offset = ClassFile_Helper.readShort(code, codeIndex);

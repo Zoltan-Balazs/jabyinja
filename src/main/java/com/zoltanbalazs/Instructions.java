@@ -412,7 +412,8 @@ public class Instructions {
         }
     }
 
-    public static void IF1I(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
+    public static void IF1I(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type,
+            ClassFile cf) {
         int value;
         if (stack.get(stack.size() - 1).first == Boolean.class || stack.get(stack.size() - 1).first == boolean.class) {
             value = (boolean) stack.remove(stack.size() - 1).second ? 1 : 0;
@@ -454,10 +455,14 @@ public class Instructions {
             default ->
                 throw new IllegalArgumentException("One value Integer IF for opcode " + type + " is not supported!");
         }
-        stack.clear();
+
+        if (!cf.MUST_INITIALIZE) {
+            stack.clear();
+        }
     }
 
-    public static void IF2I(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
+    public static void IF2I(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type,
+            ClassFile cf) {
         int value2 = ((Number) stack.remove(stack.size() - 1).second).intValue();
         int value1 = ((Number) stack.remove(stack.size() - 1).second).intValue();
 
@@ -495,10 +500,13 @@ public class Instructions {
             default ->
                 throw new IllegalArgumentException("Two value Integer IF for opcode " + type + " is not supported!");
         }
-        stack.clear();
+        if (!cf.MUST_INITIALIZE) {
+            stack.clear();
+        }
     }
 
-    public static void IF2A(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type) {
+    public static void IF2A(CodeIndex codeIndex, short offset, List<Pair<Class<?>, Object>> stack, Opcode type,
+            ClassFile cf) {
         Object value2 = stack.remove(stack.size() - 1).second;
         Object value1 = stack.remove(stack.size() - 1).second;
 
@@ -516,7 +524,9 @@ public class Instructions {
             default ->
                 throw new IllegalArgumentException("Two value Reference IF for opcode " + type + " is not supported!");
         }
-        stack.clear();
+        if (!cf.MUST_INITIALIZE) {
+            stack.clear();
+        }
     }
 
     public static void GOTO(CodeIndex codeIndex, short offset) {
