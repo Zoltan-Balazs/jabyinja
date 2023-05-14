@@ -725,9 +725,10 @@ public class Instructions {
         List<Object> arguments_of_function = new ArrayList<Object>();
         List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
         Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
+        int tmpIdx = 0;
         Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
         for (int j = 0; j < type_of_arguments.size(); ++j) {
-            types_of_function_paramaters[j] = Object.class;
+            types_of_function_paramaters[j] = type_of_arguments.get(tmpIdx++);
         }
 
         String new_filename = "";
@@ -760,9 +761,19 @@ public class Instructions {
                         name_and_type_of_member,
                         types_of_function_paramaters, method_arguments, arguments_on_stack);
 
+                List<Class<?>> input_types = cf.stringToTypes(description_of_method
+                        .substring(description_of_method.indexOf("(") + 1, description_of_method.indexOf(")")));
+
                 Object[] arguments_as_objects = new Object[arguments_of_function.size()];
                 for (int j = 0; j < arguments_of_function.size(); ++j) {
+                    if (input_types.get(j) == char.class && arguments_of_function.get(j) instanceof Number) {
+                        arguments_of_function.set(j, (char) (((Number) (arguments_of_function.get(j))).intValue()));
+                    }
                     arguments_as_objects[j] = (Object) arguments_of_function.get(j);
+                }
+
+                if (name_and_type_of_member.equals("clone")) {
+                    return;
                 }
 
                 method.setAccessible(true);
