@@ -781,7 +781,8 @@ class ClassFile {
                 }
                 case INVOKESTATIC -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    Instructions.INVOKESTATIC(stack, CONSTANT_POOL, index, local, FILE_NAME, this);
+                    Instructions.INVOKESTATIC(stack, CONSTANT_POOL, index, local, FILE_NAME, this,
+                            attribute.exception_table, codeIndex);
                 }
                 case INVOKEINTERFACE -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);

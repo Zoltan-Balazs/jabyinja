@@ -1125,7 +1125,7 @@ public class Instructions {
     }
 
     public static void INVOKESTATIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
-            Object[] local, String file_name, ClassFile cf)
+            Object[] local, String file_name, ClassFile cf, List<Exception_Table> exceptions, CodeIndex codeIndex)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         CP_Info reference_to_method = constant_pool.get(index - 1);
         String name_of_class = cf.getNameOfClass(reference_to_method.getClassIndex());
@@ -1172,9 +1172,46 @@ public class Instructions {
             }
 
             method.setAccessible(true);
-            result = method.invoke(name_of_class.replace("/", "."), arguments_as_objects);
-            if (result != null) {
-                returnType = result.getClass();
+            try {
+                result = method.invoke(name_of_class.replace("/", "."), arguments_as_objects);
+                if (result != null) {
+                    returnType = result.getClass();
+                }
+            } catch (Throwable t) {
+                if (name_and_type_of_member.equals("arraycopy")) {
+                    int objectIdx = -1;
+                    for (int i = 0; i < 65535 && objectIdx == -1; ++i) {
+                        if (local[i] == stack.get(stack_size - number_of_method_arguments + 2).second) {
+                            objectIdx = i;
+                        }
+                    }
+                    stack.set(stack_size - number_of_method_arguments + 2,
+                            stack.get(stack_size - number_of_method_arguments));
+                    if (objectIdx != -1) {
+                        local[objectIdx] = stack.get(stack_size - number_of_method_arguments).second;
+                    }
+                } else {
+                    Throwable problem = t.getCause();
+                    if (0 < stack_size) {
+                        stack.subList(0, stack_size - 1).clear();
+                    }
+                    boolean exception_thrown = false;
+                    for (Exception_Table exception : exceptions) {
+                        String exception_name = new String(constant_pool
+                                .get(constant_pool.get(exception.catch_type - 1).getNameIndex() - 1)
+                                .getBytes(), StandardCharsets.UTF_8);
+                        if (problem.getClass().getName().equals(exception_name.replace("/", "."))
+                                && exception.start_pc <= codeIndex.Get()
+                                && codeIndex.Get() <= exception.end_pc) {
+                            codeIndex.Set(exception.handler_pc);
+                            exception_thrown = true;
+                        }
+                    }
+                    if (!exception_thrown) {
+                        problem.printStackTrace();
+                    }
+                    stack.add(new Pair<Class<?>, Object>(problem.getClass(), problem));
+                }
             }
         } else {
             ClassFile CLASS_FILE = new ClassFile(new_filename, null);
