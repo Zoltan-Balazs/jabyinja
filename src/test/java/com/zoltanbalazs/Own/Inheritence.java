@@ -7,17 +7,28 @@ class Gorgonzola extends Cheese {
 }
 
 class NagyonSajtosGorgonzola extends Gorgonzola {
+    Gorgonzola gz;
+
     public NagyonSajtosGorgonzola() {
-        System.out.println("This is NOT a Gorgonzola");
+        this.gz = null;
     }
 
     public NagyonSajtosGorgonzola(Gorgonzola gz) {
-        System.out.println("This is a Gorgonzola");
+        this.gz = gz;
+    }
+
+    public void check() {
+        if (gz == null) {
+            System.out.println("This is NOT a Gorgonzola");
+        } else {
+            System.out.println("This is a Gorgonzola");
+        }
     }
 }
 
 public class Inheritence {
     public static void main(String[] args) {
-        new NagyonSajtosGorgonzola(new NagyonSajtosGorgonzola(new NagyonSajtosGorgonzola()));
+        new NagyonSajtosGorgonzola().check();
+        new NagyonSajtosGorgonzola(new NagyonSajtosGorgonzola()).check();
     }
 }
