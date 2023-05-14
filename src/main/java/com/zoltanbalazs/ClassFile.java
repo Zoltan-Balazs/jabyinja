@@ -68,28 +68,29 @@ class CodeIndex {
 class ClassFile {
     private static final byte[] MAGIC_NUMBER = HexFormat.of().parseHex("CAFEBABE");
 
-    private String FILE_NAME = "";
-    private boolean VALID_CLASS_FILE = false;
-    private short MINOR_VERSION;
-    private short MAJOR_VERSION;
-    private short CONSTANT_POOL_COUNT;
-    private List<CP_Info> CONSTANT_POOL;
-    private List<Access_Flags> ACCESS_FLAGS;
-    private short THIS_CLASS;
-    private short SUPER_CLASS;
-    private short INTERFACES_COUNT;
-    private List<Interface> INTERFACES;
-    private short FIELDS_COUNT;
-    private List<Field_Info> FIELDS;
-    private short METHODS_COUNT;
-    private List<Method_Info> METHODS;
-    private short ATTRIBUTES_COUNT;
-    private List<Attribute_Info> ATTRIBUTES;
+    public String FILE_NAME = "";
+    public String CLASS_NAME = "";
+    public boolean VALID_CLASS_FILE = false;
+    public short MINOR_VERSION;
+    public short MAJOR_VERSION;
+    public short CONSTANT_POOL_COUNT;
+    public List<CP_Info> CONSTANT_POOL;
+    public List<Access_Flags> ACCESS_FLAGS;
+    public short THIS_CLASS;
+    public short SUPER_CLASS;
+    public short INTERFACES_COUNT;
+    public List<Interface> INTERFACES;
+    public short FIELDS_COUNT;
+    public List<Field_Info> FIELDS;
+    public short METHODS_COUNT;
+    public List<Method_Info> METHODS;
+    public short ATTRIBUTES_COUNT;
+    public List<Attribute_Info> ATTRIBUTES;
 
-    private List<BootstrapMethods_Attribute> BOOTSTRAP_METHODS = new ArrayList<>();
-    private List<Object> LOCKS = new ArrayList<>();
+    public List<BootstrapMethods_Attribute> BOOTSTRAP_METHODS = new ArrayList<>();
+    public List<Object> LOCKS = new ArrayList<>();
 
-    private List<CallSite> callSites = new ArrayList<>();
+    public List<CallSite> callSites = new ArrayList<>();
     public List<Pair<Class<?>, Object>> stack = new ArrayList<>();
     public Object[] local = new Object[65535];
 
