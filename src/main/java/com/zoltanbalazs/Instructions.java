@@ -648,9 +648,11 @@ public class Instructions {
 
     public static void GETFIELD(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             ClassFile cf)
-            throws NoSuchFieldException, IllegalAccessException {
+            throws NoSuchFieldException, IllegalAccessException, Throwable {
         CP_Info reference_to_field = constant_pool.get(index - 1);
         String name_of_field = cf.getNameOfMember(reference_to_field.getNameAndTypeIndex());
+
+        RETURN(cf);
 
         int stack_size = stack.size();
         Pair<Class<?>, Object> objectref = stack.get(stack_size - 1);
@@ -678,6 +680,12 @@ public class Instructions {
         int stack_size = stack.size();
         Pair<Class<?>, Object> objectref = stack.get(stack_size - 2);
         Pair<Class<?>, Object> value = stack.get(stack_size - 1);
+
+        if (cf.MUST_INITIALIZE) {
+            cf.FIELDS_TO_INITIALIZE.add(new Pair<String, Pair<Object, Object>>(name_of_field,
+                    new Pair<Object, Object>(objectref.second, value.second)));
+            return;
+        }
 
         Field f = null;
         try {
