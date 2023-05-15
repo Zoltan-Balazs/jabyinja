@@ -1,12 +1,14 @@
 package com.zoltanbalazs.PTI._06._04;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class CircleMain {
     public static void main(String[] args) {
         try {
-            String basePath = "/home/zoli/Git/jabyinja/target/test-classes/com/zoltanbalazs/PTI/_06/_04/";
+            String basePath = new File(".").getAbsolutePath().replace(".", "")
+                    + "target/test-classes/com/zoltanbalazs/PTI/_06/_04/";
             Circle c1 = new Circle(2.3, 5.6, 20);
             c1.saveToFile(basePath + "circle.txt");
 

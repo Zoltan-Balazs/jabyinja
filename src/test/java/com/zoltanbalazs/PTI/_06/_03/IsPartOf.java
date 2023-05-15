@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class IsPartOf {
-    // "/home/zoli/Git/jabyinja/target/test-classes/com/zoltanbalazs/PTI/_06/_03/in.txt"
+    // "target/test-classes/com/zoltanbalazs/PTI/_06/_03/in.txt"
     public static void main(String[] args) {
         try {
             if (args.length != 1) {
