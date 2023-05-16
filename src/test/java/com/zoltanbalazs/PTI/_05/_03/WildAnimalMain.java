@@ -7,7 +7,6 @@ public class WildAnimalMain {
         System.out.println(a.ordinal());
         System.out.println(a);
 
-        WildAnimal.values();
         System.out.println(WildAnimal.listAllAnimals());
     }
 }

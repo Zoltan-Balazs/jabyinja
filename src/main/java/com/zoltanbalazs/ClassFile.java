@@ -89,6 +89,9 @@ class ClassFile {
     public List<Attribute_Info> ATTRIBUTES;
 
     public boolean MUST_INITIALIZE = false;
+    public boolean IN_INIT_METHOD = false;
+    public List<Object> INIT_ARGS = new ArrayList<>();
+    public List<Class<?>> INIT_ARG_TYPES = new ArrayList<>();
     public List<Pair<Field, Pair<Class<?>, Object>>> STATICS_TO_INITIALIZE = new ArrayList<>();
     public List<Pair<String, Pair<Object, Object>>> FIELDS_TO_INITIALIZE = new ArrayList<>();
     public boolean IN_MAIN_METHOD = false;

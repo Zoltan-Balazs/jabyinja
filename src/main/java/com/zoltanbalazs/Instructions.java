@@ -666,7 +666,11 @@ public class Instructions {
 
         f.setAccessible(true);
         Object field = f.get(objectref.second);
-        stack.add(new Pair<Class<?>, Object>(field.getClass(), field));
+        if (field == null) {
+            stack.add(new Pair<Class<?>, Object>(void.class, field));
+        } else {
+            stack.add(new Pair<Class<?>, Object>(field.getClass(), field));
+        }
     }
 
     public static void PUTFIELD(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
@@ -711,6 +715,11 @@ public class Instructions {
         List<Class<?>> method_arguments = cf.getArguments(description_of_method);
         int number_of_method_arguments = method_arguments.size();
 
+        if (cf.IN_INIT_METHOD && name_of_class.equals("java/io/PrintStream")
+                && name_and_type_of_member.equals("println")) {
+            return;
+        }
+
         int stack_size = stack.size();
         Pair<Class<?>, Object> objectref = stack.get(stack_size - number_of_method_arguments - 1);
 
@@ -737,6 +746,11 @@ public class Instructions {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
             Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+
+            if (returned == null) {
+                name_of_class = cf.stringToType(name_of_class).second.getName();
+                returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            }
             reference_to_class = returned.second;
             new_filename = returned.first;
         }
@@ -1321,6 +1335,9 @@ public class Instructions {
             for (Attribute_Info attribute : attributes) {
                 try {
                     Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+                    CLASS_FILE.INIT_ARGS = arguments_of_function;
+                    CLASS_FILE.INIT_ARG_TYPES = method_arguments;
+                    CLASS_FILE.IN_INIT_METHOD = true;
 
                     Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
 
@@ -2002,7 +2019,7 @@ public class Instructions {
 
         switch (type) {
             case IFNULL -> {
-                if (value == null && value != "null") {
+                if (value == null || value == "null") {
                     codeIndex.Inc(offset - 2 - 1);
                 }
             }
@@ -2055,28 +2072,35 @@ public class Instructions {
                 f = new File(f.getParent());
             }
 
-            int numberOfVariables = 0;
-            for (int i = 0; i < cf.stack.size(); i++) {
-                Object currentObject = cf.stack.get(i).second;
-                if (!(currentObject instanceof Class<?>
-                        && class_name.equals(((Class<?>) currentObject).getName()))) {
-                    numberOfVariables++;
-                }
-            }
+            // int numberOfVariables = 0;
+            // for (int i = 0; i < cf.stack.size(); i++) {
+            // Object currentObject = cf.stack.get(i).second;
+            // if (!(currentObject instanceof Class<?>
+            // && class_name.equals(((Class<?>) currentObject).getName()))) {
+            // numberOfVariables++;
+            // }
+            // }
 
-            Object[] arguments_as_objects = new Object[numberOfVariables];
+            int numberOfArguments = cf.INIT_ARG_TYPES.size();
+            Object[] arguments_as_objects = new Object[numberOfArguments];
             int idx = 0;
-            for (int i = 0; i < cf.stack.size(); i++) {
-                Object currentObject = cf.stack.get(i).second;
-                if (!(currentObject instanceof Class<?>
-                        && class_name.equals(((Class<?>) currentObject).getName()))) {
-                    arguments_as_objects[idx++] = currentObject;
-                }
+            for (int i = 0; i < cf.INIT_ARGS.size() && idx < numberOfArguments; i++) {
+                arguments_as_objects[idx++] = cf.INIT_ARGS.get(i);
             }
 
             Constructor<?> initConstructor = null;
             for (Constructor<?> ctor : resolved_class.getDeclaredConstructors()) {
-                if (ctor.getParameterCount() == numberOfVariables) {
+                boolean valid_ctor = ctor.getParameterCount() == numberOfArguments;
+                idx = 0;
+                if (valid_ctor) {
+                    for (Class<?> current_type : ctor.getParameterTypes()) {
+                        if (!current_type.isAssignableFrom(cf.INIT_ARG_TYPES.get(idx))) {
+                            valid_ctor = false;
+                        }
+                        idx++;
+                    }
+                }
+                if (valid_ctor) {
                     initConstructor = ctor;
                 }
             }
@@ -2109,10 +2133,10 @@ public class Instructions {
 
             try {
                 initConstructor.setAccessible(true);
-                initConstructor.newInstance(arguments_as_objects);
+                Pair<Class<?>, Object> test = new Pair<Class<?>, Object>(resolved_class,
+                        initConstructor.newInstance(arguments_as_objects));
                 cf.stack.clear();
-                cf.stack.add(
-                        new Pair<Class<?>, Object>(resolved_class, initConstructor.newInstance(arguments_as_objects)));
+                cf.stack.add(test);
             } catch (Throwable e) {
                 for (int j = 0; j < resolved_class.getDeclaredConstructors().length; j++) {
                     Constructor<?> ctor = resolved_class.getDeclaredConstructors()[j];
@@ -2131,7 +2155,7 @@ public class Instructions {
                             arguments_as_objects[currentArguments] = currentObject;
                             currentArguments++;
                         } else if (!(currentObject instanceof Class<?>)) {
-                            if (arguments_as_objects[0] == null || numberOfVariables < 2) {
+                            if (arguments_as_objects[0] == null || numberOfArguments < 2) {
                                 return;
                             }
                             arguments_as_objects[currentArguments] = new int[((Number) arguments_as_objects[0])
