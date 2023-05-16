@@ -2102,7 +2102,8 @@ public class Instructions {
                 idx = 0;
                 if (valid_ctor) {
                     for (Class<?> current_type : ctor.getParameterTypes()) {
-                        if (!current_type.isAssignableFrom(cf.INIT_ARG_TYPES.get(idx))) {
+                        if (!(current_type.isAssignableFrom(cf.INIT_ARG_TYPES.get(idx))
+                                || current_type.getName().equals(cf.INIT_ARG_TYPES.get(idx).getName()))) {
                             valid_ctor = false;
                         }
                         idx++;
