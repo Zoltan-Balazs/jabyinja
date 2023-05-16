@@ -768,15 +768,23 @@ public class Instructions {
 
         try {
             if (ClassFile.isClassBuiltIn(name_of_class)) {
+                List<Class<?>> input_types = cf.stringToTypes(description_of_method
+                        .substring(description_of_method.indexOf("(") + 1, description_of_method.indexOf(")")));
+
+                for (int i = 0; i < input_types.size(); ++i) {
+                    if (input_types.get(i) == char.class && arguments_of_function.get(i) instanceof Number) {
+                        arguments_on_stack.set(i, new Pair<Class<?>, Object>(char.class,
+                                (char) (((Number) (arguments_of_function.get(i))).intValue())));
+                        types_of_function_paramaters[i] = char.class;
+                    }
+                }
+
                 Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
                         types_of_function_paramaters,
                         method_arguments, arguments_on_stack);
                 types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(reference_to_class,
                         name_and_type_of_member,
                         types_of_function_paramaters, method_arguments, arguments_on_stack);
-
-                List<Class<?>> input_types = cf.stringToTypes(description_of_method
-                        .substring(description_of_method.indexOf("(") + 1, description_of_method.indexOf(")")));
 
                 Object[] arguments_as_objects = new Object[arguments_of_function.size()];
                 for (int j = 0; j < arguments_of_function.size(); ++j) {
