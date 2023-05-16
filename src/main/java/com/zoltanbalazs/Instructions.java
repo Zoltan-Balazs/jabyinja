@@ -748,7 +748,8 @@ public class Instructions {
             Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
 
             if (returned == null) {
-                name_of_class = cf.stringToType(name_of_class).second.getName();
+                name_of_class = name_of_class.replace("[", "");
+                name_of_class = name_of_class.substring(1, name_of_class.length() - 1);
                 returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
             }
             reference_to_class = returned.second;
@@ -838,6 +839,12 @@ public class Instructions {
                         } else {
                             Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
                                     name_of_class);
+
+                            if (returned == null) {
+                                name_of_class = name_of_class.replace("[", "");
+                                name_of_class = name_of_class.substring(1, name_of_class.length() - 1);
+                                returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+                            }
                             reference_to_class = returned.second;
                             new_filename = returned.first;
 
