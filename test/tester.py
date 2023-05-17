@@ -33,7 +33,6 @@ class ARG_TYPES(Enum):
 
 java_command = "java -cp target/test-classes/ "
 jabyinja_command = "java -jar target/jabyinja-*.jar "
-# jabyinja_command = "java -cp target/classes/:target/test-classes/ com.zoltanbalazs.Main "
 
 base_dir = "target/test-classes/"
 
@@ -112,6 +111,38 @@ passed_tests = 0
 failed_tests = 0
 
 
+def get_input(input_types):
+    inp = ""
+    tmp_inp = []
+
+    for input_type in input_types:
+        if input_type == ARG_TYPES.BYTE:
+            tmp_inp.append(random.randint(-2 ** 7, 2 ** 7 - 1))
+        elif input_type == ARG_TYPES.SHORT:
+            tmp_inp.append(random.randint(-2 ** 15, 2 ** 15 - 1))
+        elif input_type == ARG_TYPES.INT:
+            tmp_inp.append(random.randint(-2 ** 31, 2 ** 31 - 1))
+        elif input_type == ARG_TYPES.LONG:
+            tmp_inp.append(random.randint(-2 ** 63, 2 ** 63 - 1))
+        elif input_type == ARG_TYPES.FLOAT:
+            tmp_inp.append(round(random.uniform(0, 100), 7))
+        elif input_type == ARG_TYPES.DOUBLE:
+            tmp_inp.append(round(random.uniform(0, 100), 15))
+        elif input_type == ARG_TYPES.CHAR:
+            char = random.choice(string.printable)
+            while char == ' ':
+                char = random.choice(string.printable)
+            tmp_inp.append(char)
+        elif input_type == ARG_TYPES.STRING:
+            tmp_inp.append(''.join(random.choice(
+                string.printable) for _ in range(20)))
+
+    for current_input in tmp_inp:
+        inp = f'{inp} \"{str(current_input)}\"'
+
+    return inp.strip()
+
+
 def tester(test_files, line_length, test_type):
     global passed_tests
     global failed_tests
@@ -127,90 +158,37 @@ def tester(test_files, line_length, test_type):
         jabyinja_file = tempfile.TemporaryFile()
         java_file = tempfile.TemporaryFile()
 
-        stdin = ""
-        args = ""
+        input_file = ""
 
         for _ in range(number_of_tests):
+            stdin = ""
+            args = ""
 
-            if type(test_file) is tuple and (test_type == TEST_TYPE.ARGS or test_type == TEST_TYPE.STDIN):
+            if type(test_file) is tuple and test_type == TEST_TYPE.ARGS:
                 (test_file, test_arg_types) = (test_file[0], test_file[1])
+            elif type(test_file) is tuple and test_type == TEST_TYPE.STDIN:
+                (test_file, test_stdin_types) = (test_file[0], test_file[1])
             elif type(test_file) is tuple and test_type == TEST_TYPE.ARGS_AND_STDIN:
-                (test_file, args, test_arg_types) = (
+                (test_file, input_file, test_stdin_types) = (
                     test_file[0], f"\"{test_file[1]}\"", test_file[2])
 
             if test_type == TEST_TYPE.ARGS:
-                tmp_args = []
-
-                for arg in test_arg_types:
-                    if arg == ARG_TYPES.BYTE:
-                        tmp_args.append(random.randint(-2 ** 7, 2 ** 7 - 1))
-                    elif arg == ARG_TYPES.SHORT:
-                        tmp_args.append(random.randint(-2 ** 15, 2 ** 15 - 1))
-                    elif arg == ARG_TYPES.INT:
-                        tmp_args.append(random.randint(-2 ** 31, 2 ** 31 - 1))
-                    elif arg == ARG_TYPES.LONG:
-                        tmp_args.append(random.randint(-2 ** 63, 2 ** 63 - 1))
-                    elif arg == ARG_TYPES.FLOAT:
-                        tmp_args.append(round(random.uniform(0, 100), 7))
-                    elif arg == ARG_TYPES.DOUBLE:
-                        tmp_args.append(round(random.uniform(0, 100), 15))
-                    elif arg == ARG_TYPES.CHAR:
-                        char = random.choice(string.printable)
-                        while char == ' ':
-                            char = random.choice(string.printable)
-                        tmp_args.append(char)
-                    elif arg == ARG_TYPES.STRING:
-                        tmp_args.append(''.join(random.choice(
-                            string.printable) for _ in range(20)))
-
-                for arg in tmp_args:
-                    args = f'{args} \"{str(arg)}\"'
+                args = get_input(test_arg_types)
             elif test_type == TEST_TYPE.STDIN or test_type == TEST_TYPE.ARGS_AND_STDIN:
-                tmp_stdin = []
-
-                for arg in test_arg_types:
-                    if arg == ARG_TYPES.BYTE:
-                        tmp_stdin.append(random.randint(-2 ** 7, 2 ** 7 - 1))
-                    elif arg == ARG_TYPES.SHORT:
-                        tmp_stdin.append(random.randint(-2 ** 15, 2 ** 15 - 1))
-                    elif arg == ARG_TYPES.INT:
-                        tmp_stdin.append(random.randint(-2 ** 31, 2 ** 31 - 1))
-                    elif arg == ARG_TYPES.LONG:
-                        tmp_stdin.append(random.randint(-2 ** 63, 2 ** 63 - 1))
-                    elif arg == ARG_TYPES.FLOAT:
-                        tmp_stdin.append(round(random.uniform(0, 100), 7))
-                    elif arg == ARG_TYPES.DOUBLE:
-                        tmp_stdin.append(round(random.uniform(0, 100), 15))
-                    elif arg == ARG_TYPES.CHAR:
-                        char = random.choice(string.printable)
-                        while char == ' ':
-                            char = random.choice(string.printable)
-                        tmp_stdin.append(char)
-                    elif arg == ARG_TYPES.STRING:
-                        tmp_stdin.append(''.join(random.choice(
-                            string.printable) for _ in range(20)))
-
-                for arg in tmp_stdin:
-                    stdin = f'{stdin} \"{str(arg)}\"'
-
-            args = args.strip()
-            stdin = stdin.strip()
+                stdin = get_input(test_stdin_types)
 
             if test_type == TEST_TYPE.STDIN:
-                subprocess.call("echo \"" + stdin + "\" | " + jabyinja_command + base_dir + test_file +
+                subprocess.call("echo " + stdin + " | " + jabyinja_command + base_dir + test_file +
                                 ".class", shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
 
-                subprocess.call("echo \"" + stdin + "\" | " + java_command + test_file.replace("/",
+                subprocess.call("echo " + stdin + " | " + java_command + test_file.replace("/",
                                 "."), shell=True, stdout=java_file, stderr=java_file)
             elif test_type == TEST_TYPE.ARGS_AND_STDIN:
-                subprocess.call("echo \"" + stdin + "\" | " + jabyinja_command + base_dir + test_file +
-                                ".class " + args, shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
+                subprocess.call("echo " + stdin + " | " + jabyinja_command + base_dir + test_file +
+                                ".class " + input_file, shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
 
-                print("echo \"" + stdin + "\" | " + jabyinja_command + base_dir + test_file +
-                      ".class " + args)
-
-                subprocess.call("echo \"" + stdin + "\" | " + java_command + test_file.replace("/",
-                                ".") + " " + args, shell=True, stdout=java_file, stderr=java_file)
+                subprocess.call("echo " + stdin + " | " + java_command + test_file.replace("/",
+                                ".") + " " + input_file, shell=True, stdout=java_file, stderr=java_file)
             else:
                 subprocess.call(jabyinja_command + base_dir + test_file +
                                 ".class " + args, shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
@@ -226,9 +204,6 @@ def tester(test_files, line_length, test_type):
 
             is_valid = (jabyinja_file_content == java_file_content)
 
-            # print(jabyinja_file_content)
-            # print(java_file_content)
-
             if not is_valid:
                 all_valid = False
 
@@ -238,11 +213,11 @@ def tester(test_files, line_length, test_type):
         align_length = len(line_length) - len(test_file)
 
         if all_valid:
-            print("\t - " + CLI_COLOR.BOLD + test_file + ": " + (' ' * align_length) + CLI_COLOR.END +
+            print("  - " + test_file + ": " + (' ' * align_length) +
                   CLI_COLOR.GREEN + "PASSED" + CLI_COLOR.END)
             passed_tests += 1
         else:
-            print("\t - " + CLI_COLOR.BOLD + test_file + ": " + (' ' * align_length) + CLI_COLOR.END +
+            print("  - " + test_file + ": " + (' ' * align_length) +
                   CLI_COLOR.RED + "FAILED" + CLI_COLOR.END)
             failed_tests += 1
 
@@ -253,15 +228,21 @@ if __name__ == '__main__':
         pti_args_tests + pti_stdin_tests, key=lambda item: len(item[0]))[0]
     longest_line = max(longest_name, longest_name_tuple)
 
-    print(CLI_COLOR.BOLD + "Test files: " + CLI_COLOR.END)
+    print(CLI_COLOR.BOLD + "Testing given files " + CLI_COLOR.END)
+    print(CLI_COLOR.BOLD + " Own test case(s): " + CLI_COLOR.END)
     tester(own_tests, longest_line, TEST_TYPE.STANDARD)
+    print(CLI_COLOR.BOLD + " PTI basic test case(s): " + CLI_COLOR.END)
     tester(pti_basic_tests, longest_line, TEST_TYPE.STANDARD)
-    # tester(pti_args_tests, longest_line, TEST_TYPE.ARGS)
-    # tester(pti_stdin_tests, longest_line, TEST_TYPE.STDIN)
-    # tester(pti_args_stdin_tests, longest_line, TEST_TYPE.ARGS_AND_STDIN)
+    print(CLI_COLOR.BOLD + " PTI with argument test case(s): " + CLI_COLOR.END)
+    tester(pti_args_tests, longest_line, TEST_TYPE.ARGS)
+    print(CLI_COLOR.BOLD + " PTI with stdin test case(s): " + CLI_COLOR.END)
+    tester(pti_stdin_tests, longest_line, TEST_TYPE.STDIN)
+    print(CLI_COLOR.BOLD + " PTI with stdin and argument test case(s): " + CLI_COLOR.END)
+    tester(pti_args_stdin_tests, longest_line, TEST_TYPE.ARGS_AND_STDIN)
 
-    print(CLI_COLOR.BOLD + "TOTAL:" + CLI_COLOR.END)
-    print("\t" + CLI_COLOR.BOLD + CLI_COLOR.GREEN + "PASSED: " + CLI_COLOR.END +
+    print()
+    print(CLI_COLOR.BOLD + "Summary:" + CLI_COLOR.END)
+    print(CLI_COLOR.BOLD + CLI_COLOR.GREEN + " PASSED: " + CLI_COLOR.END +
           CLI_COLOR.BOLD + str(passed_tests) + CLI_COLOR.END)
-    print("\t" + CLI_COLOR.BOLD + CLI_COLOR.RED + "FAILED: " + CLI_COLOR.END +
+    print(CLI_COLOR.BOLD + CLI_COLOR.RED + " FAILED: " + CLI_COLOR.END +
           CLI_COLOR.BOLD + str(failed_tests) + CLI_COLOR.END)
