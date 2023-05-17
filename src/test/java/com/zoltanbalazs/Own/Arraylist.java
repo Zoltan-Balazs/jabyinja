@@ -3,7 +3,7 @@ package com.zoltanbalazs.Own;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArraylistTest {
+public class Arraylist {
     public static void main(String[] args) {
         List<Double> a = new ArrayList<Double>();
 
