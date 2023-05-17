@@ -1178,7 +1178,7 @@ public class Instructions {
                                 resolved_class.newInstance()));
 
                 local[0] = stack.get(0).second;
-            } catch (Exception e) {
+            } catch (Throwable t) {
                 cf.MUST_INITIALIZE = true;
             }
 
