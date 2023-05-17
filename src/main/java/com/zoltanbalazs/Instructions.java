@@ -1114,6 +1114,8 @@ public class Instructions {
 
             if (return_type == String.class) {
                 stack.add(new Pair<Class<?>, Object>(String.class, "null"));
+            } else if (return_type == Object.class) {
+                stack.add(new Pair<Class<?>, Object>(Object.class, null));
             }
         }
     }
