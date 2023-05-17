@@ -697,7 +697,14 @@ public class Instructions {
         }
 
         f.setAccessible(true);
+        try {
         f.set(objectref.second, value.second);
+        } catch (Exception e) {
+            if (f.get(objectref.second).getClass().getName()
+                    .equals(value.second.getClass().getName())) {
+                e.printStackTrace();
+            }
+        }
 
         stack.subList(stack_size - 2, stack_size).clear();
     }
