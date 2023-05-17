@@ -6,7 +6,7 @@
 
   <groupId>com.zoltanbalazs</groupId>
   <artifactId>jabyinja</artifactId>
-  <version>0.9.1</version>
+  <version>0.9.8</version>
 
   <name>jabyinja</name>
   <url>https://github.com/Zoltan-Balazs/jabyinja</url>
@@ -44,7 +44,6 @@
           <version>3.8.0</version>
           <configuration>
                 <compilerArgs>
-                    <arg>-verbose</arg>
                     <arg>-XDstringConcat=inline</arg>
                 </compilerArgs>
             </configuration>
