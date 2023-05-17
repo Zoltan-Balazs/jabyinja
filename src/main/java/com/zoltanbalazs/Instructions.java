@@ -1933,7 +1933,7 @@ public class Instructions {
             }
 
             Class<?> type = objectRef.first;
-            if (reference_to_class.isAssignableFrom(type)) {
+            if (reference_to_class.isAssignableFrom(type) || reference_to_class.getName().equals(type.getName())) {
                 stack.add(new Pair<Class<?>, Object>(int.class, 1));
             } else {
                 stack.add(new Pair<Class<?>, Object>(int.class, 0));
