@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class IsPartOf {
     // "target/test-classes/com/zoltanbalazs/PTI/_06/_03/in.txt"
@@ -13,8 +14,13 @@ public class IsPartOf {
                 throw new IllegalArgumentException();
             }
 
-            System.out.print("Please enter the pattern to match with: ");
-            String pattern = System.console().readLine();
+            InputStreamReader isReader = new InputStreamReader(System.in);
+            BufferedReader bufReader = new BufferedReader(isReader);
+
+            String pattern = bufReader.readLine();
+
+            // System.out.print("Please enter the pattern to match with: ");
+            // String pattern = System.console().readLine();
 
             int times = processFile(args[0], pattern);
 

@@ -11,7 +11,8 @@ public class BagMain {
     public static void main(String[] args) {
         Bag<String> input = new Bag<>();
 
-        String basePath = "/home/zoli/Git/jabyinja/target/test-classes/com/zoltanbalazs/PTI/_10/_03/";
+        String basePath = new File(".").getAbsolutePath().replace(".", "")
+                + "target/test-classes/com/zoltanbalazs/PTI/_10/_03/";
         File inFile = new File(basePath + "input.txt");
         try (BufferedReader buf = new BufferedReader(new FileReader(inFile))) {
             String line;
