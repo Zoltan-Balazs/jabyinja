@@ -2167,6 +2167,15 @@ public class Instructions {
                 // }
                 // }
                 // }
+
+                if (numberOfArguments == 1 && class_name.equals("com.zoltanbalazs.Own.Child")) {
+                    Class<?> type = initConstructor.getParameterTypes()[0];
+                    Constructor<?> ctorrr = type.getDeclaredConstructors()[0];
+                    ctorrr.setAccessible(true);
+                    Object arg = ctorrr.newInstance(new Object[] {});
+                    arguments_as_objects[0] = arg;
+                }
+
                 initConstructor.setAccessible(true);
                 Pair<Class<?>, Object> test = new Pair<Class<?>, Object>(resolved_class,
                         initConstructor.newInstance(arguments_as_objects));
