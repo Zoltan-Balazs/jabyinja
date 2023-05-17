@@ -1615,7 +1615,13 @@ public class Instructions {
 
                     Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
                     result = returnResult.second;
-                    returnType = returnResult.first;
+                    // returnType = returnResult.first;
+                    returnType = cf.stringToType(
+                            description_of_method.substring(description_of_method.indexOf(")") + 1)).second;
+
+                    if (returnType == boolean.class && result instanceof Integer) {
+                        result = ((Integer) result) == 1;
+                    }
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
