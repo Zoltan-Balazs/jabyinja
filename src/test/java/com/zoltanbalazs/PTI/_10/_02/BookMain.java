@@ -1,5 +1,6 @@
 package com.zoltanbalazs.PTI._10._02;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import com.zoltanbalazs.PTI._10._02.PrintedBook.Cover;
@@ -19,7 +20,8 @@ public class BookMain {
                                 "The Hitchhiker's Guide to the Galaxy", 832,
                                 300);
 
-                String basePath = "/home/zoli/Git/jabyinja/target/test-classes/com/zoltanbalazs/PTI/_10/_02/";
+                String basePath = new File(".").getAbsolutePath().replace(".", "")
+                                + "src/test/java/com/zoltanbalazs/PTI/_10/_02/";
                 Article a = new Article("Teszt Cím", "Teszt Body", "Teszt Konkluzió", basePath + "outFile.txt",
                                 new ArrayList<>());
 

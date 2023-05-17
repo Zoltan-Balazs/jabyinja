@@ -8,7 +8,7 @@ public class CircleMain {
     public static void main(String[] args) {
         try {
             String basePath = new File(".").getAbsolutePath().replace(".", "")
-                    + "target/test-classes/com/zoltanbalazs/PTI/_06/_04/";
+                    + "src/test/java/com/zoltanbalazs/PTI/_06/_04/";
             Circle c1 = new Circle(2.3, 5.6, 20);
             c1.saveToFile(basePath + "circle.txt");
 

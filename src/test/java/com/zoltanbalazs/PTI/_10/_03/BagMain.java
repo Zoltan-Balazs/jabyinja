@@ -12,7 +12,7 @@ public class BagMain {
         Bag<String> input = new Bag<>();
 
         String basePath = new File(".").getAbsolutePath().replace(".", "")
-                + "target/test-classes/com/zoltanbalazs/PTI/_10/_03/";
+                + "src/test/java/com/zoltanbalazs/PTI/_10/_03/";
         File inFile = new File(basePath + "input.txt");
         try (BufferedReader buf = new BufferedReader(new FileReader(inFile))) {
             String line;

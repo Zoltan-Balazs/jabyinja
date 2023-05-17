@@ -10,7 +10,7 @@ import java.io.IOException;
 public class AddByLine {
     public static void main(String[] args) {
         String basePath = new File(".").getAbsolutePath().replace(".", "")
-                + "target/test-classes/com/zoltanbalazs/PTI/_06/_02/";
+                + "src/test/java/com/zoltanbalazs/PTI/_06/_02/";
         processFile(basePath + "in.txt", basePath + "out.txt");
     }
 
