@@ -698,7 +698,7 @@ public class Instructions {
 
         f.setAccessible(true);
         try {
-        f.set(objectref.second, value.second);
+            f.set(objectref.second, value.second);
         } catch (Exception e) {
             if (f.get(objectref.second).getClass().getName()
                     .equals(value.second.getClass().getName())) {
@@ -2094,15 +2094,6 @@ public class Instructions {
                 f = new File(f.getParent());
             }
 
-            // int numberOfVariables = 0;
-            // for (int i = 0; i < cf.stack.size(); i++) {
-            // Object currentObject = cf.stack.get(i).second;
-            // if (!(currentObject instanceof Class<?>
-            // && class_name.equals(((Class<?>) currentObject).getName()))) {
-            // numberOfVariables++;
-            // }
-            // }
-
             int numberOfArguments = cf.INIT_ARG_TYPES.size();
             Object[] arguments_as_objects = new Object[numberOfArguments];
             int idx = 0;
@@ -2111,50 +2102,50 @@ public class Instructions {
             }
 
             Constructor<?> initConstructor = null;
-            for (Constructor<?> ctor : resolved_class.getDeclaredConstructors()) {
-                boolean valid_ctor = ctor.getParameterCount() == numberOfArguments;
-                idx = 0;
-                if (valid_ctor) {
-                    for (Class<?> current_type : ctor.getParameterTypes()) {
-                        if (!(current_type.isAssignableFrom(cf.INIT_ARG_TYPES.get(idx))
-                                || current_type.getName().equals(cf.INIT_ARG_TYPES.get(idx).getName()))) {
-                            valid_ctor = false;
-                        }
-                        idx++;
-                    }
-                }
-                if (valid_ctor) {
-                    initConstructor = ctor;
-                }
-            }
-
-            if (initConstructor == null) {
-                for (int j = 0; j < resolved_class.getDeclaredConstructors().length; j++) {
-                    Constructor<?> ctor = resolved_class.getDeclaredConstructors()[j];
-                    Class<?>[] argumentTypes = ctor.getParameterTypes();
-                    arguments_as_objects = new Object[ctor.getParameterCount()];
-                    int currentArguments = 0;
-                    for (int i = 0; i < cf.stack.size() && currentArguments < ctor.getParameterCount(); i++) {
-                        Object currentObject = cf.stack.get(i).second;
-                        Class<?> currentArgumentType = argumentTypes[currentArguments];
-                        if (currentObject instanceof Object
-                                && (currentObject.getClass().isAssignableFrom(currentArgumentType)
-                                        || (currentArgumentType == int.class
-                                                && currentObject.getClass() == Integer.class)
-                                        || (currentArgumentType == double.class
-                                                && currentObject.getClass() == Double.class))) {
-                            arguments_as_objects[currentArguments] = currentObject;
-                            currentArguments++;
+            try {
+                for (Constructor<?> ctor : resolved_class.getDeclaredConstructors()) {
+                    boolean valid_ctor = ctor.getParameterCount() == numberOfArguments;
+                    idx = 0;
+                    if (valid_ctor) {
+                        for (Class<?> current_type : ctor.getParameterTypes()) {
+                            if (!(current_type.isAssignableFrom(cf.INIT_ARG_TYPES.get(idx))
+                                    || current_type.getName().equals(cf.INIT_ARG_TYPES.get(idx).getName()))) {
+                                valid_ctor = false;
+                            }
+                            idx++;
                         }
                     }
-                    if (currentArguments == ctor.getParameterCount()
-                            || j == resolved_class.getDeclaredConstructors().length - 1) {
+                    if (valid_ctor) {
                         initConstructor = ctor;
                     }
                 }
-            }
 
-            try {
+                if (initConstructor == null) {
+                    for (int j = 0; j < resolved_class.getDeclaredConstructors().length; j++) {
+                        Constructor<?> ctor = resolved_class.getDeclaredConstructors()[j];
+                        Class<?>[] argumentTypes = ctor.getParameterTypes();
+                        arguments_as_objects = new Object[ctor.getParameterCount()];
+                        int currentArguments = 0;
+                        for (int i = 0; i < cf.stack.size() && currentArguments < ctor.getParameterCount(); i++) {
+                            Object currentObject = cf.stack.get(i).second;
+                            Class<?> currentArgumentType = argumentTypes[currentArguments];
+                            if (currentObject instanceof Object
+                                    && (currentObject.getClass().isAssignableFrom(currentArgumentType)
+                                            || (currentArgumentType == int.class
+                                                    && currentObject.getClass() == Integer.class)
+                                            || (currentArgumentType == double.class
+                                                    && currentObject.getClass() == Double.class))) {
+                                arguments_as_objects[currentArguments] = currentObject;
+                                currentArguments++;
+                            }
+                        }
+                        if (currentArguments == ctor.getParameterCount()
+                                || j == resolved_class.getDeclaredConstructors().length - 1) {
+                            initConstructor = ctor;
+                        }
+                    }
+                }
+
                 // for (int i = 0; i < numberOfArguments; ++i) {
                 // if
                 // (!arguments_as_objects[i].getClass().getName().equals(cf.INIT_ARG_TYPES.get(i).getName()))
@@ -2182,56 +2173,101 @@ public class Instructions {
                 cf.stack.clear();
                 cf.stack.add(test);
             } catch (Throwable e) {
-                for (int j = 0; j < resolved_class.getDeclaredConstructors().length; j++) {
-                    Constructor<?> ctor = resolved_class.getDeclaredConstructors()[j];
-                    Class<?>[] argumentTypes = ctor.getParameterTypes();
-                    arguments_as_objects = new Object[ctor.getParameterCount()];
-                    int currentArguments = 0;
-                    for (int i = 0; i < cf.stack.size() && currentArguments < ctor.getParameterCount(); i++) {
-                        Object currentObject = cf.stack.get(i).second;
-                        Class<?> currentArgumentType = argumentTypes[currentArguments];
-                        if (currentObject instanceof Object
-                                && (currentObject.getClass().isAssignableFrom(currentArgumentType)
-                                        || (currentArgumentType == int.class
-                                                && currentObject.getClass() == Integer.class)
-                                        || (currentArgumentType == double.class
-                                                && currentObject.getClass() == Double.class))) {
-                            arguments_as_objects[currentArguments] = currentObject;
-                            currentArguments++;
-                        } else if (!(currentObject instanceof Class<?>)) {
-                            if (arguments_as_objects[0] == null || numberOfArguments < 2) {
-                                return;
-                            }
-                            arguments_as_objects[currentArguments] = new int[((Number) arguments_as_objects[0])
-                                    .intValue() * ((Number) arguments_as_objects[1]).intValue()];
-                            currentArguments++;
-                        }
-                    }
-                    if (currentArguments == ctor.getParameterCount()
-                            || j == resolved_class.getDeclaredConstructors().length - 1) {
-                        initConstructor = ctor;
-
-                        argumentTypes = initConstructor.getParameterTypes();
-                        boolean allValid = true;
-                        for (int i = 0; i < argumentTypes.length; ++i) {
-                            if (!arguments_as_objects[i].getClass().getName().equals(argumentTypes[i].getName())) {
-                                allValid = false;
-                            }
-                        }
-                        if (allValid) {
-                            break;
-                        }
-                    }
-                }
-
-                initConstructor.setAccessible(true);
-                cf.stack.clear();
                 try {
-                    cf.stack.add(
-                            new Pair<Class<?>, Object>(resolved_class,
-                                    initConstructor.newInstance(arguments_as_objects)));
+                    class_name = e.getCause().toString().split(" ")[1].replace("/", ".");
+
+                    URL[] correct = new URL[2];
+                    correct[0] = f.toURI().toURL();
+
+                    f = new File(new_filename);
+                    length = 0;
+                    if (class_name.contains("/")) {
+                        length = class_name.split("/").length;
+                    } else {
+                        length = class_name.split("\\.").length;
+                    }
+                    for (int i = 0; i < length + 1; ++i) {
+                        URL[] cp = { f.toURI().toURL() };
+                        URLClassLoader urlcl = new URLClassLoader(cp);
+                        try {
+                            urlcl.loadClass(class_name);
+                            correct[1] = cp[0];
+                        } catch (Exception eee) {
+
+                        }
+                        urlcl.close();
+
+                        f = new File(f.getParent());
+                    }
+
+                    URLClassLoader urlcl = new URLClassLoader(correct);
+                    Thread.currentThread().setContextClassLoader(urlcl);
+                    for (Constructor<?> ctor : Thread.currentThread().getContextClassLoader()
+                            .loadClass(resolved_class.getName())
+                            .getDeclaredConstructors()) {
+                        if (ctor.getParameterCount() == numberOfArguments) {
+                            initConstructor = ctor;
+                        }
+                    }
+                    initConstructor.setAccessible(true);
+                    Pair<Class<?>, Object> test = new Pair<Class<?>, Object>(resolved_class,
+                            initConstructor.newInstance(arguments_as_objects));
+                    cf.stack.clear();
+                    cf.stack.add(test);
+
+                    urlcl.close();
                 } catch (Throwable ee) {
-                    return;
+                    for (int j = 0; j < resolved_class.getDeclaredConstructors().length; j++) {
+                        Constructor<?> ctor = resolved_class.getDeclaredConstructors()[j];
+                        Class<?>[] argumentTypes = ctor.getParameterTypes();
+                        arguments_as_objects = new Object[ctor.getParameterCount()];
+                        int currentArguments = 0;
+                        for (int i = 0; i < cf.stack.size() && currentArguments < ctor.getParameterCount(); i++) {
+                            Object currentObject = cf.stack.get(i).second;
+                            Class<?> currentArgumentType = argumentTypes[currentArguments];
+                            if (currentObject instanceof Object
+                                    && (currentObject.getClass().isAssignableFrom(currentArgumentType)
+                                            || (currentArgumentType == int.class
+                                                    && currentObject.getClass() == Integer.class)
+                                            || (currentArgumentType == double.class
+                                                    && currentObject.getClass() == Double.class))) {
+                                arguments_as_objects[currentArguments] = currentObject;
+                                currentArguments++;
+                            } else if (!(currentObject instanceof Class<?>)) {
+                                if (arguments_as_objects[0] == null || numberOfArguments < 2) {
+                                    return;
+                                }
+                                arguments_as_objects[currentArguments] = new int[((Number) arguments_as_objects[0])
+                                        .intValue() * ((Number) arguments_as_objects[1]).intValue()];
+                                currentArguments++;
+                            }
+                        }
+                        if (currentArguments == ctor.getParameterCount()
+                                || j == resolved_class.getDeclaredConstructors().length - 1) {
+                            initConstructor = ctor;
+
+                            argumentTypes = initConstructor.getParameterTypes();
+                            boolean allValid = true;
+                            for (int i = 0; i < argumentTypes.length; ++i) {
+                                if (!arguments_as_objects[i].getClass().getName().equals(argumentTypes[i].getName())) {
+                                    allValid = false;
+                                }
+                            }
+                            if (allValid) {
+                                break;
+                            }
+                        }
+                    }
+
+                    initConstructor.setAccessible(true);
+                    cf.stack.clear();
+                    try {
+                        cf.stack.add(
+                                new Pair<Class<?>, Object>(resolved_class,
+                                        initConstructor.newInstance(arguments_as_objects)));
+                    } catch (Throwable eee) {
+                        return;
+                    }
                 }
             }
 
