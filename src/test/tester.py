@@ -104,7 +104,7 @@ pti_stdin_tests = [
 
 pti_args_stdin_tests = [
     ("com/zoltanbalazs/PTI/_06/_03/IsPartOf",
-     "target/test-classes/com/zoltanbalazs/PTI/_06/_03/in.txt", [ARG_TYPES.STRING])
+     "src/test/java/com/zoltanbalazs/PTI/_06/_03/in.txt", [ARG_TYPES.STRING])
 ]
 
 passed_tests = 0
