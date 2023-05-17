@@ -2200,6 +2200,11 @@ public class Instructions {
                         f = new File(f.getParent());
                     }
 
+                    Class<?>[] args_types = new Class<?>[numberOfArguments];
+                    for (int i = 0; i < numberOfArguments; ++i) {
+                        args_types[i] = cf.INIT_ARG_TYPES.get(i);
+                    }
+
                     URLClassLoader urlcl = new URLClassLoader(correct);
                     Thread.currentThread().setContextClassLoader(urlcl);
                     for (Constructor<?> ctor : Thread.currentThread().getContextClassLoader()
@@ -2209,6 +2214,33 @@ public class Instructions {
                             initConstructor = ctor;
                         }
                     }
+
+                    // for (int i = 0; i < numberOfArguments; ++i) {
+                    // if
+                    // (!arguments_as_objects[i].getClass().getName().equals(cf.INIT_ARG_TYPES.get(i).getName()))
+                    // {
+                    // boolean sameClass = arguments_as_objects[i].getClass()
+                    // .isAssignableFrom(cf.INIT_ARG_TYPES.get(i));
+                    // Class<?> currentClass = arguments_as_objects[i].getClass();
+                    // while (!(currentClass.getName().equals("java.lang.Object") || sameClass)) {
+                    // currentClass = currentClass.getSuperclass();
+                    // if (currentClass.getName()
+                    // .equals(cf.INIT_ARG_TYPES.get(i).getName())) {
+                    // sameClass = true;
+                    // }
+                    // }
+                    // if (sameClass) {
+                    // arguments_as_objects[i] = currentClass.cast(arguments_as_objects[i]);
+                    // if (arguments_as_objects[i].getClass().getName() != currentClass.getName()) {
+                    // arguments_as_objects[i] = currentClass;
+                    // }
+                    // } else {
+                    // arguments_as_objects[i] =
+                    // cf.INIT_ARG_TYPES.get(i).cast(arguments_as_objects[i]);
+                    // }
+                    // }
+                    // }
+
                     initConstructor.setAccessible(true);
                     Pair<Class<?>, Object> test = new Pair<Class<?>, Object>(resolved_class,
                             initConstructor.newInstance(arguments_as_objects));
