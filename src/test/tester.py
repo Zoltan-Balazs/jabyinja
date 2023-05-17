@@ -203,8 +203,6 @@ def tester(test_files, line_length, test_type):
             jabyinja_file_content = jabyinja_file.readlines()
             java_file_content = java_file.readlines()
 
-            print(jabyinja_file_content)
-
             is_valid = (jabyinja_file_content == java_file_content)
 
             if not is_valid:
@@ -231,15 +229,15 @@ if __name__ == '__main__':
         pti_args_tests + pti_stdin_tests, key=lambda item: len(item[0]))[0]
     longest_line = max(longest_name, longest_name_tuple)
 
-    # print(CLI_COLOR.BOLD + "Testing given files " + CLI_COLOR.END)
-    # print(CLI_COLOR.BOLD + " Own test case(s): " + CLI_COLOR.END)
-    # tester(own_tests, longest_line, TEST_TYPE.STANDARD)
-    # print(CLI_COLOR.BOLD + " PTI basic test case(s): " + CLI_COLOR.END)
-    # tester(pti_basic_tests, longest_line, TEST_TYPE.STANDARD)
-    # print(CLI_COLOR.BOLD + " PTI with argument test case(s): " + CLI_COLOR.END)
-    # tester(pti_args_tests, longest_line, TEST_TYPE.ARGS)
-    # print(CLI_COLOR.BOLD + " PTI with stdin test case(s): " + CLI_COLOR.END)
-    # tester(pti_stdin_tests, longest_line, TEST_TYPE.STDIN)
+    print(CLI_COLOR.BOLD + "Testing given files " + CLI_COLOR.END)
+    print(CLI_COLOR.BOLD + " Own test case(s): " + CLI_COLOR.END)
+    tester(own_tests, longest_line, TEST_TYPE.STANDARD)
+    print(CLI_COLOR.BOLD + " PTI basic test case(s): " + CLI_COLOR.END)
+    tester(pti_basic_tests, longest_line, TEST_TYPE.STANDARD)
+    print(CLI_COLOR.BOLD + " PTI with argument test case(s): " + CLI_COLOR.END)
+    tester(pti_args_tests, longest_line, TEST_TYPE.ARGS)
+    print(CLI_COLOR.BOLD + " PTI with stdin test case(s): " + CLI_COLOR.END)
+    tester(pti_stdin_tests, longest_line, TEST_TYPE.STDIN)
     print(CLI_COLOR.BOLD + " PTI with stdin and argument test case(s): " + CLI_COLOR.END)
     tester(pti_args_stdin_tests, longest_line, TEST_TYPE.ARGS_AND_STDIN)
 
