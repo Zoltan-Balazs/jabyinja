@@ -2436,7 +2436,8 @@ class Instructions_Helper {
             Class<?> argument_type = arguments.first;
             Object current_argument = arguments.second;
 
-            if (current_argument.getClass().isArray() && current_argument.getClass() != argument_type) {
+            if (current_argument != null && current_argument.getClass().isArray()
+                    && current_argument.getClass() != argument_type) {
                 arguments_of_function.add(current_argument.getClass().cast(current_argument));
                 // arguments_of_function.add(argument_type.cast(current_argument));
                 type_of_arguments.add(current_argument.getClass());
