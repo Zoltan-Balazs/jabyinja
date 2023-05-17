@@ -700,9 +700,9 @@ public class Instructions {
         try {
             f.set(objectref.second, value.second);
         } catch (Exception e) {
-            if (f.get(objectref.second).getClass().getName()
+            if (!f.get(objectref.second).getClass().getName()
                     .equals(value.second.getClass().getName())) {
-                e.printStackTrace();
+                return;
             }
         }
 
