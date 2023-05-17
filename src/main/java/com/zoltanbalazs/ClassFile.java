@@ -892,7 +892,7 @@ class ClassFile {
                 return new Pair<Integer, Class<?>>(1, int.class);
             }
             case 'J' -> {
-                return new Pair<Integer, Class<?>>(1, int.class);
+                return new Pair<Integer, Class<?>>(1, long.class);
             }
             case 'L' -> {
                 Pair<Integer, String> className = decodeClassName(argument);
