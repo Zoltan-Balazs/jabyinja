@@ -1909,7 +1909,11 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+            try {
+                reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+            } catch (Exception e) {
+
+            }
         }
 
         Pair<Class<?>, Object> objectRef = stack.get(stack.size() - 1);
@@ -1918,7 +1922,18 @@ public class Instructions {
         }
 
         try {
-            reference_to_class.isAssignableFrom(objectRef.second.getClass());
+            if (reference_to_class == null) {
+                if (!objectRef.second.getClass().getName().equals(name_of_class.replace("/", "."))) {
+                    throw new ClassCastException();
+                }
+            } else {
+                if (!(reference_to_class.isAssignableFrom(objectRef.second.getClass())
+                        || reference_to_class.getName().equals(objectRef.second.getClass().getName())
+                        || reference_to_class.getName()
+                                .equals(objectRef.second.getClass().getSuperclass().getName()))) {
+                    throw new ClassCastException();
+                }
+            }
         } catch (Exception e) {
             throw new ClassCastException(e.getMessage());
         }
