@@ -1,6 +1,7 @@
 package com.zoltanbalazs;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,6 +10,8 @@ import java.lang.invoke.CallSite;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -922,7 +925,41 @@ class ClassFile {
                     type.append("L");
                     type.append(className.second);
                     type.append(";");
-                    return new Pair<Integer, Class<?>>(idx + className.first, Class.forName(type.toString()));
+
+                    if (!isClassBuiltIn(className.second)) {
+                        String class_name = className.second;
+                        String new_filename = FILE_NAME;
+                        Class<?> resolved_class = null;
+
+                        File f = new File(new_filename);
+                        int length = 0;
+                        if (class_name.contains("/")) {
+                            length = class_name.split("/").length;
+                        } else {
+                            length = class_name.split("\\.").length;
+                        }
+
+                        try {
+                            for (int i = 0; i < length + 1 && resolved_class == null; ++i) {
+                                URL[] cp = { f.toURI().toURL() };
+                                URLClassLoader urlcl = new URLClassLoader(cp);
+                                try {
+                                    resolved_class = urlcl.loadClass(class_name);
+                                } catch (Exception eee) {
+
+                                }
+                                urlcl.close();
+
+                                f = new File(f.getParent());
+                            }
+                        } catch (Exception e) {
+                            System.out.println(e);
+                        }
+
+                        return new Pair<Integer, Class<?>>(idx + className.first, resolved_class);
+                    } else {
+                        return new Pair<Integer, Class<?>>(idx + className.first, Class.forName(type.toString()));
+                    }
                 } else {
                     type.append(argument.charAt(idx));
                     return new Pair<Integer, Class<?>>(idx + 1, Class.forName(type.toString()));
