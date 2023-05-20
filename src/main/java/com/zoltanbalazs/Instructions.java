@@ -774,6 +774,10 @@ public class Instructions {
             }
         }
 
+        if (name_and_type_of_member.equals("clone")) {
+            return;
+        }
+
         try {
             if (ClassFile.isClassBuiltIn(name_of_class)) {
                 List<Class<?>> input_types = cf.stringToTypes(description_of_method
@@ -800,10 +804,6 @@ public class Instructions {
                         arguments_of_function.set(j, (char) (((Number) (arguments_of_function.get(j))).intValue()));
                     }
                     arguments_as_objects[j] = (Object) arguments_of_function.get(j);
-                }
-
-                if (name_and_type_of_member.equals("clone")) {
-                    return;
                 }
 
                 method.setAccessible(true);
