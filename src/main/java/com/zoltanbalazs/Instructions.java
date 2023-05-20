@@ -687,6 +687,8 @@ public class Instructions {
             cf.FIELDS_TO_INITIALIZE.add(new Pair<String, Pair<Object, Object>>(name_of_field,
                     new Pair<Object, Object>(objectref.second, value.second)));
             return;
+        } else if (cf.IN_INIT_METHOD) {
+            return;
         }
 
         Field f = null;
