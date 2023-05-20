@@ -1469,8 +1469,6 @@ public class Instructions {
                             Thread.currentThread().setContextClassLoader(correct_loader);
 
                             resolved_class.newInstance();
-
-                            System.out.println(resolved_class);
                         }
 
                     }
@@ -1486,8 +1484,11 @@ public class Instructions {
                         }
                     }
 
-                    // stack.subList(stack_size - number_of_method_arguments - 2,
-                    // stack_size).clear();
+                    if (0 < stack_size - number_of_method_arguments - 2) {
+                        stack.subList(stack_size - number_of_method_arguments - 2,
+                                stack_size).clear();
+                    }
+
                     stack.add(objectref);
                 } catch (Throwable e) {
                     e.printStackTrace();
