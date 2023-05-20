@@ -2,14 +2,10 @@ package com.zoltanbalazs.PTI._04._01.util;
 
 public class Point {
     private double x, y;
-    private int id;
-
-    static int next = 1;
 
     public Point(double x, double y) {
         this.x = x;
         this.y = y;
-        this.id = next++;
     }
 
     public double getX() {
@@ -18,10 +14,6 @@ public class Point {
 
     public double getY() {
         return this.y;
-    }
-
-    public int getID() {
-        return this.id;
     }
 
     public void setX(double x) {
@@ -67,6 +59,6 @@ public class Point {
 
     @Override
     public String toString() {
-        return this.getID() + ": (" + this.getX() + "," + this.getY() + ")";
+        return "(" + this.getX() + ", " + this.getY() + ")";
     }
 }

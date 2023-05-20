@@ -29,6 +29,7 @@ class ARG_TYPES(Enum):
     DOUBLE = "double",
     CHAR = "char",
     STRING = "string",
+    PAIR_DOUBLE_ARRAY = "pair_double_array"
 
 
 java_command = "java -cp target/test-classes/ "
@@ -98,6 +99,7 @@ pti_stdin_tests = [
     ("com/zoltanbalazs/PTI/_01/Sqrt", [ARG_TYPES.INT]),
     ("com/zoltanbalazs/PTI/_01/SquareRoot",
      [ARG_TYPES.DOUBLE, ARG_TYPES.DOUBLE]),
+    ("com/zoltanbalazs/PTI/_04/_01/PointMain", [ARG_TYPES.PAIR_DOUBLE_ARRAY]),
     ("com/zoltanbalazs/PTI/_06/_01/Calculator",
      [ARG_TYPES.DOUBLE, ARG_TYPES.CHAR, ARG_TYPES.DOUBLE]),
 ]
@@ -137,6 +139,12 @@ def get_input(input_types):
             string_length = random.randint(2, 20)
             tmp_inp.append(''.join(random.choice(
                 string_choices) for _ in range(string_length)).replace("\"", "").replace("\n", "").replace("\r", "").replace("\t", ""))
+        elif input_type == ARG_TYPES.PAIR_DOUBLE_ARRAY:
+            number_of_var = random.randint(2, 15)
+            tmp_inp.append(number_of_var)
+            for _ in range(number_of_var):
+                tmp_inp.append(round(random.uniform(0, 100), 15))
+                tmp_inp.append(round(random.uniform(0, 100), 15))
 
     for current_input in tmp_inp:
         inp = f'{inp} \"{str(current_input)}\"'
