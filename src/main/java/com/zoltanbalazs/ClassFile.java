@@ -419,28 +419,28 @@ class ClassFile {
                     Instructions.ASTORE(stack, local, opCode - 0x4B);
                 }
                 case IASTORE -> {
-                    Instructions.IASTORE(stack);
+                    Instructions.IASTORE(stack, this);
                 }
                 case LASTORE -> {
-                    Instructions.LASTORE(stack);
+                    Instructions.LASTORE(stack, this);
                 }
                 case FASTORE -> {
-                    Instructions.FASTORE(stack);
+                    Instructions.FASTORE(stack, this);
                 }
                 case DASTORE -> {
-                    Instructions.DASTORE(stack);
+                    Instructions.DASTORE(stack, this);
                 }
                 case AASTORE -> {
-                    Instructions.AASTORE(stack);
+                    Instructions.AASTORE(stack, this);
                 }
                 case BASTORE -> {
-                    Instructions.BASTORE(stack);
+                    Instructions.BASTORE(stack, this);
                 }
                 case CASTORE -> {
-                    Instructions.CASTORE(stack);
+                    Instructions.CASTORE(stack, this);
                 }
                 case SASTORE -> {
-                    Instructions.SASTORE(stack);
+                    Instructions.SASTORE(stack, this);
                 }
                 case POP -> {
                     Instructions.POP(stack, Opcode.POP);

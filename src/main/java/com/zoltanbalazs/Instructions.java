@@ -139,36 +139,36 @@ public class Instructions {
         local[index] = stack.remove(stack.size() - 1).second;
     }
 
-    public static void IASTORE(List<Pair<Class<?>, Object>> stack) {
-        Instructions_Helper.ARRAYSTORE(stack);
+    public static void IASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
+        Instructions_Helper.ARRAYSTORE(stack, cf);
     }
 
-    public static void LASTORE(List<Pair<Class<?>, Object>> stack) {
-        Instructions_Helper.ARRAYSTORE(stack);
+    public static void LASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
+        Instructions_Helper.ARRAYSTORE(stack, cf);
     }
 
-    public static void FASTORE(List<Pair<Class<?>, Object>> stack) {
-        Instructions_Helper.ARRAYSTORE(stack);
+    public static void FASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
+        Instructions_Helper.ARRAYSTORE(stack, cf);
     }
 
-    public static void DASTORE(List<Pair<Class<?>, Object>> stack) {
-        Instructions_Helper.ARRAYSTORE(stack);
+    public static void DASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
+        Instructions_Helper.ARRAYSTORE(stack, cf);
     }
 
-    public static void AASTORE(List<Pair<Class<?>, Object>> stack) {
-        Instructions_Helper.ARRAYSTORE(stack);
+    public static void AASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
+        Instructions_Helper.ARRAYSTORE(stack, cf);
     }
 
-    public static void BASTORE(List<Pair<Class<?>, Object>> stack) {
-        Instructions_Helper.ARRAYSTORE(stack);
+    public static void BASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
+        Instructions_Helper.ARRAYSTORE(stack, cf);
     }
 
-    public static void CASTORE(List<Pair<Class<?>, Object>> stack) {
-        Instructions_Helper.ARRAYSTORE(stack);
+    public static void CASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
+        Instructions_Helper.ARRAYSTORE(stack, cf);
     }
 
-    public static void SASTORE(List<Pair<Class<?>, Object>> stack) {
-        Instructions_Helper.ARRAYSTORE(stack);
+    public static void SASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
+        Instructions_Helper.ARRAYSTORE(stack, cf);
     }
 
     public static void POP(List<Pair<Class<?>, Object>> stack, Opcode type) {
@@ -2422,12 +2422,93 @@ class Instructions_Helper {
         return Array.get(arrayRef.second, index);
     }
 
-    public static void ARRAYSTORE(List<Pair<Class<?>, Object>> stack) {
+    public static void ARRAYSTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
         Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
         int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
         Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
 
-        Array.set(arrayRef.second, index, value.second);
+        try {
+            Array.set(arrayRef.second, index, value.second);
+        } catch (IllegalArgumentException iae) {
+            if (arrayRef.second.getClass().getComponentType().getName().equals(value.first.getName())) {
+                String class_name = arrayRef.second.getClass().getComponentType().getName();
+                String new_filename = cf.FILE_NAME;
+                Class<?> resolved_class = null;
+
+                File f = new File(new_filename);
+                int length = 0;
+                if (class_name.contains("/")) {
+                    length = class_name.split("/").length;
+                } else {
+                    length = class_name.split("\\.").length;
+                }
+
+                try {
+                    for (int i = 0; i < length + 1 && resolved_class == null; ++i) {
+                        URL[] cp = { f.toURI().toURL() };
+                        URLClassLoader urlcl = new URLClassLoader(cp);
+                        try {
+                            resolved_class = urlcl.loadClass(class_name);
+                        } catch (Exception eee) {
+
+                        }
+                        urlcl.close();
+
+                        f = new File(f.getParent());
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+
+                Object[] arguments = new Object[value.first.getDeclaredFields().length];
+                Object[] foundArgs = new Object[value.first.getDeclaredFields().length];
+                Object[] actual_arguments = null;
+                int idx = 0;
+
+                try {
+                    for (Field ff : value.first.getDeclaredFields()) {
+                        ff.setAccessible(true);
+                        arguments[idx++] = ff.get(value.second);
+                    }
+                } catch (IllegalAccessException iaeee) {
+                    System.out.println(iaeee);
+                }
+
+                Constructor<?> initCtor = null;
+                for (Constructor<?> ctor : arrayRef.second.getClass().getComponentType().getDeclaredConstructors()) {
+                    boolean canBeValid = true;
+                    idx = 0;
+                    for (Class<?> clazz : ctor.getParameterTypes()) {
+                        boolean found = false;
+                        for (int i = idx; i < value.first.getDeclaredFields().length && !found; ++i) {
+                            if (clazz.getName().equals(arguments[i].getClass().getName())
+                                    || (clazz.getName().equals("double")
+                                            && arguments[i].getClass().getName().equals("java.lang.Double"))) {
+                                foundArgs[idx] = arguments[idx];
+                                idx++;
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            canBeValid = false;
+                        }
+                    }
+                    if (canBeValid) {
+                        initCtor = ctor;
+                        actual_arguments = new Object[idx];
+                        for (int i = 0; i < idx; ++i) {
+                            actual_arguments[i] = foundArgs[i];
+                        }
+                    }
+                }
+
+                try {
+                    Array.set(arrayRef.second, index, initCtor.newInstance(actual_arguments));
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+        }
     }
 
     public static void SETARGUMENTS_AND_TYPES(List<Pair<Class<?>, Object>> arguments_on_stack,
