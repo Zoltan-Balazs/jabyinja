@@ -1752,76 +1752,8 @@ public class Instructions {
 
     public static void INVOKEDYNAMIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             Object[] local, List<BootstrapMethods_Attribute> bootstrap_methods, List<CallSite> call_sites,
-            String file_name, ClassFile cf) throws ClassNotFoundException, Throwable {
-        CP_Info reference_to_method = constant_pool.get(index - 1);
-        String description_of_method = cf.getDescriptionOfMethod(reference_to_method.getNameAndTypeIndex());
-        List<Class<?>> method_arguments = cf.getArguments(description_of_method);
-        int number_of_method_arguments = method_arguments.size();
-
-        short bootstrap_method_attr_index = reference_to_method.getBootStrapMethodAttributeIndex();
-        BootstrapMethods_Attribute bootstrap_method = bootstrap_methods.get(bootstrap_method_attr_index);
-        // int bootstrap_method_ref_index = bootstrap_method.bootstrap_methods
-        // .get(bootstrap_method_attr_index).bootstrap_method_ref;
-
-        BoostrapMethod stuff = bootstrap_method.bootstrap_methods
-                .get(bootstrap_method_attr_index);
-
-        for (int i = 0; i < stuff.num_bootstrap_arguments; ++i) {
-            short currIndex = stuff.bootstrap_arguments[i];
-            CP_Info stuff1 = constant_pool.get(currIndex - 1);
-            if (stuff1 instanceof CONSTANT_MethodHandle_Info) {
-                short reference = stuff1.getReferenceIndex();
-                CP_Info stuff2 = constant_pool.get(reference - 1);
-                String name_of_class = new String(
-                        constant_pool.get(constant_pool.get(stuff2.getClassIndex() - 1).getNameIndex() - 1).getBytes(),
-                        StandardCharsets.UTF_8).replace("/", ".");
-                String name_of_function = new String(
-                        constant_pool.get(constant_pool.get(stuff2.getNameAndTypeIndex() - 1).getNameIndex() - 1)
-                                .getBytes(),
-                        StandardCharsets.UTF_8);
-
-                Method method = null;
-                if (ClassFile.isClassBuiltIn(name_of_class)) {
-                    Class<?> c = Class.forName(name_of_class);
-                    method = c.getDeclaredMethod(name_of_function);
-                } else {
-                    Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
-                            name_of_class);
-                    Class<?> reference_to_class = returned.second;
-                    String new_filename = returned.first;
-                    Class<?> resolved_class = null;
-
-                    File f = new File(new_filename);
-                    int length = 0;
-                    if (reference_to_class.getName().contains("/")) {
-                        length = reference_to_class.getName().split("/").length;
-                    } else {
-                        length = reference_to_class.getName().split("\\.").length;
-                    }
-                    for (int j = 0; j < length + 1 && resolved_class == null; ++j) {
-                        URL[] cp = { f.toURI().toURL() };
-                        URLClassLoader urlcl = new URLClassLoader(cp);
-                        try {
-                            resolved_class = urlcl.loadClass(reference_to_class.getName());
-                        } catch (Exception eee) {
-
-                        }
-                        urlcl.close();
-
-                        f = new File(f.getParent());
-                    }
-
-                    for (Method m : resolved_class.getDeclaredMethods()) {
-                        if (m.getName().equals(name_of_function)) {
-                            method = m;
-                            break;
-                        }
-                    }
-                }
-
-                stack.add(new Pair<Class<?>, Object>(Method.class, method));
-            }
-        }
+            String file_name, ClassFile cf) {
+        throw new UnsupportedOperationException("Invokedyanmic isn't supported yet");
     }
 
     public static void NEW(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index, Object[] local,
