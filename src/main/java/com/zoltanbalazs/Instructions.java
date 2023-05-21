@@ -2523,7 +2523,9 @@ class Instructions_Helper {
                         for (int i = idx; i < value.first.getDeclaredFields().length && !found; ++i) {
                             if (clazz.getName().equals(arguments[i].getClass().getName())
                                     || (clazz.getName().equals("double")
-                                            && arguments[i].getClass().getName().equals("java.lang.Double"))) {
+                                            && arguments[i].getClass().getName().equals("java.lang.Double"))
+                                    || (clazz.getName().equals("int")
+                                            && arguments[i].getClass().getName().equals("java.lang.Integer"))) {
                                 foundArgs[idx] = arguments[idx];
                                 idx++;
                                 found = true;
@@ -2543,6 +2545,7 @@ class Instructions_Helper {
                 }
 
                 try {
+                    initCtor.setAccessible(true);
                     Array.set(arrayRef.second, index, initCtor.newInstance(actual_arguments));
                 } catch (Exception e) {
                     System.out.println(e);
