@@ -133,13 +133,6 @@ $ just co
 $ java -jar target/jabyinja-*.jar <optional class file>
 ```
 
-If you need to alter the classpath (i.e. you would normally run `java -cp ..` to launch the file) you might get an exception, in this case you need to alter the classpath
-
-```sh
-$ mvn package
-$ java -cp target/classes:<your own classpaths> com.zoltanbalazs.Main <optional class file>
-```
-
 ## Generating a PDF from the thesis
 
 *Ignore any warnings*
@@ -288,6 +281,7 @@ Thankfully, they are the exact same
 | *STATIC        	| <ul><li>[x] </li></ul> 	|
 | *FIELD         	| <ul><li>[x] </li></ul> 	|
 | INVOKE*        	| <ul><li>[x] </li></ul> 	|
+| INVOKEDYNAMIC   | <ul><li>[ ] </li></ul> 	|
 | NEW            	| <ul><li>[x] </li></ul> 	|
 | NEWARRAY       	| <ul><li>[x] </li></ul> 	|
 | ANEWARRAY      	| <ul><li>[x] </li></ul> 	|
@@ -295,7 +289,7 @@ Thankfully, they are the exact same
 | ATHROW         	| <ul><li>[x] </li></ul> 	|
 | CHECKCAST      	| <ul><li>[x] </li></ul> 	|
 | INSTANCEOF      | <ul><li>[x] </li></ul>  |
-| MONITOR*       	| <ul><li>[ ] </li></ul> 	|
+| MONITOR*       	| <ul><li>[x] </li></ul> 	|
 | WIDE           	| <ul><li>[x] </li></ul> 	|
 | MULTIANEWARRAY 	| <ul><li>[x] </li></ul> 	|
 | IF*NULL        	| <ul><li>[x] </li></ul> 	|
