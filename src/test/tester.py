@@ -38,6 +38,8 @@ jabyinja_command = "java -jar target/jabyinja-*.jar "
 base_dir = "target/test-classes/"
 
 own_tests = [
+    "com/zoltanbalazs/Own/Arithmetic",
+    "com/zoltanbalazs/Own/Arrayclass",
     "com/zoltanbalazs/Own/Arraylist",
     "com/zoltanbalazs/Own/Athrow",
     "com/zoltanbalazs/Own/Dup2",
