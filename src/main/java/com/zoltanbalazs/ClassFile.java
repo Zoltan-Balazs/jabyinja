@@ -104,7 +104,7 @@ class ClassFile {
 
     public List<CallSite> callSites = new ArrayList<>();
     public List<Pair<Class<?>, Object>> stack = new ArrayList<>();
-    public Object[] local = new Object[65535];
+    public Object[] local = new Object[65536];
 
     public ClassFile(String fileName, String[] mainArgs) {
         FILE_NAME = fileName;
