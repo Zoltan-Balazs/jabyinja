@@ -252,6 +252,47 @@ Példa forrása: \href{https://www.inf.u-szeged.hu/actacybernetica/}{Acta Cybern
 \end{algorithmic}
 \end{algorithm}
 
+\section{Erőforrás igények}
+
+A \lstinline{Linux} operációs rendszeren beépített \lstinline{time} programot (illetve a \lstinline{hyperfine} programot) használva az erőforrás igények a tesztfájlokra az alábbiak (a tesztelt számítógép releváns specifikációi: Intel Core i7-8700k processzor 4.7 GHz-en, 16 GB DDR4 memória 2133 MT/s sebességgel):
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{ | l | r | r | r | r | }
+		\hline
+		\multirow{2}{*}{\textbf{Különbségek}} & \multicolumn{2}{ c | }{\textbf{Beépített java}} & \multicolumn{2}{ c | }{\textbf{Interpret}} \\
+		\cline{2-5}
+		& Memória & Futási idő & Memória & Futási idő \\
+		\hline \hline		
+		Own/Arithmetic.class & 37,1 MB & 21,4 ms & 47,6 MB & 92,8 ms \\
+		\hline
+		Own/Arrayclass.class & 34,9 MB & 20,9 ms & 54,6 MB & 130,8 ms \\
+		\hline
+		Own/Arraylist.class & 37,2 MB & 21,4 ms & 49,6 MB & 87,1 ms \\
+		\hline
+		Own/Athrow.class & 34,6 MB & 20,4 ms & 46,9 MB & 61,7 ms \\
+		\hline
+		Own/Dup2.class & 36,3 MB & 20,3 ms & 39,2 MB & 45,6 ms \\
+		\hline
+		Own/Inheritence.class & 34,8 MB & 20,7 ms & 51,9 MB & 98,1 ms \\
+		\hline
+		Own/Instanceof.class & 38,8 MB & 20,2 ms & 43,1 MB & 64,2 ms \\
+		\hline
+		Own/Multianewarray.class & 34,4 MB & 20,6 ms & 47,7 MB & 62,9 ms \\
+		\hline
+		Own/Nested.class & 39,3 MB & 22,1 ms & 47,2 MB & 80,5 ms \\
+		\hline
+		Own/Ownclass.class & 37,5 MB & 20,2 ms & 61,9 MB & 135,5 ms \\
+		\hline
+		Own/SwitchAthrow.class & 36,8 MB & 20,5 ms & 40,5 MB & 43,9 ms \\
+		\hline
+		Own/Template.class & 39,2 MB & 21,2 ms & 51,9 MB & 86,5 ms \\
+		\hline
+	\end{tabular}
+	\caption[Erőforrás különbségek]{A beépített \lstinline{java} és az interpreter közötti erőforrás különbségek}
+	\label{jabyinja:resource}
+\end{table}
+
 \section{Továbbfejlesztési lehetőségek}
 
 \subsection{Invokedynamic utasítás}
