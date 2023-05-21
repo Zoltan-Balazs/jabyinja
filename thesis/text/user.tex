@@ -55,8 +55,15 @@ Mindkét esetben egy opcionális argumentumot (argumentum sorozatot ha a futtata
 Futásra egy példa:
 \lstinline{java -jar target/jabyinja-1.0.0.jar target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World}
 
-\section{Problémák}
+\subsection{Önfuttatás}
+
+Az elkészült interpreter képes saját magát is futtatni, ehhez a futtatáshoz hasonlóan meg kell adni a programnak a saját class fájlának elérési útját, majd opcionálisan a többi paramétert.
+
+Ez jar fájl esetén így néz ki, a főkönyvtárból futtatva:
+\lstinline{java -jar target/jabyinja-1.0.0.jar target/classes/com/zoltanbalazs/Main.class target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World}
+
+\section{Felmerülő problémák}
 
 A futtatandó program futása során nem merül fel probléma (hacsak nincsen \lstinline{invokedynamic} a generált class fájlban) amelyet a program okoz. Ha a futtatandó programunk hibát dob, akkor ezt az interpretáló program is ugyanúgy megteszi; viszont a hiba kiírása során nem biztos hogy ugyanazt a kimentet kapjuk mint a beépített interpreter-rel.
 
-Tehát ha a hibánk nem egy \lstinline{try \- catch} blokk-ban szerepel, akkor a kiírt üzenet nem biztos hogy ugyanaz lesz mint a beépített interpreter-rel, az összes többi kiírt üzenet viszont ugyanaz kell hogy legyen.
+Tehát ha a hibánk nem egy \lstinline{try, catch} blokk-ban szerepel, akkor a kiírt üzenet nem biztos hogy ugyanaz lesz mint a beépített interpreter-rel, az összes többi kiírt üzenet viszont ugyanaz kell hogy legyen.
