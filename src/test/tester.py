@@ -1,3 +1,4 @@
+import argparse
 import random
 import string
 import subprocess
@@ -154,7 +155,7 @@ def get_input(input_types):
     return inp.strip()
 
 
-def tester(test_files, line_length, test_type):
+def tester(test_files, line_length, test_type, timing, memory_usage):
     global passed_tests
     global failed_tests
 
@@ -188,24 +189,44 @@ def tester(test_files, line_length, test_type):
             elif test_type == TEST_TYPE.STDIN or test_type == TEST_TYPE.ARGS_AND_STDIN:
                 stdin = get_input(test_stdin_types)
 
+            jabyinja_command_current = ""
+            java_command_current = ""
+
             if test_type == TEST_TYPE.STDIN:
-                subprocess.call("echo " + stdin + " | " + jabyinja_command + base_dir + test_file +
-                                ".class", shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
+                jabyinja_command_current = "echo " + stdin + " | " + \
+                    jabyinja_command + base_dir + test_file + ".class"
 
-                subprocess.call("echo " + stdin + " | " + java_command + test_file.replace("/",
-                                "."), shell=True, stdout=java_file, stderr=java_file)
+                java_command_current = "echo " + stdin + " | " + \
+                    java_command + test_file.replace("/", ".")
             elif test_type == TEST_TYPE.ARGS_AND_STDIN:
-                subprocess.call("echo " + stdin + " | " + jabyinja_command + base_dir + test_file +
-                                ".class " + input_file, shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
+                jabyinja_command_current = "echo " + stdin + " | " + \
+                    jabyinja_command + base_dir + test_file + ".class " + input_file
 
-                subprocess.call("echo " + stdin + " | " + java_command + test_file.replace("/",
-                                ".") + " " + input_file, shell=True, stdout=java_file, stderr=java_file)
+                java_command_current = "echo " + stdin + " | " + \
+                    java_command + \
+                    test_file.replace("/", ".") + " " + input_file
             else:
-                subprocess.call(jabyinja_command + base_dir + test_file +
-                                ".class " + args, shell=True, stdout=jabyinja_file, stderr=jabyinja_file)
+                jabyinja_command_current = jabyinja_command + \
+                    base_dir + test_file + ".class " + args
 
-                subprocess.call(java_command + test_file.replace("/",
-                                ".") + " " + args, shell=True, stdout=java_file, stderr=java_file)
+                java_command_current = java_command + \
+                    test_file.replace("/", ".") + " " + args
+
+            subprocess.call(jabyinja_command_current, shell=True,
+                            stdout=jabyinja_file, stderr=jabyinja_file)
+            subprocess.call(java_command_current, shell=True,
+                            stdout=java_file, stderr=java_file)
+
+            if timing:
+                subprocess.call("hyperfine '" + jabyinja_command_current +
+                                "' '" + java_command_current + "' 2>&1 | grep 'Time (mean ± σ)'", shell=True)
+            if memory:
+                print("\tJabyinja: ", end='', flush=True)
+                subprocess.call("gtime --verbose " + jabyinja_command_current +
+                                " 2>&1 | grep 'Maximum resident'", shell=True)
+                print("\t/usr/bin/java: ", end='', flush=True)
+                subprocess.call("gtime --verbose " + java_command +
+                                " 2>&1 | grep 'Maximum resident'", shell=True)
 
             jabyinja_file.seek(0)
             java_file.seek(0)
@@ -234,6 +255,20 @@ def tester(test_files, line_length, test_type):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Jabyinja tester')
+    parser.add_argument('-t', '--time',
+                        dest='time', nargs='?', default=False,
+                        help='Measure the time between the built in java command and the interpreter.')
+
+    parser.add_argument('-m', '--mem',
+                        dest='mem', nargs='?', default=False,
+                        help='Measure the memory usage between the built in java command and the interpreter.')
+
+    args = parser.parse_args()
+
+    timing = (args.time is None)
+    memory = (args.mem is None)
+
     longest_name = max(own_tests + pti_basic_tests, key=len)
     longest_name_tuple = max(
         pti_args_tests + pti_stdin_tests, key=lambda item: len(item[0]))[0]
@@ -241,15 +276,16 @@ if __name__ == '__main__':
 
     print(CLI_COLOR.BOLD + "Testing given files " + CLI_COLOR.END)
     print(CLI_COLOR.BOLD + " Own test case(s): " + CLI_COLOR.END)
-    tester(own_tests, longest_line, TEST_TYPE.STANDARD)
+    tester(own_tests, longest_line, TEST_TYPE.STANDARD, timing, memory)
     print(CLI_COLOR.BOLD + " PTI basic test case(s): " + CLI_COLOR.END)
-    tester(pti_basic_tests, longest_line, TEST_TYPE.STANDARD)
+    tester(pti_basic_tests, longest_line, TEST_TYPE.STANDARD, timing, memory)
     print(CLI_COLOR.BOLD + " PTI with argument test case(s): " + CLI_COLOR.END)
-    tester(pti_args_tests, longest_line, TEST_TYPE.ARGS)
+    tester(pti_args_tests, longest_line, TEST_TYPE.ARGS, timing, memory)
     print(CLI_COLOR.BOLD + " PTI with stdin test case(s): " + CLI_COLOR.END)
-    tester(pti_stdin_tests, longest_line, TEST_TYPE.STDIN)
+    tester(pti_stdin_tests, longest_line, TEST_TYPE.STDIN, timing, memory)
     print(CLI_COLOR.BOLD + " PTI with stdin and argument test case(s): " + CLI_COLOR.END)
-    tester(pti_args_stdin_tests, longest_line, TEST_TYPE.ARGS_AND_STDIN)
+    tester(pti_args_stdin_tests, longest_line,
+           TEST_TYPE.ARGS_AND_STDIN, timing, memory)
 
     print()
     print(CLI_COLOR.BOLD + "Summary:" + CLI_COLOR.END)
