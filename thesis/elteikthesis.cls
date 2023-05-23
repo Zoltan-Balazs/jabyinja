@@ -1,7 +1,7 @@
 %% MIT License
 %%
-%% Version 2.3, 2022/04/30
-%% Copyright (c) 2013-2022 Máté Cserép <mcserep@inf.elte.hu>, Bálint Bognár
+%% Version 2.3.1, 2023/04/10
+%% Copyright (c) 2013-2023 Máté Cserép <mcserep@inf.elte.hu>, Bálint Bognár
 %%
 %% Permission is hereby granted, free of charge, to any person obtaining a copy
 %% of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 %% to the original package.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{elteikthesis}[2022/04/30 ELTE FI bachelor and master thesis template]
+\ProvidesClass{elteikthesis}[2023/04/10 ELTE FI bachelor and master thesis template]
 
 % LaTeX programming tools
 \RequirePackage{etoolbox}
@@ -120,7 +120,7 @@
 		\newcommand{\lstcodelabel}{Forráskódjegyzék}
 		\newcommand{\lstnomencl}{Jelölésjegyzék}
 		\newcommand{\todolabel}{Teendők listája}
-		\newcommand{\acklabel}{Köszönyetnyilvánítás}
+		\newcommand{\acklabel}{Köszönetnyilvánítás}
 	}
 	{ % English
 		\newcommand{\authorlabel}{Author}
@@ -394,7 +394,7 @@
 % Bibliography
 \RequirePackage[autostyle=true]{csquotes}
 \RequirePackage[
-	backend=bibtex,
+	backend=biber,
 	style=numeric, % style of bibliography
 	sorting=none   % sorting of references
 ]{biblatex}
@@ -464,8 +464,8 @@
 
 % ------------------------------
 % List of TODOs
-% http://www.tex.ac.uk/tex-archive/help/Catalogue/entries/todonotes.html
-\RequirePackage[textwidth=30mm, textsize=small, color=todobackg, linecolor=orange, colorinlistoftodos, shadow, obeyFinal]{todonotes}
+% http://tug.ctan.org/macros/latex/contrib/todonotes/todonotes.pdf
+\RequirePackage[textwidth=30mm, textsize=small, color=todobackg, linecolor=orange, colorinlistoftodos, loadshadowlibrary, shadow, obeyFinal]{todonotes}
 \RequirePackage[displaymath, tightpage]{preview}
 % Place TODOs on the left margin
 \reversemarginpar

@@ -1,8 +1,6 @@
 \chapter{Fejlesztői dokumentáció}
 \label{ch:impl}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis nibh leo, dapibus in elementum nec, aliquet id sem. Suspendisse potenti. Nullam sit amet consectetur nibh. Donec scelerisque varius turpis at tincidunt.
-
 \section{Class fájl felépítése}
 
 \subsection{Class fájltól a benne levő metódus futtatásáig}
@@ -252,7 +250,9 @@ Példa forrása: \href{https://www.inf.u-szeged.hu/actacybernetica/}{Acta Cybern
 \end{algorithmic}
 \end{algorithm}
 
-\section{Erőforrás igények}
+\section{Az interpreter sajátosságai}
+
+\subsection{Erőforrás igények}
 
 A \lstinline{Linux} operációs rendszeren beépített \lstinline{time} programot (illetve a \lstinline{hyperfine} programot) használva az erőforrás igények a tesztfájlokra az alábbiak (a tesztelt számítógép releváns specifikációi: Intel Core i7-8700k processzor 4.7 GHz-en, 16 GB DDR4 memória 2133 MT/s sebességgel):
 
@@ -292,6 +292,10 @@ A \lstinline{Linux} operációs rendszeren beépített \lstinline{time} programo
 	\caption[Erőforrás különbségek]{A beépített \lstinline{java} és az interpreter közötti erőforrás különbségek}
 	\label{jabyinja:resource}
 \end{table}
+
+\subsection{A program memóriamodellje}
+
+\subsection{Az önfuttatásról}
 
 \section{Továbbfejlesztési lehetőségek}
 
