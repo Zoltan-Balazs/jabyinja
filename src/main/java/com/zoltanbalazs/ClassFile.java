@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.CallSite;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -268,10 +267,7 @@ class ClassFile {
         return getArguments(descriptor).size();
     }
 
-    public Pair<Class<?>, Object> executeCode(Code_Attribute attribute)
-            throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException,
-            NoSuchMethodException, SecurityException, InstantiationException, IllegalArgumentException,
-            InvocationTargetException, Throwable {
+    public Pair<Class<?>, Object> executeCode(Code_Attribute attribute) throws Throwable {
         byte[] code = attribute.code;
 
         CodeIndex codeIndex = new CodeIndex();
@@ -867,7 +863,7 @@ class ClassFile {
                 }
             }
         }
-        return new Pair<Class<?>, Object>(void.class, null); // Should throw an error...
+        throw new Throwable("Code did not contain a return statement");
     }
 
     public static Pair<Integer, String> decodeClassName(String argument) {
