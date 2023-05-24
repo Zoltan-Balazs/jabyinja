@@ -59,10 +59,7 @@ Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribut
 
 Ezt a beolvasott attribútumot a \lstinline{ClassFile} osztály fel tudja használni az \lstinline{executeCode} metódusával, mely egy \lstinline{byte[]} változót vár bemeneti paraméterként, ami a \lstinline{Code_Attribute} része:
 \begin{minted}{java}
-public Pair<Class<?>, Object> executeCode(byte[] code)
-	throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException,
-	NoSuchMethodException, SecurityException, InstantiationException, IllegalArgumentException,
-	InvocationTargetException, Throwable
+public Pair<Class<?>, Object> executeCode(byte[] code) Throwable
 \end{minted}
 A reflekció miatt számos hibát dob vissza a függvény, ha nem helyes a kód formátuma akkor \lstinline{IOException}-t dob a függvény, a \lstinline{Throwable} az \lstinline{ATHROW} Java bájtkód instrukció miatt szükséges (ekkor egy hibát dob vissza a metódusunk).
 Visszatérési értéke \lstinline{Pair<Class<?>, Object>}, a számos \lstinline{RETURN} utasítás miatt (ezeket a stack-en szükséges elhelyezünk)
@@ -74,16 +71,21 @@ CLASS_FILE.executeCode(codeAttribute.code);
 Ezzel el is jutottunk egy class fájl beolvasásától, az abban lévő adott függvény Java bájtkódjának futtatásáig, több teendőnk nincsen, a program az adott függvényben levő külön függvényhívásokat automatikusan elvégzi.
 
 A teljes példakód:
-\begin{minted}{java}
-ClassFile CLASS_FILE = new ClassFile("Main.class", null);
-Method_Info method = CLASS_FILE.findMethodsByName("main");
-List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
+\lstset{caption={Egyszerű példakód a Main.class interpretálására}, label=src:classinterpret}
+\begin{lstlisting}[language={Java}]
+public class Interpreter {
+	public static void main(String[] args) throws Throwable {
+		ClassFile CLASS_FILE = new ClassFile("Main.class", null);
+		Method_Info method = CLASS_FILE.findMethodsByName("main");
+		List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
 
-for (Attribute_Info attribute : attributes) {
-	Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
-	CLASS_FILE.executeCode(codeAttribute.code);
+		for (Attribute_Info attribute : attributes) {
+			Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
+			CLASS_FILE.executeCode(codeAttribute.code);
+		}
+	}
 }
-\end{minted}
+\end{lstlisting}
 
 \subsection{Pár minta class fájl felépítése}
 
@@ -115,8 +117,6 @@ Class fájl formátumának magyarázata:
 \item \stagemethodsize{00 00}: Függvények száma
 \item \stageattributes{00 00}: Osztály attribútumainak száma
 \end{compactitem}
-
-\pagebreak
 
 A legegyszerűbb class fájl amit a $Jabyinja$ program le tud futtatni (a beépített \lstinline{java} program nem képes ezt lefuttatni, mivel nincsenek benne osztályok, a JVM specifikáció alapján az osztályok elhanyagolhatóak):
 
@@ -212,7 +212,8 @@ A lokális változók maximális mennyiségét előre tudjuk, ez nem lehet több
 Gyakorlatban ez a szám csökkenthető lenne, tudhatjuk hogy futási időben mennyi lokális változója (illetve a \lstinline{stack} nagyságát is tudhatjuk, tehát tömbként is reprezentálhatnánk) van egy metódusnak. Ez bővebben le van írva a továbbfejlesztési lehetőségekben.
 
 Kényelmi szempontból létezik a \lstinline{CodeIndex} osztály, amely lényegében egy \lstinline{int} szám absztrakciója:
-\begin{minted}{java}
+\lstset{caption={A Codeindex osztály, amely a kód bájttömb jelenlegi indexét tárolja}, label=src:codeindex}
+\begin{lstlisting}[language={Java}]
 class CodeIndex {
     private int index = 0;
 
@@ -232,7 +233,7 @@ class CodeIndex {
         return index;
     }
 }
-\end{minted}
+\end{lstlisting}
 Az absztrakció oka hogy függvényeknek átadva lehessen módosítani ezt a számot; a szám a jelenlegi index a kódot reprezentáló \lstinline{byte} tömbben, megmondja hogy a tömbben lévő melyik indexen levő instrukciót kell végrehajtani.
 
 Az absztrakció különösen észrevehető amikor az \lstinline{if} és \lstinline{goto} utasításokat hajtjuk végre, a \lstinline{ClassFile} objektumunk lokális változója módosítható az \lstinline{Instructions} osztály metódusain keresztül. Mivel a Java érték szerint adja át a paramétereket, ez egy sima \lstinline{int} számmal nem lehetne megoldani.
@@ -265,6 +266,37 @@ Példa forrása: \href{https://www.inf.u-szeged.hu/actacybernetica/}{Acta Cybern
 \State \textbf{return} ${\cal L}_Q$
 \end{algorithmic}
 \end{algorithm}
+
+\subsection{Interpretálás működése}
+
+Az algoritmus alapján az interpretálás viszonylag egyszerűen működik.
+\begin{enumerate}
+	\item Olvassuk be a jelenlegi indexen lévő utasítást
+	\item A specifikáció alapján olvassuk be a megfelelő darabszámú extra paramétert
+	\item Végezzük el az utasításnak megfelelő műveletet; módosítsuk a lokális változókat és a stack-et
+	\item Ismételjük az 1. pontot amíg nem vagyunk a kódot tartalmazó bájttömb végén
+\end{enumerate}
+
+Természetesen valóságban egy kicsit komplikáltabb ennél a működés (bár nem sokkal). Az utasítások nagy része ténylegesen leírható ezzel az egyszerű 4 lépéses "algoritmussal". A komplikáltabb utasítások viszont a \lstinline{invoke*}, \lstinline{put*}, \lstinline{get}. Ezeknél a stack-nek megfelelően kell lekérnünk az adatokat, majd a Java nyelv sajátossága miatt (illetve a reflekció használata miatt) le kell kérnünk a megfelelő metódust, és a paraméterrekkel együtt meghívni / interpretálni a függvényt az interpreterrel.
+
+A fő interpretálást végrehajtó kód a \lstinline{ClassFile} osztályban az \lstinline{executeCode} metódus.
+
+\lstset{caption={Az interpretálásért felelős kódrészlet}, label=src:codeindex}
+\begin{lstlisting}[language={Java}]
+public Pair<Class<?>, Object> executeCode(Code_Attribute attribute) throws Throwable {
+	byte[] code = attribute.code;
+
+	CodeIndex codeIndex = new CodeIndex();
+	while (codeIndex.Get() < code.length) {
+		byte opCode = code[codeIndex.Next()];
+
+		switch (Opcode.opcodeRepresentation(opCode)) {
+			...
+		}
+	}
+	throw new Throwable("Code did not contain a return statement");
+}
+\end{lstlisting}
 
 \section{Az interpreter sajátosságai}
 
@@ -426,6 +458,32 @@ A \lstinline{java} beépített interperet működése miatt amikor egy jar fájl
 
 Természetesen a \lstinline{main} függvényben is megfelelően kell felépíteni a különböző adattagokat, tehát az interpret tényleg saját magát futtatja, viszont nem látunk akkora erőforrásbeli különbséget mint ami a beépített interpretert és a megírt program között van.
 
+\section{Tesztelő környezet}
+
+A tesztelő környezet egy átlagos Java tesztelő (pl. JUnit) helyett egy saját Python szkript. Az előnye ennek az, hogy a tesztelésnél többet is tud ez a szkript; például a memóriahasználatot, és a futási idő különbséget is mérni. A tesztelő szkript a \lstinline{src/test/tester.py} fájlban elérhető. A szkript futtatásához legalább Python 3-as verzió szükséges. A tesztelő működésileg megnézi hogy a beépített Java interpreter, és a megírt interpreter kimenetei megegyeznek-e, ha igen akkor helyesen futott le az interpret, ha nem, akkor helytelenül. Jelen esetben 3 teszteset van, amelyek nem mennek át a tesztelőn, ezek mindegyike tartalmaz \lstinline{invokedynamic} utasítást.
+
+\subsection{Tesztelés}
+
+A tesztelőt nagyon egyszerűen meg lehet hívni a
+\begin{minted}{bash}
+$ python3 src/test/tester.py
+\end{minted}
+paranccsal
+
+\textbf{Fontos:} Ha mindegyik teszteset megbukik akkor nincsen fordított állomány! A tesztelő feltételezi hogy jar fájlként van fordítva a program, amely a \lstinline{target} mappában van elhelyezve.
+
+\subsection{Saját teszteset hozzáadása}
+
+Nagyon egyszerűen adható saját teszteset hozzá a szkripthez.
+\begin{enumerate}
+	\item Helyezzük el a tesztesetet a \lstinline{src/test/java/zoltanbalazs/Own} mappába
+	\item Nyissuk meg a tesztelő szkriptet
+	\item Adjuk hozzá a megfelelő \lstinline{own_} névvel kezdődő listához a saját tesztesetünket
+	\item Ha van, határozzuk meg a bemeneti argumentum(ok) és/vagy standard bemenetről kapott értékek mennyiségét és típusát
+	\item A következő futtatásnál az új teszteset le fog futni
+\end{enumerate}
+
+
 \section{Továbbfejlesztési lehetőségek}
 
 \subsection{Invokedynamic utasítás}
@@ -462,7 +520,7 @@ A szakdolgozat írása során megpróbáltam az alapos tesztelésre figyelni, ez
 
 Ehhez egy példa még több tesztfájl mellékelése. A tesztelő környezetbe (Python szkript) viszonylag egyszerűen be lehet helyezni új teszt fájlokat, amely leellenőrzi hogy megfelelő-e a program futása. Továbbfejlesztésként lehet Java programokat írni, majd ezeket a tesztelő környezethez hozzáadni, és ellenőrizni hogy jól fut-e le a program.
 
-Egy másik érdekes továbbfejlesztés, hogy ne csak Java programokat írjunk, hanem más JVM-et felhasználó nyelvekben is írjunk programokat. Ezekkel ellenőrizhetjük hogy a program tényleg képes-e általános Java bájtkódot interpretálni, vagy csak limitált a Java programozási nyelvre. A témabejelentés miatt én ezt az opciót kihagytam. (Egy egyszerű "Hello, World!"-el való tesztelés során a program hibát fog dobni, ennek az indoka hogy a programban levő reflekció, mivel a program Java nyelven van írva, nem találja a Clojure/Kotlin/Scala függvényeket, ehelyett érdemes lenne minden egyes fájlt interpretálni, nem csak a nem beépített osztályok fájlait.)
+Egy másik érdekes továbbfejlesztés, hogy ne csak Java programokat írjunk, hanem más JVM-et felhasználó nyelvekben is írjunk programokat. Ezekkel ellenőrizhetjük hogy a program tényleg képes-e általános Java bájtkódot interpretálni, vagy csak limitált a Java programozási nyelvre. A témabejelentés miatt én az ezekkel a nyelvekkel való tesztelést kihagytam. Egy egyszerű "Hello, World!"-el való tesztelés során (Clojure/Kotlin/Scala nyelven) a program hibát fog dobni, ennek az indoka hogy a programban levő reflekció, mivel a program Java nyelven van írva, nem találja a Clojure/Kotlin/Scala függvényeket, ehelyett érdemes lenne minden egyes fájlt interpretálni, nem csak a nem beépített osztályok fájlait. Természetesen ez megoldható ha a megfelelő nyelv standard könyvtárát be tudjuk másolni a \lstinline{cp} parancssori zászlóval.
 
 \subsection{Reflekció újragondolása}
 
