@@ -13,7 +13,7 @@ A mellékelt fájlok között elérhető egy jar fájl is, ennek a futtatásáho
 A program csak Java 7-nél újabb fordítóprogrammal fordított Java programokat képes interpretálni, számos bájtkód instrukciót a Java 7-es verziójában elavulttá tettek (ezek: \lstinline{ret}, \lstinline{jsr}, \lstinline{jsr_w}), nem fordulnak elő class fájlokban. A szakdolgozat ezeket az instrukciókat nem implementálta. (Implementálásukról részletesebben szó van a fejlesztői dokumentáció "Továbbfejlesztési lehetőségek" szekciójában, implementálásuk viszonylag triviális, viszont megértésük segít elmélyülni a Java bátjkódban.)
 
 Ezen felül egy másik, a Java 7-nél újabb verziójú programokban elég gyakran előforduló instrukció is implementálatlan maradt (név szerint az \lstinline{invokedynamic}), tehát nem minden program futtatható. Ennek az indoka hogy ez az utasítás nagyon nagy szintű elmélyülést igényel a Java bájtkódban, értelmezése meghaladja egy szakdolgozat szintjét. Ez az instrukció önmagában használható arra hogy egy, a szakdolgozat témájához hasonló, Java bátjkód interpretert írjon az ember. Ha a class fájlok egyike tartalmazza ezt az instrukciót, akkor a program jelez a felhasználó számára. Akaratlanul is része lehet a programunknak ez az instrukció, amikor egy változót szöveggel együtt próbálunk kiírni:
-\lstset{caption={Egyszerű példa invokedynamic utasítást tartalmazó Java kódra}, label=src:invokedynamic}
+\lstset{caption={invokedynamic utasítást tartalmazó Java kód}, label=src:invokedynamic}
 \begin{lstlisting}[language={Java}]
 public class InvokeDynamic {
 	public static void main(String[] args) {

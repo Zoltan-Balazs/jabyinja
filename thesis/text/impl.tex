@@ -71,7 +71,7 @@ CLASS_FILE.executeCode(codeAttribute.code);
 Ezzel el is jutottunk egy class fájl beolvasásától, az abban lévő adott függvény Java bájtkódjának futtatásáig, több teendőnk nincsen, a program az adott függvényben levő külön függvényhívásokat automatikusan elvégzi.
 
 A teljes példakód:
-\lstset{caption={Egyszerű példakód a Main.class interpretálására}, label=src:classinterpret}
+\lstset{caption={Példa a Main.class interpretálására}, label=src:classinterpret}
 \begin{lstlisting}[language={Java}]
 public class Interpreter {
 	public static void main(String[] args) throws Throwable {
@@ -237,35 +237,6 @@ class CodeIndex {
 Az absztrakció oka hogy függvényeknek átadva lehessen módosítani ezt a számot; a szám a jelenlegi index a kódot reprezentáló \lstinline{byte} tömbben, megmondja hogy a tömbben lévő melyik indexen levő instrukciót kell végrehajtani.
 
 Az absztrakció különösen észrevehető amikor az \lstinline{if} és \lstinline{goto} utasításokat hajtjuk végre, a \lstinline{ClassFile} objektumunk lokális változója módosítható az \lstinline{Instructions} osztály metódusain keresztül. Mivel a Java érték szerint adja át a paramétereket, ez egy sima \lstinline{int} számmal nem lehetne megoldani.
-
-\subsection{Interpretálás algoritmusa}
-
-Az \ref{alg:ibb}.~algoritmus egy általános elágazás és korlátozás algoritmust (\emph{Branch and Bound algorithm}) mutat be. A \ref{step:selrule}.~lépésben egy megfelelő kiválasztási szabályt kell alkalmazni.
-Példa forrása: \href{https://www.inf.u-szeged.hu/actacybernetica/}{Acta Cybernetica (ez egy hiperlink)}.
-
-\begin{algorithm}[H]
-\caption{A general interval B\&B algorithm}
-\label{alg:ibb}
-\textbf{\underline{Funct}} IBB($S,f$)
-\begin{algorithmic}[1] % sorszámok megjelenítése minden n. sor előtt, most n = 1
-\State Set the working list ${\cal L}_W$ := $\{S\}$ and the final list ${\cal L}_Q$ := $\{\}$
-\While{( ${\cal L}_W \neq \emptyset$ )} \label{alg:igoend}
-	\State Select an interval $X$ from ${\cal L}_W$ \label{step:selrule}\Comment{Selection rule}
-	\State Compute $lbf(X)$ \Comment{Bounding rule}
-	\If{$X$ cannot be eliminated} \Comment{Elimination rule}
-		\State Divide $X$ into $X^j,\ j=1,\dots, p$, subintervals   \Comment{Division rule}
-		\For{$j=1,\ldots,p$}
-			\If{$X^j$ satisfies the termination criterion} \Comment{Termination rule}
-				\State Store $X^j$ in ${\cal L}_W$
-			\Else
-				\State Store $X^j$ in ${\cal L}_W$
-			\EndIf
-		\EndFor
-	\EndIf
-\EndWhile
-\State \textbf{return} ${\cal L}_Q$
-\end{algorithmic}
-\end{algorithm}
 
 \subsection{Interpretálás működése}
 
