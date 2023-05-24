@@ -38,7 +38,7 @@ jabyinja_command = "java -jar target/jabyinja-*.jar "
 
 base_dir = "target/test-classes/"
 
-own_tests = [
+own_basic_tests = [
     "com/zoltanbalazs/Own/Arithmetic",
     "com/zoltanbalazs/Own/Arrayclass",
     "com/zoltanbalazs/Own/Arraylist",
@@ -53,6 +53,10 @@ own_tests = [
     "com/zoltanbalazs/Own/SwitchAthrow",
     "com/zoltanbalazs/Own/Template",
 ]
+
+own_args_tests = []
+own_stdin_tests = []
+own_args_stdin_tests = []
 
 pti_basic_tests = [
     "com/zoltanbalazs/PTI/_01/Print",
@@ -222,10 +226,10 @@ def tester(test_files, line_length, test_type, timing, memory_usage):
                                 "' '" + java_command_current + "' 2>&1 | grep 'Time (mean ± σ)'", shell=True)
             if memory:
                 print("\tJabyinja: ", end='', flush=True)
-                subprocess.call("gtime --verbose " + jabyinja_command_current +
+                subprocess.call("/usr/bin/time --verbose " + jabyinja_command_current +
                                 " 2>&1 | grep 'Maximum resident'", shell=True)
                 print("\t/usr/bin/java: ", end='', flush=True)
-                subprocess.call("gtime --verbose " + java_command +
+                subprocess.call("/usr/bin/time --verbose " + java_command +
                                 " 2>&1 | grep 'Maximum resident'", shell=True)
 
             jabyinja_file.seek(0)
@@ -269,23 +273,44 @@ if __name__ == '__main__':
     timing = (args.time is None)
     memory = (args.mem is None)
 
-    longest_name = max(own_tests + pti_basic_tests, key=len)
+    longest_name = max(own_basic_tests + pti_basic_tests, key=len)
     longest_name_tuple = max(
-        pti_args_tests + pti_stdin_tests, key=lambda item: len(item[0]))[0]
+        own_args_tests + own_stdin_tests + own_args_stdin_tests + pti_args_tests + pti_stdin_tests + pti_args_stdin_tests, key=lambda item: len(item[0]))[0]
     longest_line = max(longest_name, longest_name_tuple)
 
     print(CLI_COLOR.BOLD + "Testing given files " + CLI_COLOR.END)
-    print(CLI_COLOR.BOLD + " Own test case(s): " + CLI_COLOR.END)
-    tester(own_tests, longest_line, TEST_TYPE.STANDARD, timing, memory)
-    print(CLI_COLOR.BOLD + " PTI basic test case(s): " + CLI_COLOR.END)
-    tester(pti_basic_tests, longest_line, TEST_TYPE.STANDARD, timing, memory)
-    print(CLI_COLOR.BOLD + " PTI with argument test case(s): " + CLI_COLOR.END)
-    tester(pti_args_tests, longest_line, TEST_TYPE.ARGS, timing, memory)
-    print(CLI_COLOR.BOLD + " PTI with stdin test case(s): " + CLI_COLOR.END)
-    tester(pti_stdin_tests, longest_line, TEST_TYPE.STDIN, timing, memory)
-    print(CLI_COLOR.BOLD + " PTI with stdin and argument test case(s): " + CLI_COLOR.END)
-    tester(pti_args_stdin_tests, longest_line,
-           TEST_TYPE.ARGS_AND_STDIN, timing, memory)
+    if own_basic_tests:
+        print(CLI_COLOR.BOLD + " Own, basic test case(s): " + CLI_COLOR.END)
+        tester(own_basic_tests, longest_line, TEST_TYPE.STANDARD, timing, memory)
+
+    if own_args_tests:
+        print(CLI_COLOR.BOLD + " Own, with argument test case(s): " + CLI_COLOR.END)
+        tester(own_args_tests, longest_line, TEST_TYPE.STANDARD, timing, memory)
+
+    if own_stdin_tests:
+        print(CLI_COLOR.BOLD + " Own, with stdin test case(s): " + CLI_COLOR.END)
+        tester(own_stdin_tests, longest_line, TEST_TYPE.STANDARD, timing, memory)
+
+    if own_args_stdin_tests:
+        print(CLI_COLOR.BOLD + " Own, with stdin and argument test case(s): " + CLI_COLOR.END)
+        tester(own_args_stdin_tests, longest_line, TEST_TYPE.STANDARD, timing, memory)
+
+    if pti_basic_tests:
+        print(CLI_COLOR.BOLD + " PTI, basic test case(s): " + CLI_COLOR.END)
+        tester(pti_basic_tests, longest_line, TEST_TYPE.STANDARD, timing, memory)
+    
+    if pti_args_tests:
+        print(CLI_COLOR.BOLD + " PTI, with argument test case(s): " + CLI_COLOR.END)
+        tester(pti_args_tests, longest_line, TEST_TYPE.ARGS, timing, memory)
+
+    if pti_stdin_tests:
+        print(CLI_COLOR.BOLD + " PTI, with stdin test case(s): " + CLI_COLOR.END)
+        tester(pti_stdin_tests, longest_line, TEST_TYPE.STDIN, timing, memory)
+
+    if pti_args_stdin_tests:
+        print(CLI_COLOR.BOLD + " PTI, with stdin and argument test case(s): " + CLI_COLOR.END)
+        tester(pti_args_stdin_tests, longest_line,
+            TEST_TYPE.ARGS_AND_STDIN, timing, memory)
 
     print()
     print(CLI_COLOR.BOLD + "Summary:" + CLI_COLOR.END)
