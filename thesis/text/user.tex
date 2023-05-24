@@ -1,7 +1,7 @@
 \chapter{Felhasználói dokumentáció}
 \label{ch:user}
 
-A program elsődleges felhasználói fejlesztők, alapszintű tudás szükséges a Java nyelvről (vagy bármilyen olyan nyelvről amely JVM Bytecode-ra fordul), a class fájlokról, illetve Java programok fordításáról.
+A program elsődleges felhasználói fejlesztők, alapszintű tudás szükséges a Java nyelvről (vagy bármilyen olyan nyelvről amely Java bájtkódra fordul), a class fájlokról, illetve Java programok fordításáról.
 
 Mivel az elkészített program csak interpretálni tud, a fordítást egy már elérhető Java fordítóprogrammal szükséges megtenni. Mivel a Java programok class fájlokra fordulnak, ezek futtatásához szükséges egy interpretáló program.
 
@@ -10,9 +10,9 @@ Alapvető esetben ez a fordítóprogrammal együtt telepítésre kerül. A szakd
 A mellékelt fájlok között elérhető egy jar fájl is, ennek a futtatásához ugyanúgy szükségünk van egy beépített interpretáló programra, amely képes Java programokat futtatni és nem a szakdolgozat maga.
 
 \section{Kikötések}
-A program csak Java 7-nél újabb fordítóprogrammal fordított Java programokat képes interpretálni, számos Bytecode instrukciót a Java 7-es verziójában elavulttá tettek (ezek: \lstinline{ret}, \lstinline{jsr}, \lstinline{jsr_w}), nem fordulnak elő class fájlokban. A szakdolgozat ezeket az instrukciókat nem implementálta.
+A program csak Java 7-nél újabb fordítóprogrammal fordított Java programokat képes interpretálni, számos Bytecode instrukciót a Java 7-es verziójában elavulttá tettek (ezek: \lstinline{ret}, \lstinline{jsr}, \lstinline{jsr_w}), nem fordulnak elő class fájlokban. A szakdolgozat ezeket az instrukciókat nem implementálta. (Implementálásukról részletesebben szó van a fejlesztői dokumentáció "Továbbfejlesztési lehetőségek" szekciójában, implementálásuk viszonylag triviális, viszont megértésük segít elmélyülni a Java bátjkódban.)
 
-Ezen felül egy másik instrukció is implementálatlan maradt (\lstinline{invokedynamic}), tehát nem minden program futtatható. Ha a class fájlok egyike tartalmazza ezt az instrukciót, akkor a program jelez a felhasználó számára. Akaratlanul is része lehet a programunknak ez az instrukció, amikor egy változót szöveggel együtt próbálunk kiírni:
+Ezen felül egy másik instrukció is implementálatlan maradt (név szerint az \lstinline{invokedynamic}), tehát nem minden program futtatható. Ennek az indoka hogy ez az utasítás nagyon nagy szintű elmélyülést igényel a Java bájtkódban, értelmezése meghaladja egy szakdolgozat szintjét. Ez az instrukció önmagában használható arra hogy egy, a szakdolgozat témájához hasonló, Java bátjkód interpretert írjon az ember. Ha a class fájlok egyike tartalmazza ezt az instrukciót, akkor a program jelez a felhasználó számára. Akaratlanul is része lehet a programunknak ez az instrukció, amikor egy változót szöveggel együtt próbálunk kiírni:
 \begin{minted}{java}
 String world = "world";
 System.out.println("Hello " + world);
@@ -33,37 +33,50 @@ A könnyebb fordítás (illetve egyszerűbb jar fájl készítés) érdekében a
 
 Ha nem akarunk Maven-t használni, akkor a fordítás menete a következő:
 \begin{compactitem}
-	\item Menjünk a \lstinline{src/main/java} mappába: \lstinline{cd src/main/java/}
-	\item Fordítsuk le a \lstinline{com/zoltanbalazs/Main.java} fájlt: \lstinline{javac com/zoltanbalazs/Main.java}
+	\item Menjünk a \lstinline{src/main/java} mappába (a \lstinline{$} jel arra utal, hogy normál felhasználóként futtassuk a parancsot): 
+	\begin{minted}{bash}
+$ cd src/main/java/
+	\end{minted}
+	\item Fordítsuk le a \lstinline{com/zoltanbalazs/Main.java} fájlt:
+	\begin{minted}{bash}
+$ javac com/zoltanbalazs/Main.java
+	\end{minted}
 	\item Az elkészült class fájl a \lstinline{src/main/java/com/zoltanbalazs} mappában lesz 
 \end{compactitem}
 
 Maven-t használva ez a procedúra egyszerűbb:
 \begin{compactitem}
-	\item Futtassuk le a csomagoló parancsot: \lstinline{mvn package}
+	\item Futtassuk le a csomagoló parancsot:
+	\begin{minted}{bash}
+$ mvn package
+	\end{minted}
 	\item Az elkészült class fájl a \lstinline{target/classes/com/zoltanbalazs} mappában lesz, ezen felül a \lstinline{target} mappában lesz egy futtatható jar fájl is
 \end{compactitem}
 
 \subsection{Futtattás}
 
-Ha a generált class fájl-lal akarjuk futtatni a programot, futtassuk le a \lstinline{java com.zoltanbalazs.Main} parancsot a \lstinline{src/main/java} mappában.\ (ha Maven-nel fordítottunk akkor a \lstinline{target/classes} mappában futtassuk le az előző fenti parancsot)
+Ha a generált class fájllal akarjuk futtatni a programot, futtassuk le a \lstinline{java com.zoltanbalazs.Main} parancsot a \lstinline{src/main/java} mappában.\ (ha Maven-nel fordítottunk akkor a \lstinline{target/classes} mappában futtassuk le az előző fenti parancsot)
 
-A maven által készített jar fájl-lal való futtatáshoz, futtassuk le a \lstinline{java -jar target/jabyinja-1.0.0.jar} parancsot a főmappában.
+A maven által készített jar fájllal való futtatáshoz, futtassuk le a \lstinline{java -jar target/jabyinja-1.0.0.jar} parancsot a főmappában.
 
 Mindkét esetben egy opcionális argumentumot (argumentum sorozatot ha a futtatandó programunk vár parancssori argumentumot) meg tudunk adni, ez a \lstinline{main} metódust tartalmazó class fájl elérési útvonala. Alapvető esetben a program a futási mappában próbál meg egy \lstinline{Main.class} fájlt futtatni.
 
 Futásra egy példa:
-\lstinline{java -jar target/jabyinja-1.0.0.jar target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World}
+\begin{minted}{bash}
+$ java -jar target/jabyinja-1.0.0.jar target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World
+\end{minted}
 
 \subsection{Önfuttatás}
 
 Az elkészült interpreter képes saját magát is futtatni, ehhez a futtatáshoz hasonlóan meg kell adni a programnak a saját class fájlának elérési útját, majd opcionálisan a többi paramétert.
 
-Ez jar fájl esetén így néz ki, a főkönyvtárból futtatva:
-\lstinline{java -jar target/jabyinja-1.0.0.jar target/classes/com/zoltanbalazs/Main.class target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World}
+Ez a futtatás jar fájl esetén így néz ki, a főkönyvtárból futtatva:
+\begin{minted}{bash}
+$ java -jar target/jabyinja-1.0.0.jar target/classes/com/zoltanbalazs/Main.class target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World
+\end{minted}
 
 \section{Felmerülő problémák}
 
-A futtatandó program futása során nem merül fel probléma (hacsak nincsen \lstinline{invokedynamic} a generált class fájlban) amelyet a program okoz. Ha a futtatandó programunk hibát dob, akkor ezt az interpretáló program is ugyanúgy megteszi; viszont a hiba kiírása során nem biztos hogy ugyanazt a kimentet kapjuk mint a beépített interpreter-rel.
+A futtatandó program futása során nem merül fel probléma (hacsak nincsen \lstinline{invokedynamic} a generált class fájlban) amelyet a program okoz. Ha a futtatandó programunk hibát dob, akkor ezt az interpretáló program is ugyanúgy megteszi; viszont a hiba kiírása során nem biztos hogy ugyanazt a kimentet kapjuk mint a beépített interpreterrel.
 
-Tehát ha a hibánk nem egy \lstinline{try, catch} blokk-ban szerepel, akkor a kiírt üzenet nem biztos hogy ugyanaz lesz mint a beépített interpreter-rel, az összes többi kiírt üzenet viszont ugyanaz kell hogy legyen.
+Tehát ha a hibánk nem egy \lstinline{try, catch} blokk-ban szerepel, akkor a kiírt üzenet nem biztos hogy ugyanaz lesz mint a beépített interpreterrel, az összes többi kiírt üzenet viszont ugyanaz kell hogy legyen.

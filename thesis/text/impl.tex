@@ -1,6 +1,8 @@
 \chapter{Fejlesztői dokumentáció}
 \label{ch:impl}
 
+A program számos segítséget ad fejlesztőknek a kód egyszerű értelmezésére; a kód bővítésére. Vállalkozó szellemű embereknek a program egy teljes Java interpretert tud nyújtani viszonylag kevés továbbfejlesztéssel. A Java bájtkód instrukciók megértése során bármely Java fejlesztő jobban tudja értékelni hogy mit is csinál a Java fordítóprogram a háttérben. A program nagyon szorosan épül a JVM specifikációra, a specifikációt annak megfelelően próbálja implementálni.
+
 \section{Class fájl felépítése}
 
 \subsection{Class fájltól a benne levő metódus futtatásáig}
@@ -31,7 +33,7 @@ ClassFile CLASS_FILE = new ClassFile("Main.class", null);
 Method_Info method = CLASS_FILE.findMethodsByName("main");
 \end{minted}
 
-A függvény megtalálása után ajánlott a \lstinline{Code} attribútumot megtalálni, ebben, többek között, található a futtatandó bytecode is. A segédfüggvény erre a \lstinline{findAttributesByName}:
+A függvény megtalálása után ajánlott a \lstinline{Code} attribútumot megtalálni, ebben, többek között, található a futtatandó Java bájtkód is. A segédfüggvény erre a \lstinline{findAttributesByName}:
 \begin{minted}{java}
 public List<Attribute_Info> findAttributesByName(List<Attribute_Info> attributes, String attributeName)
 \end{minted}
@@ -62,14 +64,14 @@ public Pair<Class<?>, Object> executeCode(byte[] code)
 	NoSuchMethodException, SecurityException, InstantiationException, IllegalArgumentException,
 	InvocationTargetException, Throwable
 \end{minted}
-A reflekció miatt számos hibát dob vissza a függvény, ha nem helyes a kód formátuma akkor \lstinline{IOException}-t dob a függvény, a \lstinline{Throwable} az \lstinline{ATHROW} bytecode instrukció miatt szükséges (ekkor egy hibát dob vissza a metódusunk).
+A reflekció miatt számos hibát dob vissza a függvény, ha nem helyes a kód formátuma akkor \lstinline{IOException}-t dob a függvény, a \lstinline{Throwable} az \lstinline{ATHROW} Java bájtkód instrukció miatt szükséges (ekkor egy hibát dob vissza a metódusunk).
 Visszatérési értéke \lstinline{Pair<Class<?>, Object>}, a számos \lstinline{RETURN} utasítás miatt (ezeket a stack-en szükséges elhelyezünk)
 Példa a használatára:
 \begin{minted}{java}
 CLASS_FILE.executeCode(codeAttribute.code);
 \end{minted}
 
-Ezzel el is jutottunk egy class fájl beolvasásától, az abban lévő adott függvény bytecodejának futtatásáig, több teendőnk nincsen, a program az adott függvényben levő külön függvényhívásokat automatikusan elvégzi.
+Ezzel el is jutottunk egy class fájl beolvasásától, az abban lévő adott függvény Java bájtkódjának futtatásáig, több teendőnk nincsen, a program az adott függvényben levő külön függvényhívásokat automatikusan elvégzi.
 
 A teljes példakód:
 \begin{minted}{java}
@@ -201,7 +203,7 @@ A class fájlnak megfelelően a két legfontosabb adattag a \lstinline{stack} é
 Az egyszerűség kedvéért a \lstinline{stack} reprezentációjában az osztály típusát is elmentjük, a két adattag Java reprezentációja a \lstinline{ClassFile} osztályban:
 \begin{minted}{java}
 public List<Pair<Class<?>, Object>> stack = new ArrayList<>();
-public Object[] local = new Object[65535];
+public Object[] local = new Object[65536];
 \end{minted}
 (A \lstinline{Pair} egy egyedi osztály, mely két adattagot tud eltárolni, más nyelvekben \lstinline{tuple}-ként is ismeretes.)
 
@@ -214,7 +216,21 @@ Kényelmi szempontból létezik a \lstinline{CodeIndex} osztály, amely lényeg�
 class CodeIndex {
     private int index = 0;
 
-    ...
+    public void Inc(int value) {
+        index += value;
+    }
+
+    public int Next() {
+        return index++;
+    }
+
+    public void Set(int value) {
+        index = value;
+    }
+
+    public int Get() {
+        return index;
+    }
 }
 \end{minted}
 Az absztrakció oka hogy függvényeknek átadva lehessen módosítani ezt a számot; a szám a jelenlegi index a kódot reprezentáló \lstinline{byte} tömbben, megmondja hogy a tömbben lévő melyik indexen levő instrukciót kell végrehajtani.
@@ -256,14 +272,24 @@ Példa forrása: \href{https://www.inf.u-szeged.hu/actacybernetica/}{Acta Cybern
 
 A \lstinline{Linux} operációs rendszeren beépített \lstinline{time} programot (illetve a \lstinline{hyperfine} programot) használva az erőforrás igények a tesztfájlokra az alábbiak (a tesztelt számítógép releváns specifikációi: Intel Core i7-8700k processzor 4.7 GHz-en, 16 GB DDR4 memória 2133 MT/s sebességgel):
 
-\begin{table}[htb]
+\begin{center}
 	\centering
-	\begin{tabular}{ | l | r | r | r | r | }
+	\begin{longtable}{ | l | r | r | r | r | }
+
 		\hline
 		\multirow{2}{*}{\textbf{Tesztfájl}} & \multicolumn{2}{ c | }{\textbf{/usr/bin/java}} & \multicolumn{2}{ c | }{\textbf{Jabyinja}} \\
 		\cline{2-5}
 		& Memória & Futási idő & Memória & Futási idő \\
 		\hline \hline		
+		\endfirsthead
+
+		\hline
+		\multirow{2}{*}{\textbf{Tesztfájl}} & \multicolumn{2}{ c | }{\textbf{/usr/bin/java}} & \multicolumn{2}{ c | }{\textbf{Jabyinja}} \\
+		\cline{2-5}
+		& Memória & Futási idő & Memória & Futási idő \\
+		\hline \hline		
+		\endhead
+
 		Own/Arithmetic.class & 37,1 MB & 21,4 ms & 47,6 MB & 92,8 ms \\
 		\hline
 		Own/Arrayclass.class & 34,9 MB & 20,9 ms & 54,6 MB & 130,8 ms \\
@@ -288,14 +314,117 @@ A \lstinline{Linux} operációs rendszeren beépített \lstinline{time} programo
 		\hline
 		Own/Template.class & 39,2 MB & 21,2 ms & 51,9 MB & 86,5 ms \\
 		\hline
-	\end{tabular}
-	\caption[Erőforrás különbségek]{A beépített \lstinline{java} és az interpreter közötti erőforrás különbségek}
-	\label{jabyinja:resource}
-\end{table}
+		PTI/\_01/Euler.class & 39,5 MB & 22,1 ms & 47,5 MB & 66,4 ms \\
+		\hline
+		PTI/\_01/Factorial.class & 39,6 MB & 21,8 ms & 50,7 MB & 68,4 ms \\
+		\hline
+		PTI/\_01/GCD.class & 38,9 MB & 20,6 ms & 51,6 MB & 67,8 ms \\
+		\hline
+		PTI/\_01/Greet.class & 38,8 MB & 20,8 ms & 50,8 MB & 56,8 ms \\
+		\hline
+		PTI/\_01/Half.class & 39,6 MB & 22,7 ms & 50,7 MB & 69,7 ms \\
+		\hline
+		PTI/\_01/Odd.class & 38,5 MB & 20,7 ms & 37,8 MB & 69,7 ms \\
+		\hline
+		PTI/\_01/PerfectNum.class & 38,8 MB & 20,7 ms & 51,2 MB & 57,1 ms \\
+		\hline
+		PTI/\_01/PerfectNumRange.class & 37,8 MB & 20,6 ms & 70,6 MB & 87,6 ms \\
+		\hline
+		PTI/\_01/Print.class & 41,1 MB & 21,4 ms & 51,2 MB & 67,2 ms \\
+		\hline
+		PTI/\_01/Sqrt.class & 35,7 MB & 22,3 ms & 50,9 MB & 70,3 ms \\
+		\hline
+		PTI/\_01/SquareRoot.class & 37,6 MB & 22,4 ms & 43,1 MB & 71,5 ms \\
+		\hline
+		PTI/\_01/TwoNum.class & 35,1 MB & 20,6 ms & 47,7 MB & 75,8 ms \\
+		\hline
+		PTI/\_02/\_01/PointMain.class & 41,5 MB & 22,3 ms & 55,6 MB & 122,7 ms \\
+		\hline
+		PTI/\_02/\_02/CircleMain.class & 41,5 MB & 21,3 ms & 53,1 MB & 82,5 ms \\
+		\hline
+		PTI/\_02/\_03/CircleMain.class & 41,3 MB & 22,7 ms & 55,1 MB & 93,7 ms \\
+		\hline
+		PTI/\_02/\_04/ComplexMain.class & 41,5 MB & 21,2 ms & 58,4 MB & 125,7 ms \\
+		\hline
+		PTI/\_02/\_05/LineMain.class & 41,4 MB & 20,7 ms & 56,7 MB & 102,5 ms \\
+		\hline
+		PTI/\_03/IterletterMain.class & 41,7 MB & 20,8 ms & 78,9 MB & 180,5 ms \\
+		\hline
+		PTI/\_04/\_01/PointMain.class & 39,6 MB & 22,7 ms & 58,8 MB & 126,7 ms \\
+		\hline
+		PTI/\_04/\_02/DoubleVectorMain.class & 41,3 MB & 21,1 ms & 68,5 MB & 176,2 ms \\
+		\hline
+		PTI/\_05/\_01/Swap.class & 41,2 MB & 20,1 ms & 51,9 MB & 60,5 ms \\
+		\hline
+		PTI/\_05/\_02/IntegerMatrixMain.class & 41,2 MB & 20,7 ms & 46,8 MB & 70,1 ms \\
+		\hline
+		PTI/\_05/\_03/WildAnimalMain.class & 41,0 MB & 21,2 ms & 73,4 MB & 183,5 ms \\
+		\hline
+		PTI/\_05/\_04/IntVectorMain.class & 43,2 MB & 21,0 ms & 53,9 MB & 93,9 ms \\
+		\hline
+		PTI/\_06/\_01/Calculator.class & 39,1 MB & 21,1 ms & 51,6 MB & 64,1 ms \\
+		\hline
+		PTI/\_06/\_02/AddByLine.class & 41,2 MB & 21,6 ms & 53,0 MB & 92,3 ms \\
+		\hline
+		PTI/\_06/\_03/IsPartOf.class & 39,3 MB & 22,4 ms & 51,8 MB & 73,9 ms \\
+		\hline
+		PTI/\_06/\_04/CircleMain.class & 41,3 MB & 22,0 ms & 64,7 MB & 124,8 ms \\
+		\hline
+		PTI/\_08/\_01/BookMain.class & 41,4 MB & 21,4 ms & 74,3 MB & 197,6 ms \\
+		\hline
+		PTI/\_08/\_02/CoffeeShop.class & 41,1 MB & 21,2 ms & 60,8 MB & 123,7 ms \\
+		\hline
+		PTI/\_09/\_01/Divisors.class & 41,2 MB & 20,2 ms & 52,2 MB & 85,4 ms \\
+		\hline
+		PTI/\_09/\_04/MultiSetMain.class & 41,4 MB & 21,6 ms & 67,7 MB & 175,4 ms \\
+		\hline
+		PTI/\_10/\_01/Extends.class & 41,4 MB & 20,6 ms & 52,6 MB & 82,4 ms \\
+		\hline
+		PTI/\_10/\_02/BookMain.class & 41,1 MB & 22,3 ms & 85,0 MB & 254,5 ms \\
+		\hline
+		PTI/\_10/\_03/BagMain.class & 41,4 MB & 21,4 ms & 72,7 MB & 175,2 ms \\
+		\hline
+		PTI/\_10/\_04/Swap.class & 41,6 MB & 20,3 ms & 53,6 MB & 101,0 ms \\
+		\hline
+		PTI/\_11/\_01/FlyingMain.class & 41,4 MB & 21,5 ms & 54,3 MB & 92,0 ms \\
+		\hline
+		PTI/\_11/\_02/Main.class & 41,3 MB & 20,8 ms & 71,6 MB & 153,7 ms \\
+		\hline
+		PTI/\_11/\_03/AnimalMain.class & 41,6 MB & 20,5 ms & 52,1 MB & 78,3 ms \\
+		\hline
+		PTI/\_11/\_04/AnimalMain.class & 41,3 MB & 21,7 ms & 64,5 MB & 152,3 ms \\
+		\hline
+		PTI/\_12/Inheritence.class & 41,6 MB & 20,2 ms & 47,7 MB & 68,3 ms \\
+		\hline
+
+		\caption[Erőforrás különbségek]{A beépített \lstinline{java} és az interpreter közötti erőforrás különbségek}
+		\label{jabyinja:resource}
+	\end{longtable}
+\end{center}
 
 \subsection{A program memóriamodellje}
 
+A heap memória nincsen implementálva a programban. Ez alapszik a standard Java interperet implementációjára. Ide tartoznak többek között az objektumoknak a referenciái. Ebből következően a szemétgyűjtés (\lstinline{garbage collector}) a beépített Java szemétgyűjtő algoritmust alkalmazza.
+
+A stack memória fontos építőeleme a programnak, az implementációja \lstinline{ArrayList} osztállyal van megoldva.
+\begin{minted}{java}
+public List<Pair<Class<?>, Object>> stack = new ArrayList<>();
+\end{minted}
+Ez az \lstinline{ArrayList} egy \lstinline{Class<?>}-t és \lstinline{Object}-et tartalmazó \lstinline{Pair}-eket (\lstinline{tuple}) foglal magába. Az \lstinline{Object} a konkrét érték amit a stack-en tárolni szeretnénk, a \lstinline{Class<?>} egy kényelmi megoldás miatt a tárolt értéknek a típusa.
+
+Az implementációból következően lényegében a tényleges program-ban az alábbi memóriaeloszlás következik be:
+
 \subsection{Az önfuttatásról}
+
+Habár a program tényleg képes önmagát lefuttatni, a Java programozási nyelvet mélyebben értő emberek észrevehetik, hogy ez egy erősen kikötéses állítás. Mivel a beépített osztályokat nem interpretálja a program, ezért amikor egy olyan parancsot hívunk meg, mint például: 
+\begin{minted}{bash}
+$ java -jar target/jabyinja-1.0.0.jar target/classes/com/zoltanbalazs/Main.class target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World
+\end{minted}
+akkor igazából csak az interperet \lstinline{main} metódusáig interpretáljuk azt.
+
+A \lstinline{java} beépített interperet működése miatt amikor egy jar fájlt futtatunk, minden, a jar fájlban lévő, osztály beépített lesz. Az eddig leírtak alapján pedig a beépített osztályok metódusai pedig reflekcióval vannak meghívva.
+
+Természetesen a \lstinline{main} függvényben is megfelelően kell felépíteni a különböző adattagokat, tehát az interpret tényleg saját magát futtatja, viszont nem látunk akkora erőforrásbeli különbséget mint ami a beépített interpretert és a megírt program között van.
 
 \section{Továbbfejlesztési lehetőségek}
 
@@ -306,7 +435,7 @@ Ez az utasítás számos helyen előfordul Java programokban, leginkább a lambd
 
 Az utóbbi egyszerűen kiküszöbölhető a \lstinline{-XDstringConcat=inline} flag-gel való fordítás során az \lstinline{invokedynamic} utasítás lecserélődik \lstinline{StringBuilder}-en keresztül lévő \lstinline{invokevirtual} és \lstinline{invokespecial} hívásokra.
 
-Az előző viszont sajnos jelen állapotban nem megoldott, és nem is oldható meg egyszerűen. Ahhoz hogy lambda függvények működjenek, az \lstinline{invokedynamic}-ot implementálni kell. Ehhez már az alapvető előkészület megvan, a class fájlban lévő \lstinline{bootstrap} metódosuk egy külön adattag elemeiként el vannak helyezve. A továbbfejlesztés során csak a megfelelő \lstinline{CallSite} helyet, illetve a class fájlban lévő constant pool általi \lstinline{index}-eken levő metódusokkal (illetve paraméterekkel) kell meghívni az éppen leírt függvényt.
+Az előző viszont sajnos jelen állapotban nem megoldott, és nem is oldható meg egyszerűen. Ahhoz hogy lambda függvények működjenek, az \lstinline{invokedynamic}-ot implementálni kell. Ehhez már az alapvető előkészület megvan, a class fájlban lévő \lstinline{bootstrap} metódusok egy külön adattag elemeiként el vannak helyezve. A továbbfejlesztés során csak a megfelelő \lstinline{CallSite} helyet, illetve a class fájlban lévő constant pool általi \lstinline{index}-eken levő metódusokkal (illetve paraméterekkel) kell meghívni az éppen leírt függvényt.
 
 \subsection{Java 7 előtti verziók támogatása}
 
@@ -316,14 +445,15 @@ A hiányzó utasítások a \lstinline{ret}, \lstinline{jsr}, \lstinline{jsr_w}, 
 
 Természetesen mindegyik utasítás során a megfelelő index-et is be kell olvasnunk a class fájlból, amely a lokális változó megfelelő indexére (\lstinline{ret}), vagy egy adott számot (\lstinline{jsr}, \lstinline{jsr_w}) határoz meg, amely a visszatérési cím, illetve az ugrási cím.
 
-\subsection{Erőforrás igény}
+\subsection{Optimalizálás}
 
 A futási idő táblázata alapján látható hogy a program exponenciálisan lassabb, mint a beépített \lstinline{java} interpretáló program. A program több memóriát is igényel mint szükséges lenne. Ezeknek számos oka is van, ezek közül pár:
 
 \begin{compactitem}
-	\item A nem beépített osztályok megfelelő konstruktorait minden egyes alkalommal a program egyesével keresi ki a program. Ez a limitáció nagyon szembetűnő ha sok saját osztállyal dolgozunk. Ilyenkor a futási idő mégjobban lassul
-	\item A \lstinline{stack}-nek maximális értéket (65536) foglal a program minden nem beépített függvény meghívása során, viszont a class fájlban ennek a maximális értéke le van írva a megfelelő függvény attribútumaként.
-	\item A különböző class fájlok beolvasásának eredménye nincs elmentve, ha egy fájlt be kell olvasnunk, akkor azt minden egyes alkalommal külön-külön megteszünk, ha az eredményt elmentenénk akkor drasztikusan lehetne a sebességen gyorsítani.
+	\item A nem beépített osztályok megfelelő konstruktorait minden egyes alkalommal a program egyesével keresi ki a program. Ez a limitáció nagyon szembetűnő ha sok saját osztállyal dolgozunk. Ilyenkor a futási idő exponenciálisan lassul. Egy lehetséges megoldás erre hogy a megfelelő konstruktorokat elmenti a program, majd keresés előtt az elmentett konstruktorok között megnézzük hogy szerepel-e már a jelenleg hívandó konstruktor. Ha igen, akkor egyértelmű módon nem keressük ki, hanem felhasználjuk azt, ha nem, akkor pedig megkeressük.
+	\item A \lstinline{local} változóknak maximális értéket ($65536$) foglal a program minden nem beépített függvény meghívása során, viszont a class fájlban ennek a maximális értéke le van írva a megfelelő függvény attribútumaként. Tehát a megoldás erre viszonylag egyszerű, függvényfuttatás előtt kellene a lokális változók mennyiségét beállítani. Ennek a problémának a másik verziója, hogy habár a stack egy \lstinline{LIFO} (\textit{\textbf{L}ast \textbf{I}n \textbf{F}irst \textbf{O}ut}, amely adat utoljára kerül bele, az kerül elsőnek ki belőle) adatszerkezet, a maximális mérete ennek is a class fájlban a függvény egy megfelelő attribútumaként jelen van. A már megírt függvényekkel viszonylag triviális ezt lekérdezni. (A megfelelő függvény a \lstinline{ClassFile} osztályban található \lstinline{findAttributesByName})
+	\item A különböző class fájlok beolvasásának eredménye nincs elmentve, ha egy fájlt be kell olvasnunk, akkor azt minden egyes alkalommal külön-külön megteszünk, ha az eredményt elmentenénk akkor drasztikusan lehetne a sebességen gyorsítani. Ennek megoldásaként a \lstinline{Main} osztályban egy listában fel lehetne venni a beolvasott class fájlokat, egy nem beépített class fájlban levő metódus interpretálása előtt pedig végig lehetne menni a már beolvasott fájlokon. Ezzel jóval kevesebb fájl beolvasás műveletet végeznénk, cserébe a listán való végigmenés lehet hogy kevés class fájl használata esetén negatív hatással lenne.
+	\item A reflekciót újragondolva, azt elhagyva a sebesség növelhető lenne, erről részletesebben a "Reflekció újragondolása" szekcióban van írva. Lényege, hogy a jelenlegi, beépített osztályokon levő reflekciót le kellene cserélni interpretálása. Az alapok ehhez megvannak, viszont ez is egy komolyabb programozási feladat.
 \end{compactitem}
 
 \subsection{További tesztelés}
@@ -332,16 +462,35 @@ A szakdolgozat írása során megpróbáltam az alapos tesztelésre figyelni, ez
 
 Ehhez egy példa még több tesztfájl mellékelése. A tesztelő környezetbe (Python szkript) viszonylag egyszerűen be lehet helyezni új teszt fájlokat, amely leellenőrzi hogy megfelelő-e a program futása. Továbbfejlesztésként lehet Java programokat írni, majd ezeket a tesztelő környezethez hozzáadni, és ellenőrizni hogy jól fut-e le a program.
 
+Egy másik érdekes továbbfejlesztés, hogy ne csak Java programokat írjunk, hanem más JVM-et felhasználó nyelvekben is írjunk programokat. Ezekkel ellenőrizhetjük hogy a program tényleg képes-e általános Java bájtkódot interpretálni, vagy csak limitált a Java programozási nyelvre. A témabejelentés miatt én ezt az opciót kihagytam. (Egy egyszerű "Hello, World!"-el való tesztelés során a program hibát fog dobni, ennek az indoka hogy a programban levő reflekció, mivel a program Java nyelven van írva, nem találja a Clojure/Kotlin/Scala függvényeket, ehelyett érdemes lenne minden egyes fájlt interpretálni, nem csak a nem beépített osztályok fájlait.)
+
+\subsection{Reflekció újragondolása}
+
+A reflekció egy viszonylag negatív hírrel rendelkező programozási folyamat, melynek számos indoka van, legtöbbször a fő indok az, hogy a reflekcióval megoldott problémát valamilyen elegánsabb módon is meg lehetne oldani.
+
+Sajnos a szakdolgozat programjában is észrevehető hogy a reflekció nem annyira tökéletes megoldás erre a problémára, lehetne elegánsabb megoldást is találni. A reflekció túlságos használata miatt a teljesítmény is rosszabb, egy komoly optimalizálási feladat a programban lévő reflekciót lecserélni.
+
+A másik komoly probléma a szakdolgozatban a reflekció használatával, az előbb említett képtelenség arra, hogy Java nyelven kívüli programokat futtatni tudjon. Habár a program készen áll arra, hogy ezeket futtatni tudja, a jelenlegi állapotában nem lehet. Ha minden egyes függvényt interpretálnánk, nem hagyakoznánk a reflekcióra, akkor egy univerzális interpretert lehetne írni, tehát egy Java nyelven íródott program képes lenne Clojure/Kotlin/Scala fordítóprogramok által generált class fájlokat interpretálni, lefuttatni.
+
 \section{Érdekességek a JVM specifikációból}
 
-% \section{JVM Bytecode utasítások}
+A specifikációt olvasva számos érdekességre bukkanhat az ember, ezek között vannak tervezési anomáliák, jó megoldások és trükkök. Ezek közül pár:
 
-% Az összes bytecode utasítás implementálva van, ezekről az alábbi táblázatban röviden pár dolog le van írva, nemlegesen a hex kódjuk, extra értékek utánuk, illetve hogy a stack-et hogyan változtatják
+\begin{compactitem}
+ \item A Java 7-es verzió előtt a Java bájtkód instrukciók viszonylag egyszerűek voltak, a 7-es verzióval lett az \lstinline{invokedynamic} bevezetve, mely közelebbi ránézésre igazából egy "szuperinstrukció", ezzel az összes többi \lstinline{invoke} instrukció implementálható, sőt, egy teljes Java bájtkód interpret is megírható csak \lstinline{invokedynamic} utasításokkal. Az \lstinline{invokedynamic} utasítás a dinamikusság kérdésére volt a válasz. Lényege, hogy azon függvényhívásokat, amelyek paramatéreit fordítási időben nem tudjuk, egy hívási helynek (\lstinline{CallSite}) megfelelően kerülnek a JVM-be bele, amely az a hívás során a megfelelő paraméterekkel hívja meg.
+ \item Elméletileg a lokális változók száma nem kéne hogy $65536$ legyen. Ha megnézi az ember, akkor minden \lstinline{store} és \lstinline{load} utasítás egy darab 8 bites előjel-mentes számot olvas be paraméterként. Ez azt jelenti hogy összesen $2^{8} = 256$ lehetséges index kellene hogy legyen. A \lstinline{wide} módosító utasítás miatt viszont ezek az utasítások beolvashatnak két darab 8 bites előjel-mentes számot, tehát lényegében egy darab 16 bites előjel-mentes szám lesz a paraméterük. Ez azt jelenti hogy $256$ lehetőség hirtelen $2^{16} = 65536$-ra ugrik fel.
+ \item Minden \lstinline{Long} és \lstinline{Double} típusú adattag két (egymást követő) helyet foglal el a class fájlon belüli \lstinline{Constant Pool}-ban. Ennek oka hogy minden \lstinline{Constant Pool} beli elem tényleges felhasználható adata $4$ byte-on van, kívéve a \lstinline{Long} és \lstinline{Double}, amelyek felhasználható adatai $8$ byte-on vannak. Így a fájlon belüli folytonosság miatt a specifikáció készítői jobbnak látták hogy inkább két helyet foglaljon el. A specifikációban azóta is a \textit{In retrospect, making 8-byte constants take two constant pool entries was a poor choice. - Utólag visszagondolva, rossz döntés volt, hogy a 8 bájtos konstansok két konstans pool bejegyzést igényelnek.} idézet áll.
+ \item A \lstinline{Long} és \lstinline{Double} típusokhoz kapcsolódoan, egy hatalmas különbség a primitívek (\lstinline{double, long}) és osztály (\lstinline{java.lang.Double, java.lang.Long}) típusok között, hogy lokális változókként a primitívek (csak a \lstinline{double} és \lstinline{long}) két helyet foglalnak el a lokális változók között; míg az osztály típusok csak egy helyet. Ez azt jelenti, hogyha függvény paraméterként adunk át egy \lstinline{double} primitívet, akkor valójában 2 helyet foglalunk el a lokális változók között, míg ha egy \lstinline{java.lang.Double} értéket adunk át, csak egy 1 helyet fogunk elfoglalni.
+\end{compactitem}
+
+% \section{Java bájtkód utasítások}
+
+% Az összes Java bájtkód utasítás implementálva van, ezekről az alábbi táblázatban röviden pár dolog le van írva, nemlegesen a hex kódjuk, extra értékek utánuk, illetve hogy a stack-et hogyan változtatják
 % \begin{center}
 % 	\begin{longtable}{ | p{0.3\textwidth} | p{0.075\textwidth} | p{0.175\textwidth} | p{0.45\textwidth} | }
 		
 % 		\hline
-% 		\multicolumn{4}{|c|}{\textbf{Bytecode utasítások}}
+% 		\multicolumn{4}{|c|}{\textbf{Java bájtkód utasítások}}
 % 		\\ \hline
 		
 % 		\emph{Neve} & \emph{HEX} & \emph{Paraméterek} & \emph{Stack}
@@ -1182,7 +1331,7 @@ Ehhez egy példa még több tesztfájl mellékelése. A tesztelő környezetbe (
 % 		& C9 & \lstinline|u32 branch| & → \lstinline|address|
 % 		\\ \hline
 		
-% 		\caption{A JVM Bytecode különböző utasításai}
+% 		\caption{A Java bájtkód különböző utasításai}
 % 		\label{tab:example-3}		
 % 	\end{longtable}
 % \end{center}
