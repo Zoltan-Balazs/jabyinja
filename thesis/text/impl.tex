@@ -3,9 +3,11 @@
 
 A program számos segítséget ad fejlesztőknek a kód egyszerű értelmezésére; a kód bővítésére. Vállalkozó szellemű embereknek a program egy teljes Java interpretert tud nyújtani viszonylag kevés továbbfejlesztéssel. A Java bájtkód instrukciók megértése során bármely Java fejlesztő jobban tudja értékelni hogy mit is csinál a Java fordítóprogram a háttérben. A program nagyon szorosan épül a JVM specifikációra, a specifikációt annak megfelelően próbálja implementálni.
 
-\section{Class fájl felépítése}
+\section{Megoldás lépései}
 
-\subsection{Class fájltól a benne levő metódus futtatásáig}
+\subsection{Class fájl felépítése}
+
+\subsubsection{Class fájltól a benne levő metódus futtatásáig}
 
 A fő osztály a \lstinline{ClassFile}, ez felel számos dologért, többek között egy class fájl beolvasáért, a megfelelő adattagok beállításával. A \lstinline{ClassFile} osztálynak egy konstruktora van, mégpedig:
 \begin{minted}{java}
@@ -125,7 +127,7 @@ public class Interpreter {
 }
 \end{lstlisting}
 
-\subsection{Pár minta class fájl felépítésére}
+\subsubsection{Pár minta class fájl felépítésére}
 
 A legegyszerűbb class fájl ami értelmes, viszont nem futtattható:
 
@@ -380,7 +382,7 @@ Class fájl formátumának magyarázata:
 \item \stageattributes{00 00}: Osztály attribútumainak száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
 \end{compactitem}
 
-\subsection{Adatszerkezetek}
+\subsubsection{Adatszerkezetek}
 
 A class fájlnak megfelelően a két legfontosabb adattag a \lstinline{stack} és a \lstinline{local} (lokális) változók. A különböző instrukciók az ezeken lévő adatokkal dolgoznak, erre/ebbe helyeznek el megfelelő adatokat.
 
@@ -422,7 +424,7 @@ Az absztrakció oka hogy függvényeknek átadva lehessen módosítani ezt a sz�
 
 Az absztrakció különösen észrevehető amikor az \lstinline{if} és \lstinline{goto} utasításokat hajtjuk végre, a \lstinline{ClassFile} objektumunk lokális változója módosítható az \lstinline{Instructions} osztály metódusain keresztül. Mivel a Java érték szerint adja át a paramétereket, ez egy sima \lstinline{int} számmal nem lehetne megoldani.
 
-\subsection{Interpretálás működése}
+\subsubsection{Interpretálás működése}
 
 Az algoritmus alapján az interpretálás viszonylag egyszerűen működik.
 \begin{enumerate}
@@ -453,9 +455,9 @@ public Pair<Class<?>, Object> executeCode(Code_Attribute attribute) throws Throw
 }
 \end{lstlisting}
 
-\section{Az interpreter sajátosságai}
+\subsection{Az interpreter sajátosságai}
 
-\subsection{Erőforrás igények}
+\subsubsection{Erőforrás igények}
 
 A \lstinline{Linux} operációs rendszeren beépített \lstinline{time} programot (illetve a \lstinline{hyperfine} programot) használva az erőforrás igények a tesztfájlokra az alábbiak (a tesztelt számítógép releváns specifikációi: Intel Core i7-8700k processzor 4.7 GHz-en, 16 GB DDR4 memória 2133 MT/s sebességgel):
 
@@ -589,7 +591,7 @@ A \lstinline{Linux} operációs rendszeren beépített \lstinline{time} programo
 	\end{longtable}
 \end{center}
 
-\subsection{A program memóriamodellje}
+\subsubsection{A program memóriamodellje}
 
 A heap memória nincsen implementálva a programban. Ez alapszik a standard Java interperet implementációjára. Ide tartoznak többek között az objektumoknak a referenciái. Ebből következően a szemétgyűjtés (\lstinline{garbage collector}) a beépített Java szemétgyűjtő algoritmust alkalmazza.
 
@@ -606,7 +608,7 @@ Az implementációból következően lényegében a tényleges programban az al�
 	\includegraphics[width=0.6\textwidth,frame]{jabyinja_memory}
 \end{figure}
 
-\subsection{Az önfuttatásról}
+\subsubsection{Az önfuttatásról}
 
 Habár a program tényleg képes önmagát lefuttatni, a Java programozási nyelvet mélyebben értő emberek észrevehetik, hogy ez egy erősen kikötéses állítás. Mivel a beépített osztályokat nem interpretálja a program, ezért amikor egy olyan parancsot hívunk meg, mint például: 
 \begin{minted}{bash}
@@ -618,13 +620,13 @@ A \lstinline{java} beépített interperet működése miatt amikor egy jar fájl
 
 Természetesen a \lstinline{main} függvényben is megfelelően kell felépíteni a különböző adattagokat, tehát az interpreter tényleg saját magát futtatja, viszont nem látunk akkora erőforrásbeli különbséget mint ami a beépített interpretert és a megírt program között van.
 
-\section{Osztályok}
+\subsection{Osztályok}
 
-\section{Tesztelő környezet}
+\section{Tesztelésről}
 
 A tesztelő környezet egy átlagos Java tesztelő (pl. JUnit) helyett egy saját Python szkript. Az előnye ennek az, hogy a tesztelésnél többet is tud ez a szkript; például a memóriahasználatot, és a futási idő különbséget is mérni. A tesztelő szkript a \lstinline{src/test/tester.py} fájlban elérhető. A szkript futtatásához legalább Python 3-as verzió szükséges. A tesztelő működésileg megnézi hogy a beépített Java interpreter, és a megírt interpreter kimenetei megegyeznek-e, ha igen akkor helyesen futott le az interpret, ha nem, akkor helytelenül. Jelen esetben 3 teszteset van, amelyek nem mennek át a tesztelőn, ezek mindegyike tartalmaz \lstinline{invokedynamic} utasítást.
 
-\subsection{Tesztelés}
+\subsection{Tesztelés lefuttatása}
 
 A tesztelőt nagyon egyszerűen meg lehet hívni a
 \begin{minted}{bash}
@@ -645,10 +647,15 @@ Nagyon egyszerűen adható saját teszteset hozzá a szkripthez.
 	\item A következő futtatásnál az új teszteset le fog futni
 \end{enumerate}
 
+\subsection{Tesztelés eredményei}
 
-\section{Továbbfejlesztési lehetőségek}
+A teszteket lefuttatva az alábbi eredményt kell kapnunk:
 
-\subsection{Invokedynamic utasítás}
+\section{Továbbiak}
+
+\subsection{Továbbfejlesztési lehetőségek}
+
+\subsubsection{Invokedynamic utasítás}
 
 Az egyik legszembetűnőbb hiány a szakdolgozatban az egyik nem implementált utasítás, az \lstinline{invokedynamic}, hiánya.
 Ez az utasítás számos helyen előfordul Java programokban, leginkább a lambda kifejezésekben (ezen belül is a Konkurens programozás tárgyon megismert \lstinline{Executor} osztály paramétereként), illetve a kiírás során szöveg(ek) és változó(k) konkatenációjánál is ez használt.
@@ -657,7 +664,7 @@ Az utóbbi egyszerűen kiküszöbölhető a \lstinline{-XDstringConcat=inline} f
 
 Az előző viszont sajnos jelen állapotban nem megoldott, és nem is oldható meg egyszerűen. Ahhoz hogy lambda függvények működjenek, az \lstinline{invokedynamic}-ot implementálni kell. Ehhez már az alapvető előkészület megvan, a class fájlban lévő \lstinline{bootstrap} metódusok egy külön adattag elemeiként el vannak helyezve. A továbbfejlesztés során csak a megfelelő \lstinline{CallSite} helyet, illetve a class fájlban lévő constant pool általi \lstinline{index}-eken levő metódusokkal (illetve paraméterekkel) kell meghívni az éppen leírt függvényt.
 
-\subsection{Java 7 előtti verziók támogatása}
+\subsubsection{Java 7 előtti verziók támogatása}
 
 Viszonylag egyszerűen továbbfejleszthető a program hogy Java 7 előtti verzióval fordított class fájlokat is támogasson.
 
@@ -665,7 +672,7 @@ A hiányzó utasítások a \lstinline{ret}, \lstinline{jsr}, \lstinline{jsr_w}, 
 
 Természetesen mindegyik utasítás során a megfelelő index-et is be kell olvasnunk a class fájlból, amely a lokális változó megfelelő indexére (\lstinline{ret}), vagy egy adott számot (\lstinline{jsr}, \lstinline{jsr_w}) határoz meg, amely a visszatérési cím, illetve az ugrási cím.
 
-\subsection{Optimalizálás}
+\subsubsection{Optimalizálás}
 
 A futási idő táblázata alapján látható hogy a program exponenciálisan lassabb, mint a beépített \lstinline{java} interpretáló program. A program több memóriát is igényel mint szükséges lenne. Ezeknek számos oka is van, ezek közül pár:
 
@@ -676,7 +683,7 @@ A futási idő táblázata alapján látható hogy a program exponenciálisan la
 	\item A reflekciót újragondolva, azt elhagyva a sebesség növelhető lenne, erről részletesebben a "Reflekció újragondolása" szekcióban van írva. Lényege, hogy a jelenlegi, beépített osztályokon levő reflekciót le kellene cserélni interpretálása. Az alapok ehhez megvannak, viszont ez is egy komolyabb programozási feladat.
 \end{compactitem}
 
-\subsection{További tesztelés}
+\subsubsection{További tesztelés}
 
 A szakdolgozat írása során megpróbáltam az alapos tesztelésre figyelni, ezért is vannak az alapvető instrukciót egyesével tesztelve (minden tesztfájl-ban külön-külön instrukciók szerepelnek). Viszont a tökéletes program nem létezik, elképzelhető hogy valahol nincs megfelelően a \lstinline{stack} törölve, vagy valamely instrukció mégsem helyes. Tehát a programban elképzelhető a probléma. Ezt a még alaposabb teszteléssel minél inkább meg lehetne cáfolni.
 
@@ -684,7 +691,7 @@ Ehhez egy példa még több tesztfájl mellékelése. A tesztelő környezetbe (
 
 Egy másik érdekes továbbfejlesztés, hogy ne csak Java programokat írjunk, hanem más JVM-et felhasználó nyelvekben is írjunk programokat. Ezekkel ellenőrizhetjük hogy a program tényleg képes-e általános Java bájtkódot interpretálni, vagy csak limitált a Java programozási nyelvre. A témabejelentés miatt én az ezekkel a nyelvekkel való tesztelést kihagytam. Egy egyszerű "Hello, World!"-el való tesztelés során (Clojure/Kotlin/Scala nyelven) a program hibát fog dobni, ennek az indoka hogy a programban levő reflekció, mivel a program Java nyelven van írva, nem találja a Clojure/Kotlin/Scala függvényeket, ehelyett érdemes lenne minden egyes fájlt interpretálni, nem csak a nem beépített osztályok fájlait. Természetesen ez megoldható ha a megfelelő nyelv standard könyvtárát be tudjuk másolni a \lstinline{cp} parancssori zászlóval.
 
-\subsection{Reflekció újragondolása}
+\subsubsection{Reflekció újragondolása}
 
 A reflekció egy viszonylag negatív hírrel rendelkező programozási folyamat, melynek számos indoka van, legtöbbször a fő indok az, hogy a reflekcióval megoldott problémát valamilyen elegánsabb módon is meg lehetne oldani.
 
@@ -692,7 +699,7 @@ Sajnos a szakdolgozat programjában is észrevehető hogy a reflekció nem annyi
 
 A másik komoly probléma a szakdolgozatban a reflekció használatával, az előbb említett képtelenség arra, hogy Java nyelven kívüli programokat futtatni tudjon. Habár a program készen áll arra, hogy ezeket futtatni tudja, a jelenlegi állapotában nem lehet. Ha minden egyes függvényt interpretálnánk, nem hagyakoznánk a reflekcióra, akkor egy univerzális interpretert lehetne írni, tehát egy Java nyelven íródott program képes lenne Clojure/Kotlin/Scala fordítóprogramok által generált class fájlokat interpretálni, lefuttatni.
 
-\section{Érdekességek a JVM specifikációból}
+\subsection{Érdekességek a JVM specifikációból}
 
 A specifikációt olvasva számos érdekességre bukkanhat az ember, ezek között vannak tervezési anomáliák, jó megoldások és trükkök. Ezek közül pár:
 
@@ -703,7 +710,7 @@ A specifikációt olvasva számos érdekességre bukkanhat az ember, ezek közö
  \item A \lstinline{Long} és \lstinline{Double} típusokhoz kapcsolódoan, egy hatalmas különbség a primitívek (\lstinline{double, long}) és osztály (\lstinline{java.lang.Double, java.lang.Long}) típusok között, hogy lokális változókként a primitívek (csak a \lstinline{double} és \lstinline{long}) két helyet foglalnak el a lokális változók között; míg az osztály típusok csak egy helyet. Ez azt jelenti, hogyha függvény paraméterként adunk át egy \lstinline{double} primitívet, akkor valójában 2 helyet foglalunk el a lokális változók között, míg ha egy \lstinline{java.lang.Double} értéket adunk át, csak egy 1 helyet fogunk elfoglalni.
 \end{compactitem}
 
-% \section{Java bájtkód utasítások}
+% \subsection{Java bájtkód utasítások}
 
 % Az összes Java bájtkód utasítás implementálva van, ezekről az alábbi táblázatban röviden pár dolog le van írva, nemlegesen a hex kódjuk, extra értékek utánuk, illetve hogy a stack-et hogyan változtatják
 % \begin{center}
