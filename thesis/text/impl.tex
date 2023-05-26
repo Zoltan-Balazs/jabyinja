@@ -242,7 +242,7 @@ A legegyszerűbb class fájl amelyet a már a beépített 17-es verziójú \lsti
 
 \begin{center}
 \begin{tabular}{ c c c c c c c c c c c c c c c c }
-\stagemagic{CA} & \stagemagic{FE} & \stagemagic{BA} & \stagemagic{BE} & \stageminor{00} & \stageminor{00} & \stagemajor{00} & \stagemajor{3D} & \stageconstantsize{00} & \stageconstantsize{0C} & \stageconstantpool{0A} & \stageconstantpool{00} & \stageconstantpool{02} & \stageconstantpool{00} & \stageconstantpool{03} & \stageconstantpool{07} \\ 
+\stagemagic{CA} & \stagemagic{FE} & \stagemagic{BA} & \stagemagic{BE} & \stageminor{00} & \stageminor{00} & \stagemajor{00} & \stagemajor{2D} & \stageconstantsize{00} & \stageconstantsize{0C} & \stageconstantpool{0A} & \stageconstantpool{00} & \stageconstantpool{02} & \stageconstantpool{00} & \stageconstantpool{03} & \stageconstantpool{07} \\ 
 \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{0C} & \stageconstantpool{00} & \stageconstantpool{05} & \stageconstantpool{00} & \stageconstantpool{06} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{10} & \stageconstantpool{6A} & \stageconstantpool{61} & \stageconstantpool{76} & \stageconstantpool{61} & \stageconstantpool{2F} & \stageconstantpool{6C} \\
 \stageconstantpool{61} & \stageconstantpool{6E} & \stageconstantpool{67} & \stageconstantpool{2F} & \stageconstantpool{4F} & \stageconstantpool{62} & \stageconstantpool{6A} & \stageconstantpool{65} & \stageconstantpool{63} & \stageconstantpool{74} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{06} & \stageconstantpool{3C} & \stageconstantpool{69} & \stageconstantpool{6E} \\
 \stageconstantpool{69} & \stageconstantpool{74} & \stageconstantpool{3E} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{03} & \stageconstantpool{28} & \stageconstantpool{29} & \stageconstantpool{56} & \stageconstantpool{07} & \stageconstantpool{00} & \stageconstantpool{08} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{4D} \\
@@ -273,7 +273,7 @@ Class fájl formátumának magyarázata:
 \begin{compactitem}
 \setlength\itemsep{-5px}
 \item \stagemagic{CA FE BA BE}: Mágikus szám, amely minden class fájl elején megtalálható
-\item \stageminor{00 00} \stagemajor{00 3D}: Class fájl \lstinline{Minor} és \lstinline{Major} verziószáma, egy táblázatnak megfelelően a \lstinline{javac} fordítóprogram verziója, jelen esetben a 17.0-ás verzió
+\item \stageminor{00 00} \stagemajor{00 2D}: Class fájl \lstinline{Minor} és \lstinline{Major} verziószáma, egy táblázatnak megfelelően a felhasznált \lstinline{javac} fordítóprogram verziója, jelen esetben az 1.0-ás verzió
 \item \stageconstantsize{00 0C}: A Constant Pool mérete (+1, mivel 1-től indexelt, jelen esetben: 00 0C\textsubscript{16} = 12\textsubscript{10}, 12 - 1 = 11 db)
 \item \stageconstantpool{0A 00 02 00 03 07 00 04 0C 00 05 00 06 01 00 10 6A 61 76 61 2F 6C 61 6E 67 2F 4F 62 6A 65 63 74 01 00 06 3C 69 6E 69 74 3E 01 00 03 28 29 56 07 00 08 01 00 04 4D 61 69 6E 01 00 04 43 6F 64 65 01 00 04 6D 61 69 6E 01 00 16 28 5B 4C 6A 61 76 61 2F 6C 61 6E 67 2F 53 74 72 69 6E 67 3B 29 56}: Constant Pool
 \begin{compactitem}
