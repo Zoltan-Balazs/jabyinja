@@ -2042,7 +2042,7 @@ public class Instructions {
 
                     for (int i = 0; i < numberOfArguments; ++i) {
                         if (arguments_as_objects[i].getClass().getName().equals(class_name)) {
-                            for (Object enums : initConstructor.getParameterTypes()[3].getEnumConstants()) {
+                            for (Object enums : initConstructor.getParameterTypes()[i].getEnumConstants()) {
                                 if (((Enum<?>) arguments_as_objects[i]).name().equals(((Enum<?>) enums).name())) {
                                     arguments_as_objects[i] = enums;
                                 }
