@@ -9,9 +9,9 @@ public class Main {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            CLASS_FILE = new ClassFile("Main.class", null);
+            CLASS_FILE = new ClassFile("Main.class");
         } else {
-            CLASS_FILE = new ClassFile(args[0], Arrays.copyOfRange(args, 1, args.length));
+            CLASS_FILE = new ClassFile(args[0]);
         }
 
         Method_Info method = new Method_Info();
@@ -29,7 +29,8 @@ public class Main {
             try {
                 Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                CLASS_FILE.executeCode(codeAttribute);
+                CLASS_FILE.executeCode(codeAttribute,
+                        args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : null);
             } catch (Throwable e) {
                 e.printStackTrace();
             }

@@ -105,10 +105,9 @@ class ClassFile {
     public List<Pair<Class<?>, Object>> stack = new ArrayList<>();
     public Object[] local = new Object[65536];
 
-    public ClassFile(String fileName, String[] mainArgs) {
+    public ClassFile(String fileName) {
         FILE_NAME = fileName;
         readClassFile(fileName);
-        local[0] = mainArgs;
     }
 
     public void readClassFile(String fileName) {
@@ -163,7 +162,6 @@ class ClassFile {
             CP_Info currentItem = CONSTANT_POOL.get(METHOD.name_index - 1);
 
             if (methodDescription == null) {
-
                 if (new String(currentItem.getBytes(), StandardCharsets.UTF_8).equals(methodName)) {
                     return METHOD;
                 }
@@ -267,8 +265,9 @@ class ClassFile {
         return getArguments(descriptor).size();
     }
 
-    public Pair<Class<?>, Object> executeCode(Code_Attribute attribute) throws Throwable {
+    public Pair<Class<?>, Object> executeCode(Code_Attribute attribute, Object[] args) throws Throwable {
         byte[] code = attribute.code;
+        local[0] = args != null ? args : local[0];
 
         CodeIndex codeIndex = new CodeIndex();
         while (codeIndex.Get() < code.length) {

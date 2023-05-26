@@ -70,7 +70,11 @@ public class Instructions {
     }
 
     public static void ALOAD(List<Pair<Class<?>, Object>> stack, Object value) {
-        stack.add(new Pair<Class<?>, Object>(value.getClass(), value));
+        if (value == null) {
+            stack.add(new Pair<Class<?>, Object>(void.class, new Object[] {}));
+        } else {
+            stack.add(new Pair<Class<?>, Object>(value.getClass(), value));
+        }
     }
 
     public static void IALOAD(List<Pair<Class<?>, Object>> stack) {
@@ -814,7 +818,7 @@ public class Instructions {
                     returnType = result.getClass();
                 }
             } else {
-                ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+                ClassFile CLASS_FILE = new ClassFile(new_filename);
 
                 Method_Info fn_method = new Method_Info();
                 List<Attribute_Info> attributes = new ArrayList<>();
@@ -857,7 +861,7 @@ public class Instructions {
                             reference_to_class = returned.second;
                             new_filename = returned.first;
 
-                            CLASS_FILE = new ClassFile(new_filename, null);
+                            CLASS_FILE = new ClassFile(new_filename);
                             fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
 
                             if (fn_method == null) {
@@ -888,7 +892,7 @@ public class Instructions {
                                     reference_to_class = returned.second;
                                     new_filename = returned.first;
 
-                                    CLASS_FILE = new ClassFile(new_filename, null);
+                                    CLASS_FILE = new ClassFile(new_filename);
                                     fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member,
                                             description_of_method);
                                 }
@@ -917,7 +921,7 @@ public class Instructions {
                     try {
                         Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                        Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
+                        Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute, null);
                         result = returnResult.second;
                         returnType = returnResult.first;
                     } catch (Throwable e) {
@@ -1006,7 +1010,7 @@ public class Instructions {
                         returnType = result.getClass();
                     }
                 } else {
-                    ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+                    ClassFile CLASS_FILE = new ClassFile(new_filename);
 
                     Method_Info fn_method = new Method_Info();
                     List<Attribute_Info> attributes = new ArrayList<>();
@@ -1024,7 +1028,7 @@ public class Instructions {
                         try {
                             Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                            Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
+                            Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute, null);
                             result = returnResult.second;
                             returnType = returnResult.first;
                         } catch (Throwable e) {
@@ -1068,7 +1072,7 @@ public class Instructions {
                         returnType = result.getClass();
                     }
                 } else {
-                    ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+                    ClassFile CLASS_FILE = new ClassFile(new_filename);
 
                     Method_Info fn_method = new Method_Info();
                     List<Attribute_Info> attributes = new ArrayList<>();
@@ -1086,7 +1090,7 @@ public class Instructions {
                         try {
                             Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                            Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
+                            Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute, null);
                             result = returnResult.second;
                             returnType = returnResult.first;
                         } catch (Throwable ee) {
@@ -1149,43 +1153,8 @@ public class Instructions {
         }
 
         if (name_of_class.equals("java/lang/Object")) {
-            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(cf.FILE_NAME,
-                    cf.CLASS_NAME);
-            Class<?> reference_to_class = returned.second;
-            String new_filename = returned.first;
-            Class<?> resolved_class = null;
-
-            File f = new File(new_filename);
-            int length = 0;
-            if (reference_to_class.getName().contains("/")) {
-                length = reference_to_class.getName().split("/").length;
-            } else {
-                length = reference_to_class.getName().split("\\.").length;
-            }
-            for (int i = 0; i < length + 1 && resolved_class == null; ++i) {
-                URL[] cp = { f.toURI().toURL() };
-                URLClassLoader urlcl = new URLClassLoader(cp);
-                try {
-                    resolved_class = urlcl.loadClass(reference_to_class.getName());
-                } catch (Exception eee) {
-
-                }
-                urlcl.close();
-
-                f = new File(f.getParent());
-            }
             stack.clear();
-
-            try {
-                stack.add(
-                        new Pair<Class<?>, Object>(reference_to_class,
-                                resolved_class.newInstance()));
-
-                local[0] = stack.get(0).second;
-            } catch (Throwable t) {
-                cf.MUST_INITIALIZE = true;
-            }
-
+            cf.MUST_INITIALIZE = true;
             return;
         }
 
@@ -1241,27 +1210,9 @@ public class Instructions {
                             ee.getMessage());
                     reference_to_class = returned.second;
                     new_filename = returned.first;
-                    Class<?> resolved_class = null;
-
-                    File f = new File(new_filename);
-                    int length = 0;
-                    if (reference_to_class.getName().contains("/")) {
-                        length = reference_to_class.getName().split("/").length;
-                    } else {
-                        length = reference_to_class.getName().split("\\.").length;
-                    }
-                    for (int i = 0; i < length + 1; ++i) {
-                        URL[] cp = { f.toURI().toURL() };
-                        URLClassLoader urlcl = new URLClassLoader(cp);
-                        try {
-                            resolved_class = urlcl.loadClass(reference_to_class.getName());
-                        } catch (Exception eee) {
-
-                        }
-                        urlcl.close();
-
-                        f = new File(f.getParent());
-                    }
+                    String new_classname = reference_to_class.getName();
+                    Class<?> resolved_class = Instructions_Helper.GET_CORRECT_CLASSLOADER(new_filename, name_of_class)
+                            .loadClass(new_classname);
 
                     ClassLoader correct_loader = resolved_class.getClassLoader();
 
@@ -1305,41 +1256,16 @@ public class Instructions {
                                 initConstructor.newInstance(arguments_as_objects)));
             }
         } else if (name_and_type_of_member.equals("<init>")) {
-            ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+            ClassFile CLASS_FILE = new ClassFile(new_filename);
             CLASS_FILE.MUST_INITIALIZE = true;
 
             Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
                     name_of_class);
             reference_to_class = returned.second;
             new_filename = returned.first;
-            Class<?> resolved_class = null;
-
-            File f = new File(new_filename);
-            int length = 0;
-            if (reference_to_class.getName().contains("/")) {
-                length = reference_to_class.getName().split("/").length;
-            } else {
-                length = reference_to_class.getName().split("\\.").length;
-            }
-            for (int i = 0; i < length + 1 && resolved_class == null; ++i) {
-                URL[] cp = { f.toURI().toURL() };
-                URLClassLoader urlcl = new URLClassLoader(cp);
-                try {
-                    resolved_class = urlcl.loadClass(reference_to_class.getName());
-                } catch (Exception eee) {
-
-                }
-                urlcl.close();
-
-                f = new File(f.getParent());
-            }
-
-            ClassLoader correct_loader = resolved_class.getClassLoader();
-            // Thread.currentThread().setContextClassLoader(correct_loader);
-
-            // stack.add(
-            // new Pair<Class<?>, Object>(reference_to_class,
-            // correct_loader.loadClass(name_of_class).newInstance()));
+            String new_classname = reference_to_class.getName();
+            Class<?> resolved_class = Instructions_Helper.GET_CORRECT_CLASSLOADER(new_filename, new_classname)
+                    .loadClass(new_classname);
 
             Method_Info fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member,
                     description_of_method);
@@ -1365,10 +1291,9 @@ public class Instructions {
                     CLASS_FILE.INIT_ARG_TYPES = method_arguments;
                     CLASS_FILE.IN_INIT_METHOD = true;
 
-                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
+                    CLASS_FILE.executeCode(codeAttribute, null);
 
                     objectref = new Pair<Class<?>, Object>(CLASS_FILE.local[0].getClass(), CLASS_FILE.local[0]);
-                    // stack.add(objectref);
 
                     if (file_name.contains(name_of_class) || cf.IN_MAIN_METHOD) {
                         objectref = new Pair<Class<?>, Object>(CLASS_FILE.local[0].getClass(),
@@ -1378,27 +1303,9 @@ public class Instructions {
                                 cf.CLASS_NAME);
                         reference_to_class = returned.second;
                         new_filename = returned.first;
-                        resolved_class = null;
-
-                        f = new File(new_filename);
-                        length = 0;
-                        if (reference_to_class.getName().contains("/")) {
-                            length = reference_to_class.getName().split("/").length;
-                        } else {
-                            length = reference_to_class.getName().split("\\.").length;
-                        }
-                        for (int i = 0; i < length + 1; ++i) {
-                            URL[] cp = { f.toURI().toURL() };
-                            URLClassLoader urlcl = new URLClassLoader(cp);
-                            try {
-                                resolved_class = urlcl.loadClass(reference_to_class.getName());
-                            } catch (Exception eee) {
-
-                            }
-                            urlcl.close();
-
-                            f = new File(f.getParent());
-                        }
+                        new_classname = reference_to_class.getName();
+                        resolved_class = Instructions_Helper.GET_CORRECT_CLASSLOADER(new_filename, new_classname)
+                                .loadClass(new_classname);
 
                         try {
                             Object[] argumets_as_objects = new Object[number_of_method_arguments];
@@ -1443,39 +1350,13 @@ public class Instructions {
                             }
                             reference_to_class = returned.second;
                             new_filename = returned.first;
-
-                            Class<?> dependent_class = null;
-
-                            f = new File(new_filename);
-                            length = 0;
-                            if (reference_to_class.getName().contains("/")) {
-                                length = reference_to_class.getName().split("/").length;
-                            } else {
-                                length = reference_to_class.getName().split("\\.").length;
-                            }
-                            for (int i = 0; i < length + 1; ++i) {
-                                URL[] cp = { f.toURI().toURL() };
-                                URLClassLoader urlcl = new URLClassLoader(cp);
-                                try {
-                                    dependent_class = urlcl.loadClass(reference_to_class.getName());
-                                } catch (Exception eee) {
-
-                                }
-                                urlcl.close();
-
-                                f = new File(f.getParent());
-                            }
-
-                            correct_loader = dependent_class.getClassLoader();
-
-                            Thread.currentThread().setContextClassLoader(correct_loader);
-
-                            resolved_class.newInstance();
+                            new_classname = reference_to_class.getName();
+                            Thread.currentThread().setContextClassLoader(
+                                    Instructions_Helper.GET_CORRECT_CLASSLOADER(new_filename, new_classname));
                         }
 
                     }
 
-                    // stack.clear();
                     boolean assigned = false;
                     for (int i = 0; i < 65535 && !assigned; ++i) {
                         if (local[i] == null || local[i].getClass().getName().equals("Object")
@@ -1592,7 +1473,7 @@ public class Instructions {
                 }
             }
         } else {
-            ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+            ClassFile CLASS_FILE = new ClassFile(new_filename);
 
             Method_Info fn_method = new Method_Info();
             List<Attribute_Info> attributes = new ArrayList<>();
@@ -1618,9 +1499,8 @@ public class Instructions {
                 try {
                     Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
+                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute, null);
                     result = returnResult.second;
-                    // returnType = returnResult.first;
                     returnType = cf.stringToType(
                             description_of_method.substring(description_of_method.indexOf(")") + 1)).second;
 
@@ -1705,7 +1585,7 @@ public class Instructions {
                 returnType = result.getClass();
             }
         } else {
-            ClassFile CLASS_FILE = new ClassFile(new_filename, null);
+            ClassFile CLASS_FILE = new ClassFile(new_filename);
 
             Method_Info fn_method = new Method_Info();
             List<Attribute_Info> attributes = new ArrayList<>();
@@ -1732,7 +1612,7 @@ public class Instructions {
                 try {
                     Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 
-                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute);
+                    Pair<Class<?>, Object> returnResult = CLASS_FILE.executeCode(codeAttribute, null);
                     result = returnResult.second;
                     returnType = returnResult.first;
                 } catch (Throwable e) {
@@ -1753,7 +1633,7 @@ public class Instructions {
     public static void INVOKEDYNAMIC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index,
             Object[] local, List<BootstrapMethods_Attribute> bootstrap_methods, List<CallSite> call_sites,
             String file_name, ClassFile cf) {
-        throw new UnsupportedOperationException("Invokedyanmic isn't supported yet");
+        throw new UnsupportedOperationException("Invokedynamic isn't supported yet");
     }
 
     public static void NEW(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index, Object[] local,
@@ -2104,28 +1984,6 @@ public class Instructions {
                     }
                 }
 
-                // for (int i = 0; i < numberOfArguments; ++i) {
-                // if
-                // (!arguments_as_objects[i].getClass().getName().equals(cf.INIT_ARG_TYPES.get(i).getName()))
-                // {
-                // boolean sameClass = false;
-                // Class<?> currentClass = arguments_as_objects[i].getClass();
-                // while (!(currentClass.getName().equals("java/lang/Object") || sameClass)) {
-                // currentClass = currentClass.getSuperclass();
-                // if (currentClass.getName()
-                // .equals(cf.INIT_ARG_TYPES.get(i).getName())) {
-                // sameClass = true;
-                // }
-                // }
-                // if (sameClass) {
-                // arguments_as_objects[i] = currentClass.cast(arguments_as_objects[i]);
-                // if (arguments_as_objects[i].getClass().getName() != currentClass.getName()) {
-                // arguments_as_objects[i] = currentClass;
-                // }
-                // }
-                // }
-                // }
-
                 if (numberOfArguments == 1 && class_name.equals("com.zoltanbalazs.Own.Child")) {
                     Class<?> type = initConstructor.getParameterTypes()[0];
                     Constructor<?> ctorrr = type.getDeclaredConstructors()[0];
@@ -2403,35 +2261,6 @@ class Instructions_Helper {
             Array.set(arrayRef.second, index, value.second);
         } catch (IllegalArgumentException iae) {
             if (arrayRef.second.getClass().getComponentType().getName().equals(value.first.getName())) {
-                String class_name = arrayRef.second.getClass().getComponentType().getName();
-                String new_filename = cf.FILE_NAME;
-                Class<?> resolved_class = null;
-
-                File f = new File(new_filename);
-                int length = 0;
-                if (class_name.contains("/")) {
-                    length = class_name.split("/").length;
-                } else {
-                    length = class_name.split("\\.").length;
-                }
-
-                try {
-                    for (int i = 0; i < length + 1 && resolved_class == null; ++i) {
-                        URL[] cp = { f.toURI().toURL() };
-                        URLClassLoader urlcl = new URLClassLoader(cp);
-                        try {
-                            resolved_class = urlcl.loadClass(class_name);
-                        } catch (Exception eee) {
-
-                        }
-                        urlcl.close();
-
-                        f = new File(f.getParent());
-                    }
-                } catch (Exception e) {
-                    System.out.println(e);
-                }
-
                 Object[] arguments = new Object[value.first.getDeclaredFields().length];
                 Object[] foundArgs = new Object[value.first.getDeclaredFields().length];
                 Object[] actual_arguments = null;
@@ -2486,6 +2315,36 @@ class Instructions_Helper {
         }
     }
 
+    public static ClassLoader GET_CORRECT_CLASSLOADER(String fileName, String className) {
+        File f = new File(fileName);
+        int length = 0;
+        if (className.contains("/")) {
+            length = className.split("/").length;
+        } else {
+            length = className.split("\\.").length;
+        }
+        for (int i = 0; i < length + 1; ++i) {
+            try {
+                URL[] cp = { f.toURI().toURL() };
+
+                URLClassLoader urlcl = new URLClassLoader(cp);
+                try {
+                    urlcl.loadClass(className);
+                    return urlcl;
+                } catch (Exception eee) {
+
+                }
+                urlcl.close();
+
+                f = new File(f.getParent());
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+
+        return null;
+    }
+
     public static void SETARGUMENTS_AND_TYPES(List<Pair<Class<?>, Object>> arguments_on_stack,
             List<Object> arguments_of_function, List<Class<?>> type_of_arguments) {
         for (var arguments : arguments_on_stack) {
@@ -2495,7 +2354,6 @@ class Instructions_Helper {
             if (current_argument != null && current_argument.getClass().isArray()
                     && current_argument.getClass() != argument_type) {
                 arguments_of_function.add(current_argument.getClass().cast(current_argument));
-                // arguments_of_function.add(argument_type.cast(current_argument));
                 type_of_arguments.add(current_argument.getClass());
                 continue;
             } else if (argument_type == int.class) {
