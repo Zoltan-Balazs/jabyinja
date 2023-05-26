@@ -2040,53 +2040,16 @@ public class Instructions {
                         }
                     }
 
-                    if (numberOfArguments == 4 && (class_name.equals("com.zoltanbalazs.PTI._10._02.PrintedBook$Cover")
-                            || class_name.equals("com.zoltanbalazs.PTI._08._01.PrintedBook$Cover"))) {
-                        for (int i = 0; i < numberOfArguments; ++i) {
-                            if (arguments_as_objects[i].getClass().getName()
-                                    .equals("com.zoltanbalazs.PTI._10._02.PrintedBook$Cover")
-                                    || arguments_as_objects[i].getClass().getName()
-                                            .equals("com.zoltanbalazs.PTI._08._01.PrintedBook$Cover")) {
-                                for (Object enums : initConstructor.getParameterTypes()[3].getEnumConstants()) {
-                                    if (((Enum<?>) arguments_as_objects[3]).name().equals(((Enum<?>) enums).name())) {
-                                        arguments_as_objects[i] = enums;
-                                    }
+                    for (int i = 0; i < numberOfArguments; ++i) {
+                        if (arguments_as_objects[i].getClass().getName().equals(class_name)) {
+                            for (Object enums : initConstructor.getParameterTypes()[3].getEnumConstants()) {
+                                if (((Enum<?>) arguments_as_objects[i]).name().equals(((Enum<?>) enums).name())) {
+                                    arguments_as_objects[i] = enums;
                                 }
-
                             }
+
                         }
                     }
-
-                    if (numberOfArguments == 0 && (class_name.equals("com.zoltanbalazs.PTI._10._02.PrintedBook$Cover")
-                            || class_name.equals("com.zoltanbalazs.PTI._08._01.PrintedBook$Cover"))) {
-
-                    }
-
-                    // for (int i = 0; i < numberOfArguments; ++i) {
-                    // if
-                    // (!arguments_as_objects[i].getClass().getName().equals(cf.INIT_ARG_TYPES.get(i).getName()))
-                    // {
-                    // boolean sameClass = arguments_as_objects[i].getClass()
-                    // .isAssignableFrom(cf.INIT_ARG_TYPES.get(i));
-                    // Class<?> currentClass = arguments_as_objects[i].getClass();
-                    // while (!(currentClass.getName().equals("java.lang.Object") || sameClass)) {
-                    // currentClass = currentClass.getSuperclass();
-                    // if (currentClass.getName()
-                    // .equals(cf.INIT_ARG_TYPES.get(i).getName())) {
-                    // sameClass = true;
-                    // }
-                    // }
-                    // if (sameClass) {
-                    // arguments_as_objects[i] = currentClass.cast(arguments_as_objects[i]);
-                    // if (arguments_as_objects[i].getClass().getName() != currentClass.getName()) {
-                    // arguments_as_objects[i] = currentClass;
-                    // }
-                    // } else {
-                    // arguments_as_objects[i] =
-                    // cf.INIT_ARG_TYPES.get(i).cast(arguments_as_objects[i]);
-                    // }
-                    // }
-                    // }
 
                     initConstructor.setAccessible(true);
                     Pair<Class<?>, Object> test = new Pair<Class<?>, Object>(resolved_class,
