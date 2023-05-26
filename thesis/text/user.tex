@@ -9,7 +9,23 @@ Alapvető esetben ez a fordítóprogrammal együtt telepítésre kerül. A szakd
 
 A mellékelt fájlok között elérhető egy jar fájl is, ennek a futtatásához ugyanúgy szükségünk van egy beépített interpretáló programra, amely képes Java programokat futtatni és nem a szakdolgozat maga.
 
-\section{Kikötések}
+\section{Probléma megfogalmazása}
+
+A program alapvető problémának egy class fájl értelmezését tűzi ki, a fordítás az előbb leírtakban nem a feladat része. 
+
+A feladat megoldása egy futtatható class fájlt (vagy jar fájlt, a felhasználó szükségeinek megfelelően) eredményez, amely képes más Java class fájlokat interpretálni, azokban lévő különböző függvényeket meghívni, a \lstinline{stack}, illetve lokális változókat helyesen változtatni.
+
+A megoldáshoz be kell olvasnia a programnak egy class fájlt, helyesen értelmezni hogy mely része mi is, majd a megfelelő részeket szekvenciálisan értelmezni, az utasításokat a specifikációnak megfelelően végrehajtani. 
+
+\section{Megoldás rövid leírása}
+
+A megoldás erősen alapszik a JVM specifikációra, annak is a 7-es verziójára. Ebben a dokumentumban elsősorban le van írva a class fájl felépítése. Mik követik egymást, ezen belül fontos nekünk a \lstinline{Constant Pool} és a \lstinline{Methods} rész. A \lstinline{Constant Pool}-ban találunk minden olyan információt amely szükséges ahhoz hogy milyen osztályaink, metódusaink, metódus szignatúráink és változóértékeink vannak. A \lstinline{Methods} részben találjuk a tényleges utasításokat, itt hívodnak meg a \lstinline{Constant Pool}-ban leírt osztályoknak a metódusai, itt végezzük el az értelmezést.
+
+A programban szerepelnek a szükséges adatszerkezetek: a \lstinline{stack} és a lokális változók. Az interpretált kódot egy bájt tömbként értelmezi a program, amelyhez szükséges a jelenlegi indexet egy külön változóban eltárolnunk. Ez a változó azért is szükséges, hogy a különböző elágazások, ciklusok működni tudjanak, leegyszerűsítve a ciklus csak egy elágazás, amely többször hajtódik végre.
+
+\section{Program használata}
+
+\subsection{Kikötések}
 A program csak Java 7-nél újabb fordítóprogrammal fordított Java programokat képes interpretálni, számos bájtkód instrukciót a Java 7-es verziójában elavulttá tettek (ezek: \lstinline{ret}, \lstinline{jsr}, \lstinline{jsr_w}), nem fordulnak elő class fájlokban. A szakdolgozat ezeket az instrukciókat nem implementálta. (Implementálásukról részletesebben szó van a fejlesztői dokumentáció "Továbbfejlesztési lehetőségek" szekciójában, implementálásuk viszonylag triviális, viszont megértésük segít elmélyülni a Java bátjkódban.)
 
 Ezen felül egy másik, a Java 7-nél újabb verziójú programokban elég gyakran előforduló instrukció is implementálatlan maradt (név szerint az \lstinline{invokedynamic}), tehát nem minden program futtatható. Ennek az indoka hogy ez az utasítás nagyon nagy szintű elmélyülést igényel a Java bájtkódban, értelmezése meghaladja egy szakdolgozat szintjét. Ez az instrukció önmagában használható arra hogy egy, a szakdolgozat témájához hasonló, Java bátjkód interpretert írjon az ember. Ha a class fájlok egyike tartalmazza ezt az instrukciót, akkor a program jelez a felhasználó számára. Akaratlanul is része lehet a programunknak ez az instrukció, amikor egy változót szöveggel együtt próbálunk kiírni:
@@ -26,15 +42,15 @@ akkor a legtöbb fordítóprogram egy \lstinline{invokedynamic} utasítást is e
 
 Ez viszont elkerülhető, ha megfelelő flagekkel fordítjuk le a programunkat, mégpedig a \lstinline{-XDstringConcat=inline} flag használatával az \lstinline{invokedynamic} nem fog szerepelni a string konkatenációnál.
 
-\section{Fordítástól futásig}
+\subsection{Fordítástól futásig}
 
-\subsection{Minimum követelmények}
+\subsubsection{Minimum követelmények}
 
 A program fordításához legalább a Java 17-es verziója szükséges. Ez alatt a program fordulni sem képes, mivel pár olyan funkciót használ, amely csak a 17-es verzióban lett bevezetve.
 
 A könnyebb fordítás (illetve egyszerűbb jar fájl készítés) érdekében a Maven fordítás automatizálási program telepítése ajánlott, ezen belül is a 3.9.0-ás verzió.
 
-\subsection{Fordítás}
+\subsubsection{Fordítás}
 
 Ha nem akarunk Maven-t használni, akkor a fordítás menete a következő:
 \begin{compactitem}
@@ -58,7 +74,7 @@ $ mvn package
 	\item Az elkészült class fájl a \lstinline{target/classes/com/zoltanbalazs} mappában lesz, ezen felül a \lstinline{target} mappában lesz egy futtatható jar fájl is
 \end{compactitem}
 
-\subsection{Futtattás}
+\subsubsection{Futtattás}
 
 Ha a generált class fájllal akarjuk futtatni a programot, futtassuk le a \lstinline{java com.zoltanbalazs.Main} parancsot a \lstinline{src/main/java} mappában.\ (ha Maven-nel fordítottunk akkor a \lstinline{target/classes} mappában futtassuk le az előző fenti parancsot)
 
@@ -71,7 +87,7 @@ Futásra egy példa:
 $ java -jar target/jabyinja-1.0.0.jar target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World
 \end{minted}
 
-\subsection{Önfuttatás}
+\subsubsection{Önfuttatás}
 
 Az elkészült interpreter képes saját magát is futtatni, ehhez a futtatáshoz hasonlóan meg kell adni a programnak a saját class fájlának elérési útját, majd opcionálisan a többi paramétert.
 
@@ -80,7 +96,7 @@ Ez a futtatás jar fájl esetén így néz ki, a főkönyvtárból futtatva:
 $ java -jar target/jabyinja-1.0.0.jar target/classes/com/zoltanbalazs/Main.class target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World
 \end{minted}
 
-\section{Felmerülő problémák}
+\subsection{Felmerülő problémák}
 
 A futtatandó program futása során nem merül fel probléma (hacsak nincsen \lstinline{invokedynamic} a generált class fájlban) amelyet a program okoz. Ha a futtatandó programunk hibát dob, akkor ezt az interpretáló program is ugyanúgy megteszi; viszont a hiba kiírása során nem biztos hogy ugyanazt a kimentet kapjuk mint a beépített interpreterrel.
 

@@ -1,6 +1,14 @@
 \chapter{Bevezetés}
 \label{ch:intro}
 
+\subsection{Motiváció}
+
+Kifejezetten érdekel a számítógép hardveréhez közeli problémák megértése és megoldása. C programozói háttérel rendelkezve az x86-64, illetve ARM assembly-ben való programozástól sem rémülök meg. Viszont amennyire azt tudom hogy azon assembly nyelvek hogyan működnek (regiszterek, \lstinline{stack}, szubrutinok, ciklusok, feltételek), annyira nem tudom hogy egy magasabb, Objektumorientált programozási nyelv (azon belül is egy fordított és interpretált nyelv) hogyan "kommunikál a géppel".
+
+A Java bájtkód egy tökéletes köztes állapot, míg ha egy C++ interpretert akarok írni akkor valójában egy fordítóprogramot kell írnom, addig Java nyelvnél elegendő a köztes nyelv interpretálását megvalósítani, a fordítást pedig a beépített fordítóprogram hagyni.
+
+\subsection{Leírás}
+
 A Java nyelvben írt programok fordításukat követően nem egy közletlen futtatható állományra (gépi kódra) fordulnak (a fordítást általában a beépített \lstinline{javac} program végzi el), hanem egy köztes nyelvre, Java bájtkódra, amelyet aztán különböző programokkal az adott architektúrán interpretáljuk. Legtöbb esetben az interpretálást a JVM (Java Virtual Machine, magyarul Java virtuális gép) interpretere hajtja végre (ez a beépített \lstinline{java} program).
 
 A szakdolgozat célja egy kiegészítő program (fantázianevén \textit{Jabyinja}: \textit{\textbf{Ja}va \textbf{by}tecode \textbf{in}terpreter in \textbf{Ja}va}) írása, amely ugyan hagyatkozik a \lstinline{javac} és \lstinline{java} programokra (az előbbire a fordítás, az utóbbira a futtatás miatt), de a tényleges futtatást a különböző Java bájtkód instrukciók (utasítások) implementálásval végzi el.
