@@ -9,11 +9,9 @@ A program számos segítséget ad fejlesztőknek a kód egyszerű értelmezésé
 
 A fő osztály a \lstinline{ClassFile}, ez felel számos dologért, többek között egy class fájl beolvasáért, a megfelelő adattagok beállításával. A \lstinline{ClassFile} osztálynak egy konstruktora van, mégpedig:
 \begin{minted}{java}
-public ClassFile(String fileName, String[] mainArgs)
+public ClassFile(String fileName)
 \end{minted}
-Tehát az első paraméter a beolvasandó class fájl neve, a második pedig a \lstinline{main} metódusnak adott argumentumok.
-
-Az implementáció alapján nem kötött a \lstinline{main} metódus használata belépési pontként, tehát a 2.\ argumentum lehet \lstinline{null} is.
+Tehát az egyetlen paraméter a beolvasandó class fájl neve.
 
 A konstruktor meghívása egyidejüleg meghívja a \lstinline{readClassFile} függvényt is:
 \begin{minted}{java}
@@ -24,13 +22,52 @@ Ez a függvény egy adott fájlnévre beolvassa a class fájlban tárolt adatoka
 
 A beolvasás után (tehát az objektum létrehozása után) érdemes a belépési függvényt (általában \lstinline{main}) megkeresni a \lstinline{findMethodsByName} metódussal:
 \begin{minted}{java}
-public Method_Info findMethodsByName(String methodName)
+public Method_Info findMethodsByName(String methodName, String methodDescription)
 \end{minted}
-Ez egy adott függvénynévre a megfelelő nevü metódust visszaadja a beolvasott fájlból (ha nem talál ilyet akkor \lstinline{null}-t ad vissza).
-Egy példa a használatára:
+Ez egy adott függvénynévre a megfelelő nevü metódust visszaadja a beolvasott fájlból (ha nem talál ilyet akkor \lstinline{null}-t ad vissza). 
+
+Opcionális paraméterként megadhatjuk a metódus szignatúráját is, ehhez a JVM specifikációban szereplő típus szöveggé való kódolásának mintája használandó.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ | m{0.25\textwidth} | m{0.65\textwidth} | }
+		\hline
+		\textbf{Kódolt típus} & \textbf{Java Típus} \\
+		\hline \hline
+		B & byte \\
+		\hline
+		C & char \\
+		\hline
+		D & double \\
+		\hline
+		F & float \\
+		\hline
+		I & int \\
+		\hline
+		J & long \\
+		\hline
+		L\textit{classnév}; & reference (osztály) \\
+		\hline
+		S & short \\
+		\hline
+		Z & boolean \\
+		\hline
+		{[} & reference (tömb) \\
+		\hline
+	\end{tabular}
+	\caption{Típust tartalmazó szöveg dekódolásá Java típusokká a JVM specifikáció alapján}
+	\label{tab:jvmtypeencoding}
+\end{table}
+
+A bemeneti paramétereket zárójelek választják el, ezután szerepel a visszatérési érték. Tehát az általános Java belépési függvény, a \lstinline{main} java kódja:
+\begin{minted}{Java}
+public static void main(String[] args)
+\end{minted}
+Ennek a függvény szignatúrájának kódolása a következő: \lstinline{([Ljava/lang/String;)V}
+
+Példa a belépési metódust megkereső függvény használatára:
 \begin{minted}{java}
-ClassFile CLASS_FILE = new ClassFile("Main.class", null);
-Method_Info method = CLASS_FILE.findMethodsByName("main");
+ClassFile CLASS_FILE = new ClassFile("Main.class");
+Method_Info method = CLASS_FILE.findMethodsByName("main", null);
 \end{minted}
 
 A függvény megtalálása után ajánlott a \lstinline{Code} attribútumot megtalálni, ebben, többek között, található a futtatandó Java bájtkód is. A segédfüggvény erre a \lstinline{findAttributesByName}:
@@ -59,13 +96,14 @@ Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribut
 
 Ezt a beolvasott attribútumot a \lstinline{ClassFile} osztály fel tudja használni az \lstinline{executeCode} metódusával, mely egy \lstinline{byte[]} változót vár bemeneti paraméterként, ami a \lstinline{Code_Attribute} része:
 \begin{minted}{java}
-public Pair<Class<?>, Object> executeCode(byte[] code) Throwable
+public Pair<Class<?>, Object> executeCode(byte[] code, Object[] args) Throwable
 \end{minted}
-A reflekció miatt számos hibát dob vissza a függvény, ha nem helyes a kód formátuma akkor \lstinline{IOException}-t dob a függvény, a \lstinline{Throwable} az \lstinline{ATHROW} Java bájtkód instrukció miatt szükséges (ekkor egy hibát dob vissza a metódusunk).
-Visszatérési értéke \lstinline{Pair<Class<?>, Object>}, a számos \lstinline{RETURN} utasítás miatt (ezeket a stack-en szükséges elhelyezünk)
+A reflekció miatt számos hibát dob vissza a függvény, ha nem helyes a kód formátuma akkor \lstinline{IOException}-t dob a függvény, viszont egy \lstinline{Throwable}-el az egészet le tudjuk kezelni, a \lstinline{Throwable} az \lstinline{ATHROW} Java bájtkód instrukció miatt egyébként szükséges (ekkor egy hibát dob vissza a metódusunk).
+Visszatérési értéke \lstinline{Pair<Class<?>, Object>}, a számos \lstinline{RETURN} utasítás miatt (ezeket a stack-en szükséges elhelyezünk).
+Opcionálisan megadhatunk neki egy \lstinline{args}-ot is, amely a függvény paramétere(i) egy \lstinline{Object} tömbben.
 Példa a használatára:
 \begin{minted}{java}
-CLASS_FILE.executeCode(codeAttribute.code);
+CLASS_FILE.executeCode(codeAttribute.code, null);
 \end{minted}
 
 Ezzel el is jutottunk egy class fájl beolvasásától, az abban lévő adott függvény Java bájtkódjának futtatásáig, több teendőnk nincsen, a program az adott függvényben levő külön függvényhívásokat automatikusan elvégzi.
@@ -75,32 +113,34 @@ A teljes példakód:
 \begin{lstlisting}[language={Java}]
 public class Interpreter {
 	public static void main(String[] args) throws Throwable {
-		ClassFile CLASS_FILE = new ClassFile("Main.class", null);
-		Method_Info method = CLASS_FILE.findMethodsByName("main");
+		ClassFile CLASS_FILE = new ClassFile("Main.class");
+		Method_Info method = CLASS_FILE.findMethodsByName("main", null);
 		List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
 
 		for (Attribute_Info attribute : attributes) {
 			Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
-			CLASS_FILE.executeCode(codeAttribute.code);
+			CLASS_FILE.executeCode(codeAttribute.code, null);
 		}
 	}
 }
 \end{lstlisting}
 
-\subsection{Pár minta class fájl felépítése}
+\subsection{Pár minta class fájl felépítésére}
 
-A legegyszerűbb class fájl ami értelmes, viszont nem futattható:
+A legegyszerűbb class fájl ami értelmes, viszont nem futtattható:
 
 \begin{center}
-\begin{tabular}{ c c c c c c c c c c c c c c c }
-\stagemagic{CA} & \stagemagic{FE} & \stagemagic{BA} & \stagemagic{BE} & \stageminor{00} & \stageminor{00} & \stagemajor{00} & \stagemajor{00} & \stageconstantsize{00} & \stageconstantsize{00} & \stageaccessflags{00} & \stageaccessflags{00} & \stagethisclass{00} & \stagethisclass{00} & \stagesuperclass{00} \\
-\stagesuperclass{00} & \stageinterfacesize{00} & \stageinterfacesize{00} & \stagefieldsize{00} & \stagefieldsize{00} & \stagemethodsize{00} & \stagemethodsize{00} & \stageattributes{00} & \stageattributes{00}
+\begin{tabular}{ c c c c c c c c c c c c c c c c }
+\stagemagic{CA} & \stagemagic{FE} & \stagemagic{BA} & \stagemagic{BE} & \stageminor{00} & \stageminor{00} & \stagemajor{00} & \stagemajor{00} & \stageconstantsize{00} & \stageconstantsize{00} & \stageaccessflags{00} & \stageaccessflags{00} & \stagethisclass{00} & \stagethisclass{00} & \stagesuperclass{00} & \stagesuperclass{00} \\
+\stageinterfacesize{00} & \stageinterfacesize{00} & \stagefieldsize{00} & \stagefieldsize{00} & \stagemethodsize{00} & \stagemethodsize{00} & \stageattributes{00} & \stageattributes{00}
 \end{tabular}
 \end{center}
 
 Java kódban ennek megfelelője az üres fájl:
 \begin{minted}{java}
 \end{minted}
+
+Elérhető a \lstinline{src/test/java/com/zoltanbalazs/Simple.class} fájl formátumában
 
 Class fájl formátumának magyarázata:
 
@@ -109,24 +149,24 @@ Class fájl formátumának magyarázata:
 \item \stagemagic{CA FE BA BE}: Mágikus szám, amely minden Class fájl elején megtalálható
 \item \stageminor{00 00} \stagemajor{00 00}: Class fájl \lstinline{Minor} és \lstinline{Major} verziószáma, egy táblázatnak megfelelően a fordítóprogram verziója
 \item \stageconstantsize{00 00}: A Constant Pool mérete (+1, mivel 1-től indexelt, itt nem számít)
-\item \stageaccessflags{00 00}: Hozzáférési zászlók ()
+\item \stageaccessflags{00 00}: Az osztály hozzáférési zászlói ()
 \item \stagethisclass{00 00}: \lstinline{This} osztály indexe a Constant Pool-ban
 \item \stagesuperclass{00 00}: \lstinline{Super} osztály indexe a Constant Pool-ban
-\item \stageinterfacesize{00 00}: Interfészek száma
-\item \stagefieldsize{00 00}: Adattagok száma
-\item \stagemethodsize{00 00}: Függvények száma
-\item \stageattributes{00 00}: Osztály attribútumainak száma
+\item \stageinterfacesize{00 00}: Interfészek száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+\item \stagefieldsize{00 00}: Adattagok száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+\item \stagemethodsize{00 00}: Függvények száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+\item \stageattributes{00 00}: Osztály attribútumainak száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
 \end{compactitem}
 
-A legegyszerűbb class fájl amit a $Jabyinja$ program le tud futtatni (a beépített \lstinline{java} program nem képes ezt lefuttatni, mivel nincsenek benne osztályok, a JVM specifikáció alapján az osztályok elhanyagolhatóak):
+A legegyszerűbb class fájl amit a $Jabyinja$ program le tud futtatni (a beépített \lstinline{java} interpreter program nem képes ezt lefuttatni, mivel nincsenek benne osztályok):
 
 \begin{center}
-\begin{tabular}{ c c c c c c c c c c c c c c c }
-\stagemagic{CA} & \stagemagic{FE} & \stagemagic{BA} & \stagemagic{BE} & \stageminor{00} & \stageminor{00} & \stagemajor{00} & \stagemajor{00} & \stageconstantsize{00} & \stageconstantsize{04} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{43} & \stageconstantpool{6F} \\
-\stageconstantpool{64} & \stageconstantpool{65} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{6D} & \stageconstantpool{61} & \stageconstantpool{69} & \stageconstantpool{6E} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{03} & \stageconstantpool{28} & \stageconstantpool{29} & \stageconstantpool{56} \\
-\stageaccessflags{00} & \stageaccessflags{21} & \stagethisclass{00} & \stagethisclass{00} & \stagesuperclass{00} & \stagesuperclass{00} & \stageinterfacesize{00} & \stageinterfacesize{00} & \stagefieldsize{00} & \stagefieldsize{00} & \stagemethodsize{00} & \stagemethodsize{01} & \stagemethods{00} & \stagemethods{09} & \stagemethods{00} \\ 
-\stagemethods{02} & \stagemethods{00} & \stagemethods{03} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{0D} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} \\
-\stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{01} & \stagemethods{B1} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stageattributes{00} & \stageattributes{00}
+\begin{tabular}{ c c c c c c c c c c c c c c c c }
+\stagemagic{CA} & \stagemagic{FE} & \stagemagic{BA} & \stagemagic{BE} & \stageminor{00} & \stageminor{00} & \stagemajor{00} & \stagemajor{00} & \stageconstantsize{00} & \stageconstantsize{04} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{43} & \stageconstantpool{6F} & \stageconstantpool{64} \\
+\stageconstantpool{65} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{6D} & \stageconstantpool{61} & \stageconstantpool{69} & \stageconstantpool{6E} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{03} & \stageconstantpool{28} & \stageconstantpool{29} & \stageconstantpool{56} & \stageaccessflags{00} & \stageaccessflags{21} \\
+\stagethisclass{00} & \stagethisclass{00} & \stagesuperclass{00} & \stagesuperclass{00} & \stageinterfacesize{00} & \stageinterfacesize{00} & \stagefieldsize{00} & \stagefieldsize{00} & \stagemethodsize{00} & \stagemethodsize{01} & \stagemethods{00} & \stagemethods{09} & \stagemethods{00} & \stagemethods{02} & \stagemethods{00} & \stagemethods{03} \\ 
+\stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{0D} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{01} \\
+\stagemethods{B1} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stageattributes{00} & \stageattributes{00}
 \end{tabular}
 \end{center}
 
@@ -137,63 +177,207 @@ public static void main() {
 }
 \end{minted}
 
+Elérhető a \lstinline{src/test/java/com/zoltanbalazs/Base.class} fájl formátumában
+
 Class fájl formátumának magyarázata:
 
 \begin{compactitem}
 \setlength\itemsep{-5px}
 \item \stagemagic{CA FE BA BE}: Mágikus szám, amely minden class fájl elején megtalálható
 \item \stageminor{00 00} \stagemajor{00 00}: Class fájl \lstinline{Minor} és \lstinline{Major} verziószáma, egy táblázatnak megfelelően a \lstinline{javac} fordítóprogram verziója
-\item \stageconstantsize{00 04}: A Constant Pool mérete (+1, mivel 1-től indexelt)
+\item \stageconstantsize{00 04}: A Constant Pool mérete (+1, mivel 1-től indexelt, jelen esetben: 00 04\textsubscript{16} = 4\textsubscript{10}, 4 - 1 = 3 db)
 \item \stageconstantpool{01 00 04 43 6F 64 65 01 00 04 6D 61 69 6E 01 00 03 28 29 56}: Constant Pool
 \begin{compactitem}
     \setlength\itemsep{-5px}
     \item \stagemajor{01} \stageminor{00 04} \stageconstantsize{43 6F 64 65} \\
     \stagemajor{01}: Constant Pool Info érték \lstinline{(CONSTANT_Utf8)} \\
-    \stageminor{00 04}: 4 hosszú \\
+    \stageminor{00 04}: 00 04\textsubscript{16} = 4\textsubscript{10} hosszú \\
     \stageconstantsize{43 6F 64 65}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{Code}
     \item \stagemajor{01} \stageminor{00 04} \stageconstantsize{6D 61 69 6E} \\
     \stagemajor{01}: Constant Pool Info érték \lstinline{(CONSTANT_Utf8)} \\
-    \stageminor{00 04}: 4 hosszú \\
+    \stageminor{00 04}: 00 04\textsubscript{16} = 4\textsubscript{10} hosszú \\
     \stageconstantsize{6D 61 69 6E}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{main}
     \item \stagemajor{01} \stageminor{00 03} \stageconstantsize{28 29 56} \\
     \stagemajor{01}: Constant Pool Info érték \lstinline{(CONSTANT_Utf8)} \\
-    \stageminor{00 03}: 3 hosszú \\
+    \stageminor{00 03}: 00 03\textsubscript{16} = 3\textsubscript{10} hosszú \\
     \stageconstantsize{28 29 56}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{()V}
 \end{compactitem}
-\item \stageaccessflags{00 21}: Hozzáférési zászlók \lstinline{(Public, Super)} - elhanyagolhatóak ebben az esetben
+\item \stageaccessflags{00 21}: Az osztály hozzáférési zászlói \lstinline{(Public, Super)} - elhanyagolhatóak ebben az esetben
 \item \stagethisclass{00 00}: \lstinline{This} osztály indexe a Constant Pool-ban
 \item \stagesuperclass{00 00}: \lstinline{Super} osztály indexe a Constant Pool-ban
-\item \stageinterfacesize{00 00}: Interfészek száma
-\item \stagefieldsize{00 00}: Adattagok száma
-\item \stagemethodsize{00 01}: Függvények száma
+\item \stageinterfacesize{00 00}: Interfészek száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+\item \stagefieldsize{00 00}: Adattagok száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+\item \stagemethodsize{00 01}: Függvények száma (00 01\textsubscript{16} = 1\textsubscript{10} db)
 \item \stagemethods{00 09 00 02 00 03 00 01 00 01 00 00 00 0D 00 00 00 00 00 00 00 01 B1 00 00 00 00}: Függvények
 \begin{compactitem}
     \setlength\itemsep{-5px}
     \item \stagemajor{00 09} \stageminor{00 02} \stageconstantsize{00 03} \stageconstantpool{00 01} \stageaccessflags{00 01 00 00 00 0D 00 00 00 00 00 00 00 01 B1 00 00 00 00} \\
     \stagemajor{00 09}: Hozzáférési zászlók \lstinline{(Public, Static)} \\
     \stageminor{00 02}: Constant Poolban lévő indexe a függvénynek: \lstinline{main} \\
-    \stageconstantsize{00 03}: Függvény leírása (bemeneti paraméterek, visszatérési érték): \lstinline{()V} \\
-    \stageconstantpool{00 01}: Függvény attribútumainak száma \\
+    \stageconstantsize{00 03}: Constant Poolban lévő indexe a függvény szignatúrájának: \lstinline{()V} \\
+    \stageconstantpool{00 01}: Függvény attribútumainak száma (00 01\textsubscript{16} = 1\textsubscript{10} db) \\
     \stageaccessflags{00 01 00 00 00 0D 00 00 00 00 00 00 00 01 B1 00 00 00 00}: Attribútumok
     \begin{compactitem}
         \setlength\itemsep{-5px}
         \item[•] \stagemajor{00 01} \stageminor{00 00 00 0D} \stageconstantsize{00 00 00 00 00 00 00 01 B1 00 00 00 00} \\
         \stagemajor{00 01}: Constant Pool-ban lévő indexe az attribútumnak: \lstinline{Code} \\
-        \stageminor{00 00 00 0D}: Attribútum hossza (\lstinline{0D} = 13 bájt) \\
+        \stageminor{00 00 00 0D}: Attribútum hossza (00 00 00 0D\textsubscript{16} = 13\textsubscript{10} bájt) \\
         \stageconstantsize{00 00 00 00 00 00 00 01 B1 00 00 00 00}: Attribútum
             \begin{compactitem}
             \setlength\itemsep{0px}
                 \item[–] \stagemajor{00 00} \stageminor{00 00} \stageconstantsize{00 00 00 01} \stageconstantpool{B1} \stageaccessflags{00 00} \stagethisclass{00 00} \\
-                \stagemajor{00 00}: Stack mérete  \\
-                \stageminor{00 00}: Lokális változók száma \\
-                \stageconstantsize{00 00 00 01}: Kód hossza \\
+                \stagemajor{00 00}: Stack-en lévő elemek száma (00 00\textsubscript{16} = 0\textsubscript{10} db)  \\
+                \stageminor{00 00}: Lokális változók száma (00 00\textsubscript{16} = 0\textsubscript{10} db) \\
+                \stageconstantsize{00 00 00 01}: Kód hossza (00 00 00 01\textsubscript{16} = 1\textsubscript{10} bájt) \\
                 \stageconstantpool{B1}: Kód \lstinline{(B1 = return)}  \\
-                \stageaccessflags{00 00}: Kivételek száma \\
-                \stagethisclass{00 00}: Attribútum attribútumainak száma
+                \stageaccessflags{00 00}: Kivételek száma (00 00\textsubscript{16} = 0\textsubscript{10} db) \\
+                \stagethisclass{00 00}: Attribútum attribútumainak száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
         \end{compactitem}
     \end{compactitem}
 \end{compactitem}
-\item \stageattributes{00 00}: Osztály attribútumainak száma
+\item \stageattributes{00 00}: Osztály attribútumainak száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+\end{compactitem}
+
+A legegyszerűbb class fájl amelyet a már a beépített 17-es verziójú \lstinline{java} interpretáló program is le tud futtatni, ez már teljesen megfelel a JVM specifikációnak (Fontos hogy a fájl neve \lstinline{Main.class} legyen):
+
+\begin{center}
+\begin{tabular}{ c c c c c c c c c c c c c c c c }
+\stagemagic{CA} & \stagemagic{FE} & \stagemagic{BA} & \stagemagic{BE} & \stageminor{00} & \stageminor{00} & \stagemajor{00} & \stagemajor{3D} & \stageconstantsize{00} & \stageconstantsize{0C} & \stageconstantpool{0A} & \stageconstantpool{00} & \stageconstantpool{02} & \stageconstantpool{00} & \stageconstantpool{03} & \stageconstantpool{07} \\ 
+\stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{0C} & \stageconstantpool{00} & \stageconstantpool{05} & \stageconstantpool{00} & \stageconstantpool{06} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{10} & \stageconstantpool{6A} & \stageconstantpool{61} & \stageconstantpool{76} & \stageconstantpool{61} & \stageconstantpool{2F} & \stageconstantpool{6C} \\
+\stageconstantpool{61} & \stageconstantpool{6E} & \stageconstantpool{67} & \stageconstantpool{2F} & \stageconstantpool{4F} & \stageconstantpool{62} & \stageconstantpool{6A} & \stageconstantpool{65} & \stageconstantpool{63} & \stageconstantpool{74} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{06} & \stageconstantpool{3C} & \stageconstantpool{69} & \stageconstantpool{6E} \\
+\stageconstantpool{69} & \stageconstantpool{74} & \stageconstantpool{3E} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{03} & \stageconstantpool{28} & \stageconstantpool{29} & \stageconstantpool{56} & \stageconstantpool{07} & \stageconstantpool{00} & \stageconstantpool{08} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{4D} \\
+\stageconstantpool{61} & \stageconstantpool{69} & \stageconstantpool{6E} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{43} & \stageconstantpool{6F} & \stageconstantpool{64} & \stageconstantpool{65} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{04} & \stageconstantpool{6D} & \stageconstantpool{61} & \stageconstantpool{69} \\
+\stageconstantpool{6E} & \stageconstantpool{01} & \stageconstantpool{00} & \stageconstantpool{16} & \stageconstantpool{28} & \stageconstantpool{5B} & \stageconstantpool{4C} & \stageconstantpool{6A} & \stageconstantpool{61} & \stageconstantpool{76} & \stageconstantpool{61} & \stageconstantpool{2F} & \stageconstantpool{6C} & \stageconstantpool{61} & \stageconstantpool{6E} & \stageconstantpool{67} \\
+\stageconstantpool{2F} & \stageconstantpool{53} & \stageconstantpool{74} & \stageconstantpool{72} & \stageconstantpool{69} & \stageconstantpool{6E} & \stageconstantpool{67} & \stageconstantpool{3B} & \stageconstantpool{29} & \stageconstantpool{56} & \stageaccessflags{00} & \stageaccessflags{21} & \stagethisclass{00} & \stagethisclass{07} & \stagesuperclass{00} & \stagesuperclass{02} \\
+\stageinterfacesize{00} & \stageinterfacesize{00} & \stagefieldsize{00} & \stagefieldsize{00} & \stagemethodsize{00} & \stagemethodsize{02} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{05} & \stagemethods{00} & \stagemethods{06} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{09} \\
+\stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{11} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{05} & \stagemethods{2A} & \stagemethods{B7} & \stagemethods{00} & \stagemethods{01} \\
+\stagemethods{B1} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{09} & \stagemethods{00} & \stagemethods{0A} & \stagemethods{00} & \stagemethods{0B} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{09} & \stagemethods{00} \\
+\stagemethods{00} & \stagemethods{00} & \stagemethods{0D} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{01} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{01} & \stagemethods{B1} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} & \stagemethods{00} \\ 
+\stageattributes{00} & \stageattributes{00}
+\end{tabular}
+\end{center}
+
+Java kód megfelelője:
+\begin{minted}{java}
+public class Main {
+	public static void main(String[] args) {
+		return;
+	}
+}
+\end{minted}
+
+Elérhető a \lstinline{src/test/java/com/zoltanbalazs/Main.class} fájl formátumában
+
+Class fájl formátumának magyarázata:
+
+\begin{compactitem}
+\setlength\itemsep{-5px}
+\item \stagemagic{CA FE BA BE}: Mágikus szám, amely minden class fájl elején megtalálható
+\item \stageminor{00 00} \stagemajor{00 3D}: Class fájl \lstinline{Minor} és \lstinline{Major} verziószáma, egy táblázatnak megfelelően a \lstinline{javac} fordítóprogram verziója, jelen esetben a 17.0-ás verzió
+\item \stageconstantsize{00 0C}: A Constant Pool mérete (+1, mivel 1-től indexelt, jelen esetben: 00 0C\textsubscript{16} = 12\textsubscript{10}, 12 - 1 = 11 db)
+\item \stageconstantpool{0A 00 02 00 03 07 00 04 0C 00 05 00 06 01 00 10 6A 61 76 61 2F 6C 61 6E 67 2F 4F 62 6A 65 63 74 01 00 06 3C 69 6E 69 74 3E 01 00 03 28 29 56 07 00 08 01 00 04 4D 61 69 6E 01 00 04 43 6F 64 65 01 00 04 6D 61 69 6E 01 00 16 28 5B 4C 6A 61 76 61 2F 6C 61 6E 67 2F 53 74 72 69 6E 67 3B 29 56}: Constant Pool
+\begin{compactitem}
+    \setlength\itemsep{-5px}
+    \item \stagemajor{0A} \stageminor{00 02} \stageconstantsize{00 03} \\
+    \stagemajor{0A}: Constant Pool Info érték: \lstinline{(CONSTANT_Methodref)} \\
+    \stageminor{00 02}: Constant Poolban lévő indexe a függvényt tartalmazó osztálynak: \lstinline{java/lang/Object} \\
+    \stageconstantsize{00 03}: Constant Poolban lévő indexe a függvény nevének és szignatúrájának: \lstinline{<init> ()V}
+    \item \stagemajor{07} \stageminor{00 04} \\
+    \stagemajor{01}: Constant Pool Info érték: \lstinline{(CONSTANT_Class)} \\
+    \stageminor{00 04}: Constant Poolban lévő indexe az osztály nevének: \lstinline{java/lang/Object}
+    \item \stagemajor{0C} \stageminor{00 05} \stageconstantsize{00 06} \\
+    \stagemajor{0C}: Constant Pool Info érték: \lstinline{(CONSTANT_NameAndType)} \\
+    \stageminor{00 05}: Constant Poolban lévő indexe a függvény nevének: \lstinline{<init>} \\
+    \stageconstantsize{28 29 56}: Constant Poolban lévő indexe a függvény szignatúrájának: \lstinline{()V}
+	\item \stagemajor{01} \stageminor{00 10} \stageconstantsize{6A 61 76 61 2F 6C 61 6E 67 2F 4F 62 6A 65 63 74} \\
+	\stagemajor{01}: Constant Pool Info érték: \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 10}: 00 10\textsubscript{16} = 16\textsubscript{10} hosszú \\
+    \stageconstantsize{6A 61 76 61 2F 6C 61 6E 67 2F 4F 62 6A 65 63 74}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{java/lang/Object}
+	\item \stagemajor{01} \stageminor{00 06} \stageconstantsize{3C 69 6E 69 74 3E} \\
+	\stagemajor{01}: Constant Pool Info érték: \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 06}: 00 06\textsubscript{16} = 6\textsubscript{10} hosszú \\
+    \stageconstantsize{3C 69 6E 69 74 3E}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{<init>}
+	\item \stagemajor{01} \stageminor{00 03} \stageconstantsize{28 29 56} \\
+	\stagemajor{01}: Constant Pool Info érték: \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 06}: 00 06\textsubscript{16} = 6\textsubscript{10} hosszú \\
+    \stageconstantsize{28 29 56}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{()V}
+	\item \stagemajor{07} \stageminor{00 08} \\
+	\stagemajor{07}: Constant Pool Info érték: \lstinline{(CONSTANT_Class)} \\
+    \stageminor{00 08}: Constant Poolban lévő indexe az osztály nevének: \lstinline{Main}
+	\item \stagemajor{01} \stageminor{00 04} \stageconstantsize{4D 61 69 6E} \\
+	\stagemajor{01}: Constant Pool Info érték: \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 04}: 00 04\textsubscript{16} = 4\textsubscript{10} hosszú \\
+    \stageconstantsize{4D 61 69 6E}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{Main}
+	\item \stagemajor{01} \stageminor{00 04} \stageconstantsize{43 6F 64 65} \\
+	\stagemajor{01}: Constant Pool Info érték: \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 04}: 00 04\textsubscript{16} = 4\textsubscript{10} hosszú \\
+    \stageconstantsize{43 6F 64 65}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{Code}
+	\item \stagemajor{01} \stageminor{00 04} \stageconstantsize{6D 61 69 6E} \\
+	\stagemajor{01}: Constant Pool Info érték: \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 04}: 00 04\textsubscript{16} = 4\textsubscript{10} hosszú \\
+    \stageconstantsize{6D 61 69 6E}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{main}
+	\item \stagemajor{01} \stageminor{00 16} \stageconstantsize{28 5B 4C 6A 61 76 61 2F 6C 61 6E 67 2F 53 74 72 69 6E 67 3B 29 56} \\
+	\stagemajor{01}: Constant Pool Info érték: \lstinline{(CONSTANT_Utf8)} \\
+    \stageminor{00 16}: 00 16\textsubscript{16} = 22\textsubscript{10} hosszú \\
+    \stageconstantsize{28 5B 4C 6A 61 76 61 2F 6C 61 6E 67 2F 53 74 72 69 6E 67 3B 29 56}: A \lstinline{CONSTANT_Utf8} értéke: \lstinline{([Ljava/lang/String;)V}
+\end{compactitem}
+\item \stageaccessflags{00 21}: Hozzáférési zászlók \lstinline{(Public, Super)}
+\item \stagethisclass{00 07}: \lstinline{This} osztály indexe a Constant Pool-ban: \lstinline{Main}
+\item \stagesuperclass{00 02}: \lstinline{Super} osztály indexe a Constant Pool-ban: \lstinline{java/lang/Object}
+\item \stageinterfacesize{00 00}: Interfészek száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+\item \stagefieldsize{00 00}: Adattagok száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+\item \stagemethodsize{00 02}: Függvények száma (00 02\textsubscript{16} = 2\textsubscript{10} db)
+\item \stagemethods{00 01 00 05 00 06 00 01 00 09 00 00 00 11 00 01 00 01 00 00 00 05 2A B7 00 01 B1 00 00 00 00 00 09 00 0A 00 0B 00 01 00 09 00 00 00 0D 00 00 00 01 00 00 00 01 B1 00 00 00 00}: Függvények
+\begin{compactitem}
+    \setlength\itemsep{-5px}
+    \item \stagemajor{00 01} \stageminor{00 05} \stageconstantsize{00 06} \stageconstantpool{00 01} \stageaccessflags{00 09 00 00 00 11 00 01 00 01 00 00 00 05 2A B7 00 01 B1 00 00 00 00} \\
+    \stagemajor{00 01}: Hozzáférési zászlók \lstinline{(Public)} \\
+    \stageminor{00 05}: Constant Poolban lévő indexe a függvénynek: \lstinline{<init>} \\
+    \stageconstantsize{00 06}: Constant Poolban lévő indexe a függvény szignatúrájának: \lstinline{()V} \\
+    \stageconstantpool{00 01}: Függvény attribútumainak száma (00 01\textsubscript{16} = 1\textsubscript{10} db) \\
+    \stageaccessflags{00 09 00 00 00 11 00 01 00 01 00 00 00 05 2A B7 00 01 B1 00 00 00 00}: Attribútumok
+    \begin{compactitem}
+        \setlength\itemsep{-5px}
+        \item[•] \stagemajor{00 09} \stageminor{00 00 00 11} \stageconstantsize{00 01 00 01 00 00 00 05 2A B7 00 01 B1 00 00 00 00} \\
+        \stagemajor{00 09}: Constant Pool-ban lévő indexe az attribútumnak: \lstinline{Code} \\
+        \stageminor{00 00 00 11}: Attribútum hossza (00 00 00 11\textsubscript{16} = 17\textsubscript{10} bájt) \\
+        \stageconstantsize{00 01 00 01 00 00 00 05 2A B7 00 01 B1 00 00 00 00}: Attribútum
+            \begin{compactitem}
+            \setlength\itemsep{0px}
+                \item[–] \stagemajor{00 01} \stageminor{00 01} \stageconstantsize{00 00 00 05} \stageconstantpool{2A B7 00 01 B1} \stageaccessflags{00 00} \stagethisclass{00 00} \\
+                \stagemajor{00 01}: Stack-en lévő elemek száma (00 01\textsubscript{16} = 1\textsubscript{10} db) \\
+                \stageminor{00 01}: Lokális változók száma (00 01\textsubscript{16} = 1\textsubscript{10} db) \\
+                \stageconstantsize{00 00 00 05}: Kód hossza (00 00 00 05\textsubscript{16} = 5\textsubscript{10} bájt) \\
+                \stageconstantpool{2A B7 00 01 B1}: Kód \lstinline{(2A = aload_0, B7 = invokespecial : 00 01 = java/lang/Object <init> ()V, B1 = return)}  \\
+                \stageaccessflags{00 00}: Kivételek száma (00 00\textsubscript{16} = 0\textsubscript{10} db) \\
+                \stagethisclass{00 00}: Attribútum attribútumainak száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+        \end{compactitem}
+    \end{compactitem}
+	\item \stagemajor{00 09} \stageminor{00 0A} \stageconstantsize{00 0B} \stageconstantpool{00 01} \stageaccessflags{00 09 00 00 00 0D 00 00 00 00 00 00 00 01 B1 00 00 00 00} \\
+    \stagemajor{00 09}: Hozzáférési zászlók \lstinline{(Public, Static)} \\
+    \stageminor{00 0A}: Constant Poolban lévő indexe a függvénynek: \lstinline{main} \\
+    \stageconstantsize{00 0B}: Constant Poolban lévő indexe a függvény szignatúrájának: \lstinline{([Ljava/lang/String;)V} \\
+    \stageconstantpool{00 01}: Függvény attribútumainak száma (00 01\textsubscript{16} = 1\textsubscript{10} db) \\
+    \stageaccessflags{00 09 00 00 00 0D 00 00 00 01 00 00 00 01 B1 00 00 00 00}: Attribútumok
+    \begin{compactitem}
+        \setlength\itemsep{-5px}
+        \item[•] \stagemajor{00 09} \stageminor{00 00 00 0D} \stageconstantsize{00 00 00 01 00 00 00 01 B1 00 00 00 00} \\
+        \stagemajor{00 09}: Constant Pool-ban lévő indexe az attribútumnak: \lstinline{Code} \\
+        \stageminor{00 00 00 0D}: Attribútum hossza (00 00 00 0D\textsubscript{16} = 13\textsubscript{10} bájt) \\
+        \stageconstantsize{00 00 00 01 00 00 00 01 B1 00 00 00 00}: Attribútum
+            \begin{compactitem}
+            \setlength\itemsep{0px}
+                \item[–] \stagemajor{00 00} \stageminor{00 01} \stageconstantsize{00 00 00 01} \stageconstantpool{B1} \stageaccessflags{00 00} \stagethisclass{00 00} \\
+                \stagemajor{00 00}: Stack mérete (00 00\textsubscript{16} = 0\textsubscript{10} db) \\
+                \stageminor{00 01}: Lokális változók száma (00 01\textsubscript{16} = 1\textsubscript{10} db) \\
+                \stageconstantsize{00 00 00 01}: Kód hossza (00 00 00 01\textsubscript{16} = 1\textsubscript{10} bájt) \\
+                \stageconstantpool{B1}: Kód \lstinline{(B1 = return)}  \\
+                \stageaccessflags{00 00}: Kivételek száma (00 00\textsubscript{16} = 0\textsubscript{10} db) \\
+                \stagethisclass{00 00}: Attribútum attribútumainak száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
+        \end{compactitem}
+    \end{compactitem}
+\end{compactitem}
+\item \stageattributes{00 00}: Osztály attribútumainak száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
 \end{compactitem}
 
 \subsection{Adatszerkezetek}
@@ -401,7 +585,7 @@ A \lstinline{Linux} operációs rendszeren beépített \lstinline{time} programo
 		\hline
 
 		\caption[Erőforrás különbségek]{A beépített \lstinline{java} és az interpreter közötti erőforrás különbségek}
-		\label{jabyinja:resource}
+		\label{table:resource}
 	\end{longtable}
 \end{center}
 
@@ -415,7 +599,12 @@ public List<Pair<Class<?>, Object>> stack = new ArrayList<>();
 \end{minted}
 Ez az \lstinline{ArrayList} egy \lstinline{Class<?>}-t és \lstinline{Object}-et tartalmazó \lstinline{Pair}-eket (\lstinline{tuple}) foglal magába. Az \lstinline{Object} a konkrét érték amit a stack-en tárolni szeretnénk, a \lstinline{Class<?>} egy kényelmi megoldás miatt a tárolt értéknek a típusa.
 
-Az implementációból következően lényegében a tényleges program-ban az alábbi memóriaeloszlás következik be:
+Az implementációból következően lényegében a tényleges programban az alábbi memóriaeloszlás következik be:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth,frame]{jabyinja_memory}
+\end{figure}
 
 \subsection{Az önfuttatásról}
 
@@ -427,7 +616,9 @@ akkor igazából csak az interperet \lstinline{main} metódusáig interpretálju
 
 A \lstinline{java} beépített interperet működése miatt amikor egy jar fájlt futtatunk, minden, a jar fájlban lévő, osztály beépített lesz. Az eddig leírtak alapján pedig a beépített osztályok metódusai pedig reflekcióval vannak meghívva.
 
-Természetesen a \lstinline{main} függvényben is megfelelően kell felépíteni a különböző adattagokat, tehát az interpret tényleg saját magát futtatja, viszont nem látunk akkora erőforrásbeli különbséget mint ami a beépített interpretert és a megírt program között van.
+Természetesen a \lstinline{main} függvényben is megfelelően kell felépíteni a különböző adattagokat, tehát az interpreter tényleg saját magát futtatja, viszont nem látunk akkora erőforrásbeli különbséget mint ami a beépített interpretert és a megírt program között van.
+
+\section{Osztályok}
 
 \section{Tesztelő környezet}
 
@@ -506,7 +697,7 @@ A másik komoly probléma a szakdolgozatban a reflekció használatával, az el�
 A specifikációt olvasva számos érdekességre bukkanhat az ember, ezek között vannak tervezési anomáliák, jó megoldások és trükkök. Ezek közül pár:
 
 \begin{compactitem}
- \item A Java 7-es verzió előtt a Java bájtkód instrukciók viszonylag egyszerűek voltak, a 7-es verzióval lett az \lstinline{invokedynamic} bevezetve, mely közelebbi ránézésre igazából egy "szuperinstrukció", ezzel az összes többi \lstinline{invoke} instrukció implementálható, sőt, egy teljes Java bájtkód interpret is megírható csak \lstinline{invokedynamic} utasításokkal. Az \lstinline{invokedynamic} utasítás a dinamikusság kérdésére volt a válasz. Lényege, hogy azon függvényhívásokat, amelyek paramatéreit fordítási időben nem tudjuk, egy hívási helynek (\lstinline{CallSite}) megfelelően kerülnek a JVM-be bele, amely az a hívás során a megfelelő paraméterekkel hívja meg.
+ \item A Java 7-es verzió előtt a Java bájtkód instrukciók viszonylag egyszerűek voltak, a 7-es verzióval lett az \lstinline{invokedynamic} bevezetve, mely közelebbi ránézésre igazából egy "szuperinstrukció", ezzel az összes többi \lstinline{invoke} instrukció implementálható, sőt, egy teljes Java bájtkód interpreter is megírható csak \lstinline{invokedynamic} utasításokkal. Az \lstinline{invokedynamic} utasítás a dinamikusság kérdésére volt a válasz. Lényege, hogy azon függvényhívásokat, amelyek paramatéreit fordítási időben nem tudjuk, egy hívási helynek (\lstinline{CallSite}) megfelelően kerülnek a JVM-be bele, amely az a hívás során a megfelelő paraméterekkel hívja meg.
  \item Elméletileg a lokális változók száma nem kéne hogy $65536$ legyen. Ha megnézi az ember, akkor minden \lstinline{store} és \lstinline{load} utasítás egy darab 8 bites előjel-mentes számot olvas be paraméterként. Ez azt jelenti hogy összesen $2^{8} = 256$ lehetséges index kellene hogy legyen. A \lstinline{wide} módosító utasítás miatt viszont ezek az utasítások beolvashatnak két darab 8 bites előjel-mentes számot, tehát lényegében egy darab 16 bites előjel-mentes szám lesz a paraméterük. Ez azt jelenti hogy $256$ lehetőség hirtelen $2^{16} = 65536$-ra ugrik fel.
  \item Minden \lstinline{Long} és \lstinline{Double} típusú adattag két (egymást követő) helyet foglal el a class fájlon belüli \lstinline{Constant Pool}-ban. Ennek oka hogy minden \lstinline{Constant Pool} beli elem tényleges felhasználható adata $4$ byte-on van, kívéve a \lstinline{Long} és \lstinline{Double}, amelyek felhasználható adatai $8$ byte-on vannak. Így a fájlon belüli folytonosság miatt a specifikáció készítői jobbnak látták hogy inkább két helyet foglaljon el. A specifikációban azóta is a \textit{In retrospect, making 8-byte constants take two constant pool entries was a poor choice. - Utólag visszagondolva, rossz döntés volt, hogy a 8 bájtos konstansok két konstans pool bejegyzést igényelnek.} idézet áll.
  \item A \lstinline{Long} és \lstinline{Double} típusokhoz kapcsolódoan, egy hatalmas különbség a primitívek (\lstinline{double, long}) és osztály (\lstinline{java.lang.Double, java.lang.Long}) típusok között, hogy lokális változókként a primitívek (csak a \lstinline{double} és \lstinline{long}) két helyet foglalnak el a lokális változók között; míg az osztály típusok csak egy helyet. Ez azt jelenti, hogyha függvény paraméterként adunk át egy \lstinline{double} primitívet, akkor valójában 2 helyet foglalunk el a lokális változók között, míg ha egy \lstinline{java.lang.Double} értéket adunk át, csak egy 1 helyet fogunk elfoglalni.

@@ -14,3 +14,4 @@ thesis/images/*
 !src/test/
 !src/test/java/com/zoltanbalazs/Own/*.class
 !thesis/images/elte_cimer_szines.eps
+!thesis/images/jabyinja_memory.png
