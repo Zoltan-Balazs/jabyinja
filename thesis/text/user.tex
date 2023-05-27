@@ -7,7 +7,7 @@ Mivel az elkészített program csak interpretálni tud, a fordítást egy már e
 
 Alapvető esetben ez a fordítóprogrammal együtt telepítésre kerül. A szakdolgozat esetében a lefordított class fájl futtatásával képesek lehetünk más, már lefordított Java programot futtatni.
 
-A mellékelt fájlok között elérhető egy jar fájl is, ennek a futtatásához ugyanúgy szükségünk van egy beépített interpretáló programra, amely képes Java programokat futtatni és nem a szakdolgozat maga.
+A mellékelt fájlok között elérhető egy jar fájl is, ennek a futtatásához ugyanúgy szükségünk van egy beépített interpretáló programra (ami nem a szakdolgozat megoldása), amely képes Java programokat futtatni.
 
 \section{Probléma megfogalmazása}
 
@@ -19,7 +19,7 @@ A megoldáshoz be kell olvasnia a programnak egy class fájlt, helyesen értelme
 
 \section{Megoldás rövid leírása}
 
-A megoldás erősen alapszik a JVM specifikációra, annak is a 7-es verziójára. Ebben a dokumentumban elsősorban le van írva a class fájl felépítése. Mik követik egymást, ezen belül fontos nekünk a \lstinline{Constant Pool} és a \lstinline{Methods} rész. A \lstinline{Constant Pool}-ban találunk minden olyan információt amely szükséges ahhoz hogy milyen osztályaink, metódusaink, metódus szignatúráink és változóértékeink vannak. A \lstinline{Methods} részben találjuk a tényleges utasításokat, itt hívodnak meg a \lstinline{Constant Pool}-ban leírt osztályoknak a metódusai, itt végezzük el az értelmezést.
+A megoldás erősen alapszik a JVM specifikációra, annak is a 7-es verziójára. Ebben a dokumentumban elsősorban le van írva a class fájl felépítése. Mik követik egymást, ezen belül fontos nekünk a \lstinline{Constant Pool} és a \lstinline{Methods} rész. A \lstinline{Constant Pool}-ban találunk minden olyan információt amely szükséges ahhoz, hogy milyen osztályaink, metódusaink, metódus szignatúráink és változóértékeink vannak. A \lstinline{Methods} részben találjuk a tényleges utasításokat, itt hívodnak meg a \lstinline{Constant Pool}-ban leírt osztályoknak a metódusai, itt végezzük el az értelmezést.
 
 A programban szerepelnek a szükséges adatszerkezetek: a \lstinline{stack} és a lokális változók. Az interpretált kódot egy bájt tömbként értelmezi a program, amelyhez szükséges a jelenlegi indexet egy külön változóban eltárolnunk. Ez a változó azért is szükséges, hogy a különböző elágazások, ciklusok működni tudjanak, leegyszerűsítve a ciklus csak egy elágazás, amely többször hajtódik végre.
 
