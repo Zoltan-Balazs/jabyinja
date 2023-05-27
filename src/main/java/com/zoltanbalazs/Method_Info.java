@@ -6,6 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Method_Helper {
+	/***
+	 * Reads the methods from a class file
+	 * 
+	 * @param in    The class file as an input stream
+	 * @param count The number of methods
+	 * @return The methods
+	 * @throws IOException If an I/O error occurs
+	 */
 	public static List<Method_Info> readMethods(DataInputStream in, int count) throws IOException {
 		List<Method_Info> methods = new ArrayList<Method_Info>(count);
 
@@ -34,7 +42,8 @@ class Method_Info {
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 
-		str.append("Method: " + access_flags + " - " + name_index + " - " + description_index + " - " + attributes_count + "\n");
+		str.append("Method: " + access_flags + " - " + name_index + " - " + description_index + " - " + attributes_count
+				+ "\n");
 
 		for (Attribute_Info ATTRIBUTE : attributes) {
 			str.append("\t" + ATTRIBUTE + "\n");

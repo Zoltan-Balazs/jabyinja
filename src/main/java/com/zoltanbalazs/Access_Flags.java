@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface Access_Flags {
+    /***
+     * Parses the access flags
+     * 
+     * @param value The value of the access flags
+     * @return The access flags
+     */
     public static List<Access_Flags> parseFlags(short value) {
         return new ArrayList<Access_Flags>();
     }
@@ -25,6 +31,12 @@ enum Class_Access_Flags implements Access_Flags {
         this.value = (short) value;
     }
 
+    /***
+     * Parses the class access flags
+     * 
+     * @param value The value of the class access flags
+     * @return The class access flags
+     */
     public static List<Class_Access_Flags> parseFlags(short value) {
         List<Class_Access_Flags> accessFlags = new ArrayList<Class_Access_Flags>();
 
@@ -55,6 +67,12 @@ enum Field_Access_Flags implements Access_Flags {
         this.value = (short) value;
     }
 
+    /***
+     * Parses the field access flags
+     * 
+     * @param value The value of the field access flags
+     * @return The field access flags
+     */
     public static List<Field_Access_Flags> parseFlags(short value) {
         List<Field_Access_Flags> accessFlags = new ArrayList<Field_Access_Flags>();
 
@@ -88,6 +106,12 @@ enum Method_Access_Flags implements Access_Flags {
         this.value = (short) value;
     }
 
+    /***
+     * Parses the method access flags
+     * 
+     * @param value The value of the method access flags
+     * @return The method access flags
+     */
     public static List<Method_Access_Flags> parseFlags(short value) {
         List<Method_Access_Flags> accessFlags = new ArrayList<Method_Access_Flags>();
 

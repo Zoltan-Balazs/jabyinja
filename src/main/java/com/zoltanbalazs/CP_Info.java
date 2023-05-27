@@ -9,12 +9,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 class InvalidConstantPoolTagException extends RuntimeException {
+	/***
+	 * Constructs a new exception with the specified detail message.
+	 * 
+	 * @param message The message
+	 */
 	public InvalidConstantPoolTagException(String message) {
 		super(message);
 	}
 }
 
 class Constant_Pool_Helper {
+	/***
+	 * Converts a byte array to a long value
+	 * 
+	 * @param bytes The byte array
+	 * @return The long value
+	 */
 	public static long convertToLong(byte[] bytes) {
 		long value = 0L;
 
@@ -25,6 +36,15 @@ class Constant_Pool_Helper {
 		return value;
 	}
 
+	/***
+	 * Reads the constant pool from a class file
+	 * 
+	 * @param in    The class file as an input stream
+	 * @param count The number of entries in the constant pool
+	 * @return The constant pool
+	 * @throws IOException                     If an I/O error occurs
+	 * @throws InvalidConstantPoolTagException If the constant pool tag is invalid
+	 */
 	public static List<CP_Info> readConstantPool(DataInputStream in, int count)
 			throws IOException, InvalidConstantPoolTagException {
 		List<CP_Info> constant_pool = new ArrayList<CP_Info>(count - 1);

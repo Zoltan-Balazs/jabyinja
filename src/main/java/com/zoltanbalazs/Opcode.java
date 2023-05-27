@@ -213,10 +213,21 @@ public enum Opcode {
 
     public final byte op_code;
 
+    /***
+     * Constructor for Opcode
+     * 
+     * @param opCode the opcode
+     */
     private Opcode(int opCode) {
         this.op_code = (byte) opCode;
     }
 
+    /***
+     * Returns the enum representation of an integer opcode
+     * 
+     * @param op_code the opcode (as an integer)
+     * @return the enum representation of the opcode
+     */
     public static Opcode opcodeRepresentation(int op_code) {
         for (Opcode OPCODE : Opcode.values()) {
             if (OPCODE.op_code == op_code) {

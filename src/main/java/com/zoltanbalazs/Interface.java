@@ -15,6 +15,14 @@ public class Interface {
 }
 
 class Interface_Helper {
+	/***
+	 * Reads the interfaces from a class file
+	 * 
+	 * @param in    The class file as an input stream
+	 * @param count The number of interfaces
+	 * @return The interfaces
+	 * @throws IOException If an I/O error occurs
+	 */
 	public static List<Interface> readInterfaces(DataInputStream in, int count) throws IOException {
 		List<Interface> interfaces = new ArrayList<Interface>(count);
 

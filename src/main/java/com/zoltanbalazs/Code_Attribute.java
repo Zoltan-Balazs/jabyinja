@@ -7,6 +7,13 @@ import java.io.InputStream;
 import java.util.List;
 
 class Code_Attribute_Helper {
+    /***
+     * Reads the code attribute from an attribute
+     * 
+     * @param attribute The attribute
+     * @return The code attribute
+     * @throws IOException If an I/O error occurs
+     */
     public static Code_Attribute readCodeAttributes(Attribute_Info attribute) throws IOException {
         Code_Attribute codeAttribute = new Code_Attribute();
 

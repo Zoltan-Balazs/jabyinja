@@ -6,6 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Attribute_Helper {
+	/***
+	 * Reads the attributes from a class file
+	 * 
+	 * @param in    The class file as an input stream
+	 * @param count The number of attributes
+	 * @return The attributes
+	 * @throws IOException If an I/O error occurs
+	 */
 	public static List<Attribute_Info> readAttributes(DataInputStream in, int count) throws IOException {
 		List<Attribute_Info> attributes = new ArrayList<Attribute_Info>(count);
 

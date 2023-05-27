@@ -6,6 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Field_Helper {
+	/***
+	 * Reads the fields from a class file
+	 * 
+	 * @param in    The class file as an input stream
+	 * @param count The number of fields
+	 * @return The fields
+	 * @throws IOException If an I/O error occurs
+	 */
 	public static List<Field_Info> readFields(DataInputStream in, int count) throws IOException {
 		List<Field_Info> fields = new ArrayList<Field_Info>(count);
 
@@ -34,7 +42,8 @@ public class Field_Info {
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 
-		str.append("Field: " + access_flags + " - " + name_index + " - " + description_index + " - " + attributes_count + "\n");
+		str.append("Field: " + access_flags + " - " + name_index + " - " + description_index + " - " + attributes_count
+				+ "\n");
 
 		for (Attribute_Info ATTRIBUTE : attributes) {
 			str.append("\t" + ATTRIBUTE + "\n");

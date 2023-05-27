@@ -8,6 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 class BootstrapMethods_Attribute_Helper {
+    /***
+     * Reads the bootstrap methods from an attribute
+     * 
+     * @param attribute The attribute
+     * @return The bootstrap methods
+     * @throws IOException If an I/O error occurs
+     */
     public static BootstrapMethods_Attribute readBootStrapMethodAttributes(Attribute_Info attribute)
             throws IOException {
         BootstrapMethods_Attribute bootstrapMethodsAttribute = new BootstrapMethods_Attribute();
@@ -27,6 +34,14 @@ class BootstrapMethods_Attribute_Helper {
 }
 
 class BoostrapMethod_Helper {
+    /***
+     * Reads the bootstrap methods from a class file
+     * 
+     * @param in    The class file as an input stream
+     * @param count The number of bootstrap methods
+     * @return The bootstrap methods
+     * @throws IOException If an I/O error occurs
+     */
     public static List<BoostrapMethod> readBootStrapMethods(DataInputStream in, int count) throws IOException {
         List<BoostrapMethod> bootstrapMethods = new ArrayList<BoostrapMethod>(count);
 

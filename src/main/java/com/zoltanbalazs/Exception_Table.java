@@ -6,6 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Exception_Table_Helper {
+    /***
+     * Reads the exception table from a class file
+     * 
+     * @param in    The class file as an input stream
+     * @param count The number of exceptions
+     * @return The exception table
+     * @throws IOException If an I/O error occurs
+     */
     public static List<Exception_Table> readExceptionTable(DataInputStream in, int count) throws IOException {
         List<Exception_Table> exceptionTable = new ArrayList<Exception_Table>(count);
 
