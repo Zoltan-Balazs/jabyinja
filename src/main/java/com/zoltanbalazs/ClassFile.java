@@ -1,7 +1,6 @@
 package com.zoltanbalazs;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,8 +8,6 @@ import java.io.InputStream;
 import java.lang.invoke.CallSite;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -248,28 +245,59 @@ class ClassFile {
         return attr;
     }
 
+    /***
+     * Finds the class name for the given index in the constant pool
+     * 
+     * @param class_index The index of the class
+     * @return The name of the class with the given index
+     */
     public String getNameOfClass(short class_index) {
         return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(class_index - 1).getNameIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
+    /***
+     * Finds the name of the member for the given index in the constant pool
+     * 
+     * @param name_and_type_index The index of the member
+     * @return The name of the member with the given index
+     */
     public String getNameOfMember(short name_and_type_index) {
         return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getNameIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
+    /***
+     * Finds the description of the member for the given index in the constant pool
+     * 
+     * @param name_and_type_index The index of the member
+     * @return The description of the member with the given index
+     */
     public String getDescriptionOfMethod(short name_and_type_index) {
         return new String(
                 CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getDescriptorIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
+    /***
+     * Gets the arguments for the given description of the method
+     * 
+     * @param method_descriptions The description of the method
+     * @return The list of arguments of the method
+     * @throws ClassNotFoundException If the class of the argument is not found
+     */
     public List<Class<?>> getArguments(String method_descriptions) throws ClassNotFoundException {
         return stringToTypes(
                 method_descriptions.substring(method_descriptions.indexOf("(") + 1,
                         method_descriptions.indexOf(")")));
     }
 
+    /***
+     * Checks if the given class is a built-in class
+     * 
+     * @param className The name of the class
+     * @return True if the class is built-in, false otherwise
+     */
     public static boolean isClassBuiltIn(String className) {
         try {
             Class.forName(className.replace("/", "."));
@@ -279,6 +307,14 @@ class ClassFile {
         }
     }
 
+    /***
+     * Checks if the given method exists
+     * 
+     * @param reference_to_class           The reference to the class
+     * @param name_and_type_of_member      The name and type of the member
+     * @param types_of_function_paramaters The types of the parameters of the method
+     * @return True if the method exists, false otherwise
+     */
     public static boolean doesMethodExists(Class<?> reference_to_class, String name_and_type_of_member,
             Class<?>[] types_of_function_paramaters) {
         Class<?> original_reference = reference_to_class;
@@ -313,11 +349,26 @@ class ClassFile {
         return doesMethodExist;
     }
 
+    /***
+     * Gets the number of arguments of the method
+     * 
+     * @param name_and_type_index The index of the member
+     * @return The number of arguments of the method
+     * @throws ClassNotFoundException If the class of the argument is not found
+     */
     public int getNumberOfArguments(short name_and_type_index) throws ClassNotFoundException {
         String descriptor = getDescriptionOfMethod(name_and_type_index);
         return getArguments(descriptor).size();
     }
 
+    /***
+     * Executes the code of the method
+     * 
+     * @param attribute The code attribute
+     * @param args      The arguments of the method
+     * @return The return value of the method
+     * @throws Throwable If the method throws an exception
+     */
     public Pair<Class<?>, Object> executeCode(Code_Attribute attribute, Object[] args) throws Throwable {
         byte[] code = attribute.code;
         local[0] = args != null ? args : local[0];
@@ -467,28 +518,28 @@ class ClassFile {
                     Instructions.ASTORE(stack, local, opCode - 0x4B);
                 }
                 case IASTORE -> {
-                    Instructions.IASTORE(stack, this);
+                    Instructions.IASTORE(stack);
                 }
                 case LASTORE -> {
-                    Instructions.LASTORE(stack, this);
+                    Instructions.LASTORE(stack);
                 }
                 case FASTORE -> {
-                    Instructions.FASTORE(stack, this);
+                    Instructions.FASTORE(stack);
                 }
                 case DASTORE -> {
-                    Instructions.DASTORE(stack, this);
+                    Instructions.DASTORE(stack);
                 }
                 case AASTORE -> {
-                    Instructions.AASTORE(stack, this);
+                    Instructions.AASTORE(stack);
                 }
                 case BASTORE -> {
-                    Instructions.BASTORE(stack, this);
+                    Instructions.BASTORE(stack);
                 }
                 case CASTORE -> {
-                    Instructions.CASTORE(stack, this);
+                    Instructions.CASTORE(stack);
                 }
                 case SASTORE -> {
-                    Instructions.SASTORE(stack, this);
+                    Instructions.SASTORE(stack);
                 }
                 case POP -> {
                     Instructions.POP(stack, Opcode.POP);
@@ -918,6 +969,12 @@ class ClassFile {
         throw new Throwable("Code did not contain a return statement");
     }
 
+    /***
+     * Decodes a class name from a string
+     * 
+     * @param argument The string to decode
+     * @return A pair containing the length of the string and the class name
+     */
     public static Pair<Integer, String> decodeClassName(String argument) {
         String type = argument.substring(0 + 1);
         int endIdx = type.indexOf(";");
@@ -925,6 +982,13 @@ class ClassFile {
         return new Pair<Integer, String>(1 + endIdx + 1, type.replace("/", "."));
     }
 
+    /***
+     * Decodes a type from a string
+     * 
+     * @param argument The string to decode
+     * @return A pair containing the length of the string and the type
+     * @throws ClassNotFoundException If the type is not found
+     */
     public Pair<Integer, Class<?>> stringToType(String argument) throws ClassNotFoundException {
         switch (argument.charAt(0)) {
             case 'B' -> {
@@ -951,7 +1015,7 @@ class ClassFile {
                     return new Pair<Integer, Class<?>>(className.first, Class.forName(className.second));
                 } else {
                     return new Pair<Integer, Class<?>>(className.first,
-                            Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(FILE_NAME, className.second).second);
+                            Instructions_Helper.loadClassFromOtherFile(FILE_NAME, className.second).second);
                 }
 
             }
@@ -977,32 +1041,8 @@ class ClassFile {
                     if (!isClassBuiltIn(className.second)) {
                         String class_name = className.second;
                         String new_filename = FILE_NAME;
-                        Class<?> resolved_class = null;
-
-                        File f = new File(new_filename);
-                        int length = 0;
-                        if (class_name.contains("/")) {
-                            length = class_name.split("/").length;
-                        } else {
-                            length = class_name.split("\\.").length;
-                        }
-
-                        try {
-                            for (int i = 0; i < length + 1 && resolved_class == null; ++i) {
-                                URL[] cp = { f.toURI().toURL() };
-                                URLClassLoader urlcl = new URLClassLoader(cp);
-                                try {
-                                    resolved_class = urlcl.loadClass(class_name);
-                                } catch (Exception eee) {
-
-                                }
-                                urlcl.close();
-
-                                f = new File(f.getParent());
-                            }
-                        } catch (Exception e) {
-                            System.out.println(e);
-                        }
+                        Class<?> resolved_class = Instructions_Helper.getCorrectClassLoader(new_filename, class_name)
+                                .loadClass(class_name);
 
                         return new Pair<Integer, Class<?>>(idx + className.first, resolved_class);
                     } else {
@@ -1022,6 +1062,13 @@ class ClassFile {
         }
     }
 
+    /***
+     * Converts a string of arguments to a list of classes
+     * 
+     * @param arguments The arguments to convert
+     * @return A list of classes representing the arguments
+     * @throws ClassNotFoundException If a class is not found
+     */
     public List<Class<?>> stringToTypes(String arguments) throws ClassNotFoundException {
         List<Class<?>> argTypes = new ArrayList<Class<?>>();
 

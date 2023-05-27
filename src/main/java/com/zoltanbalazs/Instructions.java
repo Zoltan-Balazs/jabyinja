@@ -47,8 +47,8 @@ public class Instructions {
     public static void LDC(List<Pair<Class<?>, Object>> stack, List<CP_Info> constant_pool, short index) {
         ConstantPoolTag tag = constant_pool.get((index & 0xFF) - 1).tag;
 
-        Class<?> type = Instructions_Helper.TagSwitchType(constant_pool, tag);
-        Object value = Instructions_Helper.TagSwitchValue(constant_pool, tag, (index & 0xFF));
+        Class<?> type = Instructions_Helper.tagSwitchType(constant_pool, tag);
+        Object value = Instructions_Helper.tagSwitchValue(constant_pool, tag, (index & 0xFF));
 
         stack.add(new Pair<Class<?>, Object>(type, value));
     }
@@ -143,36 +143,36 @@ public class Instructions {
         local[index] = stack.remove(stack.size() - 1).second;
     }
 
-    public static void IASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
-        Instructions_Helper.ARRAYSTORE(stack, cf);
+    public static void IASTORE(List<Pair<Class<?>, Object>> stack) {
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
-    public static void LASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
-        Instructions_Helper.ARRAYSTORE(stack, cf);
+    public static void LASTORE(List<Pair<Class<?>, Object>> stack) {
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
-    public static void FASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
-        Instructions_Helper.ARRAYSTORE(stack, cf);
+    public static void FASTORE(List<Pair<Class<?>, Object>> stack) {
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
-    public static void DASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
-        Instructions_Helper.ARRAYSTORE(stack, cf);
+    public static void DASTORE(List<Pair<Class<?>, Object>> stack) {
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
-    public static void AASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
-        Instructions_Helper.ARRAYSTORE(stack, cf);
+    public static void AASTORE(List<Pair<Class<?>, Object>> stack) {
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
-    public static void BASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
-        Instructions_Helper.ARRAYSTORE(stack, cf);
+    public static void BASTORE(List<Pair<Class<?>, Object>> stack) {
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
-    public static void CASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
-        Instructions_Helper.ARRAYSTORE(stack, cf);
+    public static void CASTORE(List<Pair<Class<?>, Object>> stack) {
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
-    public static void SASTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
-        Instructions_Helper.ARRAYSTORE(stack, cf);
+    public static void SASTORE(List<Pair<Class<?>, Object>> stack) {
+        Instructions_Helper.ARRAYSTORE(stack);
     }
 
     public static void POP(List<Pair<Class<?>, Object>> stack, Opcode type) {
@@ -602,7 +602,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+            reference_to_class = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class).second;
         }
 
         for (int i = 0; i < 65535 && cf.local[i] != null; ++i) {
@@ -628,7 +628,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+            reference_to_class = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class).second;
         }
 
         int stack_size = stack.size();
@@ -746,7 +746,7 @@ public class Instructions {
 
         List<Object> arguments_of_function = new ArrayList<Object>();
         List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
-        Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
+        Instructions_Helper.setArgumentsAndTypes(arguments_on_stack, arguments_of_function, type_of_arguments);
         int tmpIdx = 0;
         Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
         for (int j = 0; j < type_of_arguments.size(); ++j) {
@@ -758,12 +758,12 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            Pair<String, Class<?>> returned = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class);
 
             if (returned == null) {
                 name_of_class = name_of_class.replace("[", "");
                 name_of_class = name_of_class.substring(1, name_of_class.length() - 1);
-                returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+                returned = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class);
             }
             reference_to_class = returned.second;
             new_filename = returned.first;
@@ -797,10 +797,10 @@ public class Instructions {
                     }
                 }
 
-                Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
+                Method method = Instructions_Helper.getCorrectMethod(reference_to_class, name_and_type_of_member,
                         types_of_function_paramaters,
                         method_arguments, arguments_on_stack);
-                types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(reference_to_class,
+                types_of_function_paramaters = Instructions_Helper.getCorrectMethodTypes(reference_to_class,
                         name_and_type_of_member,
                         types_of_function_paramaters, method_arguments, arguments_on_stack);
 
@@ -830,11 +830,11 @@ public class Instructions {
                         name_of_class = cf.getNameOfClass(reference_to_method.getClassIndex());
 
                         if (ClassFile.isClassBuiltIn(name_of_class)) {
-                            Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class,
+                            Method method = Instructions_Helper.getCorrectMethod(reference_to_class,
                                     name_and_type_of_member,
                                     types_of_function_paramaters,
                                     method_arguments, arguments_on_stack);
-                            types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(
+                            types_of_function_paramaters = Instructions_Helper.getCorrectMethodTypes(
                                     reference_to_class,
                                     name_and_type_of_member,
                                     types_of_function_paramaters, method_arguments, arguments_on_stack);
@@ -850,13 +850,13 @@ public class Instructions {
                                 returnType = result.getClass();
                             }
                         } else {
-                            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+                            Pair<String, Class<?>> returned = Instructions_Helper.loadClassFromOtherFile(file_name,
                                     name_of_class);
 
                             if (returned == null) {
                                 name_of_class = name_of_class.replace("[", "");
                                 name_of_class = name_of_class.substring(1, name_of_class.length() - 1);
-                                returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+                                returned = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class);
                             }
                             reference_to_class = returned.second;
                             new_filename = returned.first;
@@ -868,11 +868,11 @@ public class Instructions {
                                 name_of_class = objectref.second.getClass().getSuperclass().getName().replace(".", "/");
 
                                 if (ClassFile.isClassBuiltIn(name_of_class)) {
-                                    Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class,
+                                    Method method = Instructions_Helper.getCorrectMethod(reference_to_class,
                                             name_and_type_of_member,
                                             types_of_function_paramaters,
                                             method_arguments, arguments_on_stack);
-                                    types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(
+                                    types_of_function_paramaters = Instructions_Helper.getCorrectMethodTypes(
                                             reference_to_class,
                                             name_and_type_of_member,
                                             types_of_function_paramaters, method_arguments, arguments_on_stack);
@@ -887,7 +887,7 @@ public class Instructions {
                                         returnType = result.getClass();
                                     }
                                 } else {
-                                    returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+                                    returned = Instructions_Helper.loadClassFromOtherFile(file_name,
                                             name_of_class);
                                     reference_to_class = returned.second;
                                     new_filename = returned.first;
@@ -989,10 +989,10 @@ public class Instructions {
                     obj = objectref.first;
                 }
 
-                Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
+                Method method = Instructions_Helper.getCorrectMethod(reference_to_class, name_and_type_of_member,
                         types_of_function_paramaters,
                         method_arguments, arguments_on_stack);
-                types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(reference_to_class,
+                types_of_function_paramaters = Instructions_Helper.getCorrectMethodTypes(reference_to_class,
                         name_and_type_of_member,
                         types_of_function_paramaters, method_arguments, arguments_on_stack);
 
@@ -1039,10 +1039,10 @@ public class Instructions {
 
                 local[objectRefIdx] = obj;
             } catch (Exception e) {
-                Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
+                Method method = Instructions_Helper.getCorrectMethod(reference_to_class, name_and_type_of_member,
                         types_of_function_paramaters,
                         method_arguments, arguments_on_stack);
-                types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(reference_to_class,
+                types_of_function_paramaters = Instructions_Helper.getCorrectMethodTypes(reference_to_class,
                         name_and_type_of_member,
                         types_of_function_paramaters, method_arguments, arguments_on_stack);
 
@@ -1054,12 +1054,12 @@ public class Instructions {
                 if (obj == null) {
                     obj = objectref.first;
 
-                    method = Instructions_Helper.GET_CORRECT_METHOD(objectref.first.getClass(),
+                    method = Instructions_Helper.getCorrectMethod(objectref.first.getClass(),
                             name_and_type_of_member,
                             types_of_function_paramaters,
                             method_arguments, arguments_on_stack);
                 } else {
-                    method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class,
+                    method = Instructions_Helper.getCorrectMethod(reference_to_class,
                             name_and_type_of_member,
                             types_of_function_paramaters,
                             method_arguments, arguments_on_stack);
@@ -1146,7 +1146,7 @@ public class Instructions {
 
         List<Object> arguments_of_function = new ArrayList<Object>();
         List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
-        Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
+        Instructions_Helper.setArgumentsAndTypes(arguments_on_stack, arguments_of_function, type_of_arguments);
         Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
         for (int j = 0; j < type_of_arguments.size(); ++j) {
             types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
@@ -1163,7 +1163,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            Pair<String, Class<?>> returned = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class);
             reference_to_class = returned.second;
             new_filename = returned.first;
         }
@@ -1206,12 +1206,12 @@ public class Instructions {
                     }
                 } catch (Throwable ee) {
                     // TODO
-                    Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+                    Pair<String, Class<?>> returned = Instructions_Helper.loadClassFromOtherFile(file_name,
                             ee.getMessage());
                     reference_to_class = returned.second;
                     new_filename = returned.first;
                     String new_classname = reference_to_class.getName();
-                    Class<?> resolved_class = Instructions_Helper.GET_CORRECT_CLASSLOADER(new_filename, name_of_class)
+                    Class<?> resolved_class = Instructions_Helper.getCorrectClassLoader(new_filename, name_of_class)
                             .loadClass(new_classname);
 
                     ClassLoader correct_loader = resolved_class.getClassLoader();
@@ -1259,12 +1259,12 @@ public class Instructions {
             ClassFile CLASS_FILE = new ClassFile(new_filename);
             CLASS_FILE.MUST_INITIALIZE = true;
 
-            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+            Pair<String, Class<?>> returned = Instructions_Helper.loadClassFromOtherFile(file_name,
                     name_of_class);
             reference_to_class = returned.second;
             new_filename = returned.first;
             String new_classname = reference_to_class.getName();
-            Class<?> resolved_class = Instructions_Helper.GET_CORRECT_CLASSLOADER(new_filename, new_classname)
+            Class<?> resolved_class = Instructions_Helper.getCorrectClassLoader(new_filename, new_classname)
                     .loadClass(new_classname);
 
             Method_Info fn_method = CLASS_FILE.findMethod(name_and_type_of_member,
@@ -1299,12 +1299,12 @@ public class Instructions {
                         objectref = new Pair<Class<?>, Object>(CLASS_FILE.local[0].getClass(),
                                 CLASS_FILE.local[0]);
                     } else if (CLASS_FILE.MUST_INITIALIZE) {
-                        returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(cf.FILE_NAME,
+                        returned = Instructions_Helper.loadClassFromOtherFile(cf.FILE_NAME,
                                 cf.CLASS_NAME);
                         reference_to_class = returned.second;
                         new_filename = returned.first;
                         new_classname = reference_to_class.getName();
-                        resolved_class = Instructions_Helper.GET_CORRECT_CLASSLOADER(new_filename, new_classname)
+                        resolved_class = Instructions_Helper.getCorrectClassLoader(new_filename, new_classname)
                                 .loadClass(new_classname);
 
                         try {
@@ -1343,7 +1343,7 @@ public class Instructions {
                             objectref = new Pair<Class<?>, Object>(reference_to_class,
                                     initConstructor.newInstance(argumets_as_objects));
                         } catch (Throwable ee) {
-                            returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(cf.FILE_NAME,
+                            returned = Instructions_Helper.loadClassFromOtherFile(cf.FILE_NAME,
                                     ee.getMessage());
                             if (returned == null) {
                                 return;
@@ -1352,7 +1352,7 @@ public class Instructions {
                             new_filename = returned.first;
                             new_classname = reference_to_class.getName();
                             Thread.currentThread().setContextClassLoader(
-                                    Instructions_Helper.GET_CORRECT_CLASSLOADER(new_filename, new_classname));
+                                    Instructions_Helper.getCorrectClassLoader(new_filename, new_classname));
                         }
 
                     }
@@ -1402,7 +1402,7 @@ public class Instructions {
 
         List<Object> arguments_of_function = new ArrayList<Object>();
         List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
-        Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
+        Instructions_Helper.setArgumentsAndTypes(arguments_on_stack, arguments_of_function, type_of_arguments);
         Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
         for (int j = 0; j < type_of_arguments.size(); ++j) {
             types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
@@ -1413,7 +1413,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            Pair<String, Class<?>> returned = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class);
             reference_to_class = returned.second;
             new_filename = returned.first;
         }
@@ -1421,7 +1421,7 @@ public class Instructions {
         Object result = null;
         Class<?> returnType = void.class;
         if (ClassFile.isClassBuiltIn(name_of_class)) {
-            Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
+            Method method = Instructions_Helper.getCorrectMethod(reference_to_class, name_and_type_of_member,
                     types_of_function_paramaters,
                     method_arguments, arguments_on_stack);
 
@@ -1548,7 +1548,7 @@ public class Instructions {
 
         List<Object> arguments_of_function = new ArrayList<Object>();
         List<Class<?>> type_of_arguments = new ArrayList<Class<?>>();
-        Instructions_Helper.SETARGUMENTS_AND_TYPES(arguments_on_stack, arguments_of_function, type_of_arguments);
+        Instructions_Helper.setArgumentsAndTypes(arguments_on_stack, arguments_of_function, type_of_arguments);
         Class<?>[] types_of_function_paramaters = new Class<?>[type_of_arguments.size()];
         for (int j = 0; j < type_of_arguments.size(); ++j) {
             types_of_function_paramaters[j] = (Class<?>) type_of_arguments.get(j);
@@ -1559,15 +1559,15 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class);
+            Pair<String, Class<?>> returned = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class);
             reference_to_class = returned.second;
             new_filename = returned.first;
         }
 
-        Method method = Instructions_Helper.GET_CORRECT_METHOD(reference_to_class, name_and_type_of_member,
+        Method method = Instructions_Helper.getCorrectMethod(reference_to_class, name_and_type_of_member,
                 types_of_function_paramaters,
                 method_arguments, arguments_on_stack);
-        types_of_function_paramaters = Instructions_Helper.GET_CORRECT_METHOD_TYPES(reference_to_class,
+        types_of_function_paramaters = Instructions_Helper.getCorrectMethodTypes(reference_to_class,
                 name_and_type_of_member,
                 types_of_function_paramaters, method_arguments, arguments_on_stack);
 
@@ -1646,7 +1646,7 @@ public class Instructions {
         if (ClassFile.isClassBuiltIn(name_of_class)) {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
-            reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name,
+            reference_to_class = Instructions_Helper.loadClassFromOtherFile(file_name,
                     name_of_class).second;
         }
 
@@ -1654,7 +1654,7 @@ public class Instructions {
     }
 
     public static void NEWARRAY(List<Pair<Class<?>, Object>> stack, byte atype) {
-        Class<?> arrayType = Instructions_Helper.GetArrayType(atype);
+        Class<?> arrayType = Instructions_Helper.getArrayType(atype);
         int count = ((Number) stack.remove(stack.size() - 1).second).intValue();
 
         stack.add(new Pair<Class<?>, Object>(arrayType, Array.newInstance(arrayType, count)));
@@ -1672,10 +1672,10 @@ public class Instructions {
             if (ClassFile.isClassBuiltIn(name_of_class)) {
                 arrayType = Class.forName(name_of_class.replace("/", "."));
             } else {
-                arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+                arrayType = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class).second;
             }
         } else {
-            arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
+            arrayType = Instructions_Helper.tagSwitchType(constant_pool, tag);
         }
         int count = ((Number) stack.remove(stack.size() - 1).second).intValue();
 
@@ -1725,7 +1725,7 @@ public class Instructions {
             reference_to_class = Class.forName(name_of_class.replace("/", "."));
         } else {
             try {
-                reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+                reference_to_class = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class).second;
             } catch (Exception e) {
 
             }
@@ -1767,7 +1767,7 @@ public class Instructions {
             if (ClassFile.isClassBuiltIn(name_of_class)) {
                 reference_to_class = Class.forName(name_of_class.replace("/", "."));
             } else {
-                reference_to_class = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+                reference_to_class = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class).second;
             }
 
             Class<?> type = objectRef.first;
@@ -1857,11 +1857,11 @@ public class Instructions {
                 arrayType = Class.forName(name_of_class.replace("/", "."));
                 hackyType = Class.forName(name_of_class.replace("/", ".").replaceAll("\\[+", "["));
             } else {
-                arrayType = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(file_name, name_of_class).second;
+                arrayType = Instructions_Helper.loadClassFromOtherFile(file_name, name_of_class).second;
                 hackyType = arrayType;
             }
         } else {
-            arrayType = Instructions_Helper.TagSwitchType(constant_pool, tag);
+            arrayType = Instructions_Helper.tagSwitchType(constant_pool, tag);
         }
 
         int[] size = new int[dimensions];
@@ -1906,7 +1906,7 @@ public class Instructions {
         if (cf.MUST_INITIALIZE) {
             String class_name = cf.CLASS_NAME.replace("/", ".");
 
-            Pair<String, Class<?>> returned = Instructions_Helper.LOAD_CLASS_FROM_OTHER_FILE(cf.FILE_NAME,
+            Pair<String, Class<?>> returned = Instructions_Helper.loadClassFromOtherFile(cf.FILE_NAME,
                     cf.CLASS_NAME);
             Class<?> reference_to_class = returned.second;
             String new_filename = returned.first;
@@ -2129,7 +2129,15 @@ public class Instructions {
 }
 
 class Instructions_Helper {
-    public static Object TagSwitchValue(List<CP_Info> CONSTANT_POOL, ConstantPoolTag tag, int index) {
+    /***
+     * This method is used to get the value of a constant pool entry
+     * 
+     * @param CONSTANT_POOL the constant pool of the class file
+     * @param tag           the tag of the constant pool entry
+     * @param index         the index of the constant pool entry
+     * @return the value of the constant pool entry
+     */
+    public static Object tagSwitchValue(List<CP_Info> CONSTANT_POOL, ConstantPoolTag tag, int index) {
         switch (tag) {
             case CONSTANT_String -> {
                 return new String(CONSTANT_POOL.get((CONSTANT_POOL.get(index - 1)).getStringIndex() - 1).getBytes(),
@@ -2153,7 +2161,14 @@ class Instructions_Helper {
         }
     }
 
-    public static Class<?> TagSwitchType(List<CP_Info> CONSTANT_POOL, ConstantPoolTag tag) {
+    /***
+     * Switches the tag of the constant pool to the type of the tag
+     * 
+     * @param CONSTANT_POOL the constant pool
+     * @param tag           the tag of the constant pool
+     * @return the type of the tag
+     */
+    public static Class<?> tagSwitchType(List<CP_Info> CONSTANT_POOL, ConstantPoolTag tag) {
         switch (tag) {
             case CONSTANT_String -> {
                 return String.class;
@@ -2176,7 +2191,13 @@ class Instructions_Helper {
         }
     }
 
-    public static Class<?> GetArrayType(byte atype) {
+    /***
+     * Switches the type of the array to the type of the array
+     * 
+     * @param atype the type of the array in bool
+     * @return the type of the array
+     */
+    public static Class<?> getArrayType(byte atype) {
         switch (atype) {
             case 4 -> {
                 return Boolean.class;
@@ -2215,7 +2236,7 @@ class Instructions_Helper {
         return Array.get(arrayRef.second, index);
     }
 
-    public static void ARRAYSTORE(List<Pair<Class<?>, Object>> stack, ClassFile cf) {
+    public static void ARRAYSTORE(List<Pair<Class<?>, Object>> stack) {
         Pair<Class<?>, Object> value = stack.remove(stack.size() - 1);
         int index = ((Number) stack.remove(stack.size() - 1).second).intValue();
         Pair<Class<?>, Object> arrayRef = stack.remove(stack.size() - 1);
@@ -2278,7 +2299,14 @@ class Instructions_Helper {
         }
     }
 
-    public static ClassLoader GET_CORRECT_CLASSLOADER(String fileName, String className) {
+    /***
+     * Get the correct class loader for the class
+     * 
+     * @param fileName  The file name of the class
+     * @param className The class name
+     * @return ClassLoader
+     */
+    public static ClassLoader getCorrectClassLoader(String fileName, String className) {
         File f = new File(fileName);
         int length = 0;
         if (className.contains("/")) {
@@ -2308,7 +2336,14 @@ class Instructions_Helper {
         return null;
     }
 
-    public static void SETARGUMENTS_AND_TYPES(List<Pair<Class<?>, Object>> arguments_on_stack,
+    /***
+     * Set arguments and types of arguments
+     * 
+     * @param arguments_on_stack    List of arguments on stack
+     * @param arguments_of_function List of arguments of function
+     * @param type_of_arguments     List of types of arguments
+     */
+    public static void setArgumentsAndTypes(List<Pair<Class<?>, Object>> arguments_on_stack,
             List<Object> arguments_of_function, List<Class<?>> type_of_arguments) {
         for (var arguments : arguments_on_stack) {
             Class<?> argument_type = arguments.first;
@@ -2338,7 +2373,14 @@ class Instructions_Helper {
         }
     }
 
-    public static Pair<String, Class<?>> LOAD_CLASS_FROM_OTHER_FILE(String file_name, String class_name) {
+    /***
+     * Load a class from a file
+     * 
+     * @param file_name  The file name
+     * @param class_name The class name
+     * @return A pair of the file name and the class
+     */
+    public static Pair<String, Class<?>> loadClassFromOtherFile(String file_name, String class_name) {
         Pair<String, Class<?>> returned = null;
         try {
             File f = new File(file_name);
@@ -2380,7 +2422,18 @@ class Instructions_Helper {
         return returned;
     }
 
-    public static Method GET_CORRECT_METHOD(Class<?> reference_to_class, String name_and_type_of_member,
+    /***
+     * This method is used to get the correct method that is going to be called
+     * 
+     * @param reference_to_class           The class that contains the method
+     * @param name_and_type_of_member      The name and type of the method
+     * @param types_of_function_paramaters The types of the parameters of the method
+     * @param method_arguments             The arguments of the method
+     * @param arguments_on_stack           The arguments on the stack
+     * @return The method that is going to be called
+     * @throws NoSuchMethodException If the method does not exist
+     */
+    public static Method getCorrectMethod(Class<?> reference_to_class, String name_and_type_of_member,
             Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments,
             List<Pair<Class<?>, Object>> arguments_on_stack) throws NoSuchMethodException {
         Method returnedMethod = null;
@@ -2467,7 +2520,18 @@ class Instructions_Helper {
         return returnedMethod;
     }
 
-    public static Class<?>[] GET_CORRECT_METHOD_TYPES(Class<?> reference_to_class, String name_and_type_of_member,
+    /***
+     * Returns the correct method types for a method call
+     * 
+     * @param reference_to_class           The class that contains the method
+     * @param name_and_type_of_member      The name and type of the method
+     * @param types_of_function_paramaters The types of the parameters of the method
+     * @param method_arguments             The arguments of the method
+     * @param arguments_on_stack           The arguments on the stack
+     * @return The correct method types
+     * @throws NoSuchMethodException If the method does not exist
+     */
+    public static Class<?>[] getCorrectMethodTypes(Class<?> reference_to_class, String name_and_type_of_member,
             Class<?>[] types_of_function_paramaters, List<Class<?>> method_arguments,
             List<Pair<Class<?>, Object>> arguments_on_stack) throws NoSuchMethodException {
         if (ClassFile.doesMethodExists(reference_to_class, name_and_type_of_member, types_of_function_paramaters)) {
