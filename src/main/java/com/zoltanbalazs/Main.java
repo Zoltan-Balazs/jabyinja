@@ -18,7 +18,7 @@ public class Main {
         List<Attribute_Info> attributes = new ArrayList<>();
 
         try {
-            method = CLASS_FILE.findMethodsByName("main", null);
+            method = CLASS_FILE.findMethod("main", "([Ljava/lang/String;)V");
             CLASS_FILE.IN_MAIN_METHOD = true;
             attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
         } catch (Exception e) {

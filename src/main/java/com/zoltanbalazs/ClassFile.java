@@ -154,11 +154,8 @@ class ClassFile {
         }
     }
 
-    public Method_Info findMethodsByName(String methodName, String methodDescription) {
+    public Method_Info findMethod(String methodName, String methodDescription) {
         for (Method_Info METHOD : METHODS) {
-            // TODO: Instead of doing it this way, convert the user input into bytes
-            // FIXME: That doesn't work yet... String.getBytes() doesn't return the correct
-            // byte array, even when forcing the encoding
             CP_Info currentItem = CONSTANT_POOL.get(METHOD.name_index - 1);
 
             if (methodDescription == null) {

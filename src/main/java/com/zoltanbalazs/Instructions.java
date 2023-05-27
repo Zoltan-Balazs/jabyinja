@@ -824,7 +824,7 @@ public class Instructions {
                 List<Attribute_Info> attributes = new ArrayList<>();
 
                 try {
-                    fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
+                    fn_method = CLASS_FILE.findMethod(name_and_type_of_member, description_of_method);
 
                     if (fn_method == null) {
                         name_of_class = cf.getNameOfClass(reference_to_method.getClassIndex());
@@ -862,7 +862,7 @@ public class Instructions {
                             new_filename = returned.first;
 
                             CLASS_FILE = new ClassFile(new_filename);
-                            fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
+                            fn_method = CLASS_FILE.findMethod(name_and_type_of_member, description_of_method);
 
                             if (fn_method == null) {
                                 name_of_class = objectref.second.getClass().getSuperclass().getName().replace(".", "/");
@@ -893,7 +893,7 @@ public class Instructions {
                                     new_filename = returned.first;
 
                                     CLASS_FILE = new ClassFile(new_filename);
-                                    fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member,
+                                    fn_method = CLASS_FILE.findMethod(name_and_type_of_member,
                                             description_of_method);
                                 }
                             }
@@ -1016,7 +1016,7 @@ public class Instructions {
                     List<Attribute_Info> attributes = new ArrayList<>();
 
                     try {
-                        fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
+                        fn_method = CLASS_FILE.findMethod(name_and_type_of_member, description_of_method);
                         attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -1078,7 +1078,7 @@ public class Instructions {
                     List<Attribute_Info> attributes = new ArrayList<>();
 
                     try {
-                        fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
+                        fn_method = CLASS_FILE.findMethod(name_and_type_of_member, description_of_method);
                         attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
                     } catch (Exception ee) {
                         e.printStackTrace();
@@ -1267,7 +1267,7 @@ public class Instructions {
             Class<?> resolved_class = Instructions_Helper.GET_CORRECT_CLASSLOADER(new_filename, new_classname)
                     .loadClass(new_classname);
 
-            Method_Info fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member,
+            Method_Info fn_method = CLASS_FILE.findMethod(name_and_type_of_member,
                     description_of_method);
             List<Attribute_Info> attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
 
@@ -1479,7 +1479,7 @@ public class Instructions {
             List<Attribute_Info> attributes = new ArrayList<>();
 
             try {
-                fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
+                fn_method = CLASS_FILE.findMethod(name_and_type_of_member, description_of_method);
                 attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1591,7 +1591,7 @@ public class Instructions {
             List<Attribute_Info> attributes = new ArrayList<>();
 
             try {
-                fn_method = CLASS_FILE.findMethodsByName(name_and_type_of_member, description_of_method);
+                fn_method = CLASS_FILE.findMethod(name_and_type_of_member, description_of_method);
                 attributes = CLASS_FILE.findAttributesByName(fn_method.attributes, "Code");
             } catch (Exception e) {
                 e.printStackTrace();
