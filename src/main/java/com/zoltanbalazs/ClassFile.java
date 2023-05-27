@@ -21,24 +21,59 @@ class InvalidClassFileException extends RuntimeException {
 }
 
 class ClassFile_Helper {
+    /**
+     * Reads a byte from the class file
+     * 
+     * @param classFileData The class file as an input stream
+     * @return The byte
+     * @throws IOException If an I/O error occurs
+     */
     public static byte readByte(DataInputStream classFileData) throws IOException {
         return (byte) classFileData.readUnsignedByte();
     }
 
+    /**
+     * Reads a short from the class file
+     * 
+     * @param classFileData The class file as an input stream
+     * @return The short
+     * @throws IOException If an I/O error occurs
+     */
     public static short readShort(DataInputStream classFileData) throws IOException {
         return (short) classFileData.readUnsignedShort();
     }
 
+    /**
+     * Reads a short from a byte array
+     * 
+     * @param data  The byte array
+     * @param start The index to start reading from
+     * @return The short
+     */
     public static short readShort(byte[] data, CodeIndex start) {
         byte[] dataRead = { data[start.Next()], data[start.Next()] };
 
         return (short) (((dataRead[0] & 0xFF) << 8) | (dataRead[1] & 0xFF));
     }
 
+    /**
+     * Reads an int from the class file
+     * 
+     * @param classFileData The class file as an input stream
+     * @return The int
+     * @throws IOException If an I/O error occurs
+     */
     public static int readInt(DataInputStream classFileData) throws IOException {
         return classFileData.readInt();
     }
 
+    /**
+     * Reads an int from a byte array
+     * 
+     * @param data  The byte array
+     * @param start The index to start reading from
+     * @return The int
+     */
     public static int readInt(byte[] data, CodeIndex start) {
         byte[] dataRead = { data[start.Next()], data[start.Next()], data[start.Next()], data[start.Next()] };
         return (int) (((dataRead[0] & 0xFF) << 24) | ((dataRead[1] & 0xFF) << 16) | ((dataRead[2] & 0xFF) << 8)
@@ -105,11 +140,21 @@ class ClassFile {
     public List<Pair<Class<?>, Object>> stack = new ArrayList<>();
     public Object[] local = new Object[65536];
 
+    /***
+     * Constructor for ClassFile
+     * 
+     * @param fileName The name of the class file
+     */
     public ClassFile(String fileName) {
         FILE_NAME = fileName;
         readClassFile(fileName);
     }
 
+    /***
+     * Reads the class file
+     * 
+     * @param fileName The name of the class file
+     */
     public void readClassFile(String fileName) {
         try (InputStream classFile = new FileInputStream(fileName);
                 DataInputStream classFileData = new DataInputStream(classFile)) {
@@ -154,6 +199,13 @@ class ClassFile {
         }
     }
 
+    /***
+     * Finds the method with the given name and description
+     * 
+     * @param methodName        The name of the method
+     * @param methodDescription The description of the method
+     * @return The method with the given name and description
+     */
     public Method_Info findMethod(String methodName, String methodDescription) {
         for (Method_Info METHOD : METHODS) {
             CP_Info currentItem = CONSTANT_POOL.get(METHOD.name_index - 1);
@@ -176,15 +228,19 @@ class ClassFile {
         return null;
     }
 
+    /***
+     * Finds the attributes with the given name
+     * 
+     * @param attributes    The list of attributes
+     * @param attributeName The name of the attribute
+     * @return The list of attributes with the given name
+     */
     public List<Attribute_Info> findAttributesByName(List<Attribute_Info> attributes, String attributeName) {
         List<Attribute_Info> attr = new ArrayList<Attribute_Info>();
 
         for (Attribute_Info ATTRIBUTE : attributes) {
             CP_Info currentItem = CONSTANT_POOL.get(ATTRIBUTE.attribute_name_index - 1);
 
-            // TODO: Instead of doing it this way, convert the user input into bytes
-            // FIXME: That doesn't work yet... String.getBytes() doesn't return the correct
-            // byte array, even when forcing the encoding
             if (new String(currentItem.getBytes(), StandardCharsets.UTF_8).equals(attributeName)) {
                 attr.add(ATTRIBUTE);
             }
