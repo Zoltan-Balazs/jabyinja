@@ -111,8 +111,8 @@ CLASS_FILE.executeCode(codeAttribute.code, null);
 Ezzel el is jutottunk egy class fájl beolvasásától, az abban lévő adott függvény Java bájtkódjának futtatásáig, több teendőnk nincsen, a program az adott függvényben levő külön függvényhívásokat automatikusan elvégzi.
 
 A teljes példakód:
-\lstset{caption={Példa a Main.class interpretálására}, label=src:classinterpret}
-\begin{lstlisting}[language={Java}]
+\begin{listing}[H]
+\begin{minted}{java}
 public class Interpreter {
 	public static void main(String[] args) throws Throwable {
 		ClassFile CLASS_FILE = new ClassFile("Main.class");
@@ -125,7 +125,9 @@ public class Interpreter {
 		}
 	}
 }
-\end{lstlisting}
+\end{minted}
+\caption{Példa a Main.class interpretálására}
+\end{listing}
 
 \subsubsection{Pár minta class fájl felépítésére}
 
@@ -398,8 +400,8 @@ A lokális változók maximális mennyiségét előre tudjuk, ez nem lehet több
 Gyakorlatban ez a szám csökkenthető lenne, tudhatjuk hogy futási időben mennyi lokális változója (illetve a \lstinline{stack} nagyságát is tudhatjuk, tehát tömbként is reprezentálhatnánk) van egy metódusnak. Ez bővebben le van írva a továbbfejlesztési lehetőségekben.
 
 Kényelmi szempontból létezik a \lstinline{CodeIndex} osztály, amely lényegében egy \lstinline{int} szám absztrakciója:
-\lstset{caption={A Codeindex osztály, amely a kód bájttömb jelenlegi indexét tárolja}, label=src:codeindex}
-\begin{lstlisting}[language={Java}]
+\begin{listing}[H]
+\begin{minted}{java}
 class CodeIndex {
     private int index = 0;
 
@@ -419,7 +421,9 @@ class CodeIndex {
         return index;
     }
 }
-\end{lstlisting}
+\end{minted}
+\caption{Codeindex osztály, amely a kód bájttömb jelenlegi indexét tárolja}
+\end{listing}
 Az absztrakció oka hogy függvényeknek átadva lehessen módosítani ezt a számot; a szám a jelenlegi index a kódot reprezentáló \lstinline{byte} tömbben, megmondja hogy a tömbben lévő melyik indexen levő instrukciót kell végrehajtani.
 
 Az absztrakció különösen észrevehető amikor az \lstinline{if} és \lstinline{goto} utasításokat hajtjuk végre, a \lstinline{ClassFile} objektumunk lokális változója módosítható az \lstinline{Instructions} osztály metódusain keresztül. Mivel a Java érték szerint adja át a paramétereket, ez egy sima \lstinline{int} számmal nem lehetne megoldani.
@@ -438,8 +442,8 @@ Természetesen valóságban egy kicsit komplikáltabb ennél a működés (bár 
 
 A fő interpretálást végrehajtó kód a \lstinline{ClassFile} osztályban az \lstinline{executeCode} metódus.
 
-\lstset{caption={Az interpretálásért felelős kódrészlet}, label=src:codeindex}
-\begin{lstlisting}[language={Java}]
+\begin{listing}[H]
+\begin{minted}{java}
 public Pair<Class<?>, Object> executeCode(Code_Attribute attribute) throws Throwable {
 	byte[] code = attribute.code;
 
@@ -453,7 +457,9 @@ public Pair<Class<?>, Object> executeCode(Code_Attribute attribute) throws Throw
 	}
 	throw new Throwable("Code did not contain a return statement");
 }
-\end{lstlisting}
+\end{minted}
+\caption{Interpretálásért felelős kódrészlet}
+\end{listing}
 
 \subsection{Az interpreter sajátosságai}
 
@@ -606,6 +612,8 @@ Az implementációból következően lényegében a tényleges programban az al�
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.6\textwidth,frame]{jabyinja_memory}
+	\caption{Jabyinja program memóriamodellje}
+	\label{fig:memory}
 \end{figure}
 
 \subsubsection{Az önfuttatásról}
@@ -650,6 +658,13 @@ Nagyon egyszerűen adható saját teszteset hozzá a szkripthez.
 \subsection{Tesztelés eredményei}
 
 A teszteket lefuttatva az alábbi eredményt kell kapnunk:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.55\textwidth,frame]{testing_results}
+	\caption{Jabyinja program tesztelésének eredménye}
+	\label{fig:testing}
+\end{figure}
 
 \section{Továbbiak}
 

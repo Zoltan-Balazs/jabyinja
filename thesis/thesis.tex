@@ -10,6 +10,8 @@
 % The minted package is also supported for source highlighting
 % See minted-intregration.tex for example
 \usepackage[newfloat]{minted}
+
+% For Hungarian quotation marks
 \usepackage[utf8]{inputenc}
 
 % Document's metadata
@@ -94,6 +96,12 @@ Szeretnék köszönetet mondani hallgatótársaimnak, és barátaimnak is, ezek 
 \addcontentsline{toc}{chapter}{\biblabel}
 \printbibliography[title=\biblabel]
 \cleardoublepage{}
+
+% List of figures (optional) - useful over 3-5 figures
+\phantomsection
+\addcontentsline{toc}{chapter}{\lstfigurelabel}
+\listoffigures
+\cleardoublepage
 
 % List of tables (optional) - useful over 3-5 tables
 \phantomsection{}
