@@ -211,7 +211,7 @@ public enum Opcode {
     // IMPDEP1(0xFE),
     // IMPDEP2(0xFF);
 
-    public final byte op_code;
+    public final byte opCode;
 
     /***
      * Constructor for Opcode
@@ -219,19 +219,19 @@ public enum Opcode {
      * @param opCode the opcode
      */
     private Opcode(int opCode) {
-        this.op_code = (byte) opCode;
+        this.opCode = (byte) opCode;
     }
 
     /***
      * Returns the enum representation of an integer opcode
      * 
-     * @param op_code the opcode (as an integer)
+     * @param operationCode the opcode (as an integer)
      * @return the enum representation of the opcode
      */
-    public static Opcode opcodeRepresentation(int op_code) {
-        for (Opcode OPCODE : Opcode.values()) {
-            if (OPCODE.op_code == op_code) {
-                return OPCODE;
+    public static Opcode opcodeRepresentation(int operationCode) {
+        for (Opcode opcodeValue : Opcode.values()) {
+            if (opcodeValue.opCode == operationCode) {
+                return opcodeValue;
             }
         }
         return NOP;

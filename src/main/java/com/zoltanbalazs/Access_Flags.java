@@ -40,9 +40,9 @@ enum Class_Access_Flags implements Access_Flags {
     public static List<Class_Access_Flags> parseFlags(short value) {
         List<Class_Access_Flags> accessFlags = new ArrayList<Class_Access_Flags>();
 
-        for (Class_Access_Flags access_flag : Class_Access_Flags.values()) {
-            if ((value & access_flag.value) != 0) {
-                accessFlags.add(access_flag);
+        for (Class_Access_Flags accessFlag : Class_Access_Flags.values()) {
+            if ((value & accessFlag.value) != 0) {
+                accessFlags.add(accessFlag);
             }
         }
 
@@ -76,9 +76,9 @@ enum Field_Access_Flags implements Access_Flags {
     public static List<Field_Access_Flags> parseFlags(short value) {
         List<Field_Access_Flags> accessFlags = new ArrayList<Field_Access_Flags>();
 
-        for (Field_Access_Flags access_flag : Field_Access_Flags.values()) {
-            if ((value & access_flag.value) != 0) {
-                accessFlags.add(access_flag);
+        for (Field_Access_Flags accessFlag : Field_Access_Flags.values()) {
+            if ((value & accessFlag.value) != 0) {
+                accessFlags.add(accessFlag);
             }
         }
 
@@ -115,9 +115,9 @@ enum Method_Access_Flags implements Access_Flags {
     public static List<Method_Access_Flags> parseFlags(short value) {
         List<Method_Access_Flags> accessFlags = new ArrayList<Method_Access_Flags>();
 
-        for (Method_Access_Flags access_flag : Method_Access_Flags.values()) {
-            if ((value & access_flag.value) != 0) {
-                accessFlags.add(access_flag);
+        for (Method_Access_Flags accessFlag : Method_Access_Flags.values()) {
+            if ((value & accessFlag.value) != 0) {
+                accessFlags.add(accessFlag);
             }
         }
 

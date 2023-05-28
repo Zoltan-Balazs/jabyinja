@@ -25,7 +25,7 @@ class BootstrapMethods_Attribute_Helper {
             bootstrapMethodsAttribute.attribute_name_index = attribute.attribute_name_index;
             bootstrapMethodsAttribute.attribute_length = attribute.attribute_length;
             bootstrapMethodsAttribute.num_bootstrap_methods = ClassFile_Helper.readShort(infoData);
-            bootstrapMethodsAttribute.bootstrap_methods = BoostrapMethod_Helper.readBootStrapMethods(infoData,
+            bootstrapMethodsAttribute.bootstrap_methods = BootstrapMethod_Helper.readBootStrapMethods(infoData,
                     bootstrapMethodsAttribute.num_bootstrap_methods);
         }
 
@@ -33,7 +33,7 @@ class BootstrapMethods_Attribute_Helper {
     }
 }
 
-class BoostrapMethod_Helper {
+class BootstrapMethod_Helper {
     /***
      * Reads the bootstrap methods from a class file
      * 
@@ -42,11 +42,11 @@ class BoostrapMethod_Helper {
      * @return The bootstrap methods
      * @throws IOException If an I/O error occurs
      */
-    public static List<BoostrapMethod> readBootStrapMethods(DataInputStream in, int count) throws IOException {
-        List<BoostrapMethod> bootstrapMethods = new ArrayList<BoostrapMethod>(count);
+    public static List<BootstrapMethod> readBootStrapMethods(DataInputStream in, int count) throws IOException {
+        List<BootstrapMethod> bootstrapMethods = new ArrayList<BootstrapMethod>(count);
 
         for (int i = 0; i < count; ++i) {
-            BoostrapMethod tmp = new BoostrapMethod();
+            BootstrapMethod tmp = new BootstrapMethod();
             tmp.bootstrap_method_ref = ClassFile_Helper.readShort(in);
             tmp.num_bootstrap_arguments = ClassFile_Helper.readShort(in);
             tmp.bootstrap_arguments = new short[tmp.num_bootstrap_arguments];
@@ -60,7 +60,7 @@ class BoostrapMethod_Helper {
     }
 }
 
-class BoostrapMethod {
+class BootstrapMethod {
     public short bootstrap_method_ref;
     public short num_bootstrap_arguments;
     public short[] bootstrap_arguments;
@@ -75,8 +75,8 @@ class BoostrapMethod {
 
         if (num_bootstrap_arguments != 0) {
             str.append("\tbootstrap_methods: \n");
-            for (short args : bootstrap_arguments) {
-                str.append("\t\t" + args + "\n");
+            for (short bootstrapMethodArguments : bootstrap_arguments) {
+                str.append("\t\t" + bootstrapMethodArguments + "\n");
             }
         }
         if (num_bootstrap_arguments == 0) {
@@ -92,7 +92,7 @@ class BootstrapMethods_Attribute {
     public short attribute_name_index;
     public int attribute_length;
     public short num_bootstrap_methods;
-    public List<BoostrapMethod> bootstrap_methods;
+    public List<BootstrapMethod> bootstrap_methods;
 
     @Override
     public String toString() {
@@ -105,8 +105,8 @@ class BootstrapMethods_Attribute {
 
         if (num_bootstrap_methods != 0) {
             str.append("\tbootstrap_methods: \n");
-            for (BoostrapMethod METHOD : bootstrap_methods) {
-                str.append("\t\t" + METHOD + "\n");
+            for (BootstrapMethod bootstrapMethod : bootstrap_methods) {
+                str.append("\t\t" + bootstrapMethod + "\n");
             }
         }
         if (num_bootstrap_methods == 0) {

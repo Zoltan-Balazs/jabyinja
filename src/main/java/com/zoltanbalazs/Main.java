@@ -14,18 +14,18 @@ public class Main {
             CLASS_FILE = new ClassFile(args[0]);
         }
 
-        Method_Info method = new Method_Info();
-        List<Attribute_Info> attributes = new ArrayList<>();
+        Method_Info methodInfo = new Method_Info();
+        List<Attribute_Info> methodAttributes = new ArrayList<>();
 
         try {
-            method = CLASS_FILE.findMethod("main", "([Ljava/lang/String;)V");
+            methodInfo = CLASS_FILE.findMethod("main", "([Ljava/lang/String;)V");
             CLASS_FILE.IN_MAIN_METHOD = true;
-            attributes = CLASS_FILE.findAttributesByName(method.attributes, "Code");
+            methodAttributes = CLASS_FILE.findAttributesByName(methodInfo.attributes, "Code");
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        for (Attribute_Info attribute : attributes) {
+        for (Attribute_Info attribute : methodAttributes) {
             try {
                 Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 

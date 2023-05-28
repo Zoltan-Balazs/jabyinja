@@ -48,9 +48,9 @@ class ClassFile_Helper {
      * @return The short
      */
     public static short readShort(byte[] data, CodeIndex start) {
-        byte[] dataRead = { data[start.Next()], data[start.Next()] };
+        byte[] inputData = { data[start.Next()], data[start.Next()] };
 
-        return (short) (((dataRead[0] & 0xFF) << 8) | (dataRead[1] & 0xFF));
+        return (short) (((inputData[0] & 0xFF) << 8) | (inputData[1] & 0xFF));
     }
 
     /**
@@ -72,9 +72,9 @@ class ClassFile_Helper {
      * @return The int
      */
     public static int readInt(byte[] data, CodeIndex start) {
-        byte[] dataRead = { data[start.Next()], data[start.Next()], data[start.Next()], data[start.Next()] };
-        return (int) (((dataRead[0] & 0xFF) << 24) | ((dataRead[1] & 0xFF) << 16) | ((dataRead[2] & 0xFF) << 8)
-                | (dataRead[3] & 0xFF));
+        byte[] inputData = { data[start.Next()], data[start.Next()], data[start.Next()], data[start.Next()] };
+        return (int) (((inputData[0] & 0xFF) << 24) | ((inputData[1] & 0xFF) << 16) | ((inputData[2] & 0xFF) << 8)
+                | (inputData[3] & 0xFF));
     }
 }
 
@@ -204,19 +204,19 @@ class ClassFile {
      * @return The method with the given name and description
      */
     public Method_Info findMethod(String methodName, String methodDescription) {
-        for (Method_Info METHOD : METHODS) {
-            CP_Info currentItem = CONSTANT_POOL.get(METHOD.name_index - 1);
+        for (Method_Info methodInfo : METHODS) {
+            CP_Info currentItem = CONSTANT_POOL.get(methodInfo.name_index - 1);
 
             if (methodDescription == null) {
                 if (new String(currentItem.getBytes(), StandardCharsets.UTF_8).equals(methodName)) {
-                    return METHOD;
+                    return methodInfo;
                 }
             } else {
-                CP_Info descriptionItem = CONSTANT_POOL.get(METHOD.description_index - 1);
+                CP_Info descriptionItem = CONSTANT_POOL.get(methodInfo.description_index - 1);
 
                 if (new String(currentItem.getBytes(), StandardCharsets.UTF_8).equals(methodName)
                         && new String(descriptionItem.getBytes(), StandardCharsets.UTF_8).equals(methodDescription)) {
-                    return METHOD;
+                    return methodInfo;
                 }
             }
 
@@ -235,11 +235,11 @@ class ClassFile {
     public List<Attribute_Info> findAttributesByName(List<Attribute_Info> attributes, String attributeName) {
         List<Attribute_Info> attr = new ArrayList<Attribute_Info>();
 
-        for (Attribute_Info ATTRIBUTE : attributes) {
-            CP_Info currentItem = CONSTANT_POOL.get(ATTRIBUTE.attribute_name_index - 1);
+        for (Attribute_Info attributeInfo : attributes) {
+            CP_Info currentItem = CONSTANT_POOL.get(attributeInfo.attribute_name_index - 1);
 
             if (new String(currentItem.getBytes(), StandardCharsets.UTF_8).equals(attributeName)) {
-                attr.add(ATTRIBUTE);
+                attr.add(attributeInfo);
             }
         }
         return attr;
@@ -248,48 +248,48 @@ class ClassFile {
     /***
      * Finds the class name for the given index in the constant pool
      * 
-     * @param class_index The index of the class
+     * @param classIndex The index of the class
      * @return The name of the class with the given index
      */
-    public String getNameOfClass(short class_index) {
-        return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(class_index - 1).getNameIndex() - 1).getBytes(),
+    public String getNameOfClass(short classIndex) {
+        return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(classIndex - 1).getNameIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
     /***
      * Finds the name of the member for the given index in the constant pool
      * 
-     * @param name_and_type_index The index of the member
+     * @param nameAndTypeIndex The index of the member
      * @return The name of the member with the given index
      */
-    public String getNameOfMember(short name_and_type_index) {
-        return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getNameIndex() - 1).getBytes(),
+    public String getNameOfMember(short nameAndTypeIndex) {
+        return new String(CONSTANT_POOL.get(CONSTANT_POOL.get(nameAndTypeIndex - 1).getNameIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
     /***
      * Finds the description of the member for the given index in the constant pool
      * 
-     * @param name_and_type_index The index of the member
+     * @param nameAndTypeIndex The index of the member
      * @return The description of the member with the given index
      */
-    public String getDescriptionOfMethod(short name_and_type_index) {
+    public String getDescriptionOfMethod(short nameAndTypeIndex) {
         return new String(
-                CONSTANT_POOL.get(CONSTANT_POOL.get(name_and_type_index - 1).getDescriptorIndex() - 1).getBytes(),
+                CONSTANT_POOL.get(CONSTANT_POOL.get(nameAndTypeIndex - 1).getDescriptorIndex() - 1).getBytes(),
                 StandardCharsets.UTF_8);
     }
 
     /***
      * Gets the arguments for the given description of the method
      * 
-     * @param method_descriptions The description of the method
+     * @param methodDescriptions The description of the method
      * @return The list of arguments of the method
      * @throws ClassNotFoundException If the class of the argument is not found
      */
-    public List<Class<?>> getArguments(String method_descriptions) throws ClassNotFoundException {
+    public List<Class<?>> getArguments(String methodDescriptions) throws ClassNotFoundException {
         return stringToTypes(
-                method_descriptions.substring(method_descriptions.indexOf("(") + 1,
-                        method_descriptions.indexOf(")")));
+                methodDescriptions.substring(methodDescriptions.indexOf("(") + 1,
+                        methodDescriptions.indexOf(")")));
     }
 
     /***
@@ -310,36 +310,36 @@ class ClassFile {
     /***
      * Checks if the given method exists
      * 
-     * @param reference_to_class           The reference to the class
-     * @param name_and_type_of_member      The name and type of the member
-     * @param types_of_function_paramaters The types of the parameters of the method
+     * @param classReference            The reference to the class
+     * @param memberNameAndType         The name and type of the member
+     * @param typesOfFunctionParameters The types of the parameters of the method
      * @return True if the method exists, false otherwise
      */
-    public static boolean doesMethodExists(Class<?> reference_to_class, String name_and_type_of_member,
-            Class<?>[] types_of_function_paramaters) {
-        Class<?> original_reference = reference_to_class;
-        while (reference_to_class != null) {
+    public static boolean doesMethodExists(Class<?> classReference, String memberNameAndType,
+            Class<?>[] typesOfFunctionParameters) {
+        Class<?> originalReference = classReference;
+        while (classReference != null) {
             try {
-                reference_to_class.getDeclaredMethod(name_and_type_of_member, types_of_function_paramaters);
+                classReference.getDeclaredMethod(memberNameAndType, typesOfFunctionParameters);
                 return true;
             } catch (Throwable t) {
 
             }
-            reference_to_class = reference_to_class.getSuperclass();
+            classReference = classReference.getSuperclass();
         }
 
         boolean doesMethodExist = false;
-        while (original_reference.getDeclaredMethods().length == 0) {
-            original_reference = original_reference.getSuperclass();
+        while (originalReference.getDeclaredMethods().length == 0) {
+            originalReference = originalReference.getSuperclass();
         }
 
-        for (Method method : original_reference.getDeclaredMethods()) {
-            if (method.getName().equals(name_and_type_of_member)
-                    && method.getParameterTypes().length == types_of_function_paramaters.length
+        for (Method method : originalReference.getDeclaredMethods()) {
+            if (method.getName().equals(memberNameAndType)
+                    && method.getParameterTypes().length == typesOfFunctionParameters.length
                     && !doesMethodExist) {
                 for (int i = 0; i < method.getParameterTypes().length; ++i) {
                     Class<?> type = method.getParameterTypes()[i];
-                    if (!type.getName().equals(types_of_function_paramaters[i].getName())) {
+                    if (!type.getName().equals(typesOfFunctionParameters[i].getName())) {
                         return false;
                     }
                 }
@@ -352,12 +352,12 @@ class ClassFile {
     /***
      * Gets the number of arguments of the method
      * 
-     * @param name_and_type_index The index of the member
+     * @param nameAndTypeIndex The index of the member
      * @return The number of arguments of the method
      * @throws ClassNotFoundException If the class of the argument is not found
      */
-    public int getNumberOfArguments(short name_and_type_index) throws ClassNotFoundException {
-        String descriptor = getDescriptionOfMethod(name_and_type_index);
+    public int getNumberOfArguments(short nameAndTypeIndex) throws ClassNotFoundException {
+        String descriptor = getDescriptionOfMethod(nameAndTypeIndex);
         return getArguments(descriptor).size();
     }
 
@@ -1039,10 +1039,10 @@ class ClassFile {
                     type.append(";");
 
                     if (!isClassBuiltIn(className.second)) {
-                        String class_name = className.second;
-                        String new_filename = FILE_NAME;
-                        Class<?> resolved_class = Instructions_Helper.getCorrectClassLoader(new_filename, class_name)
-                                .loadClass(class_name);
+                        String newClassName = className.second;
+                        String newFileName = FILE_NAME;
+                        Class<?> resolved_class = Instructions_Helper.getCorrectClassLoader(newFileName, newClassName)
+                                .loadClass(newClassName);
 
                         return new Pair<Integer, Class<?>>(idx + className.first, resolved_class);
                     } else {

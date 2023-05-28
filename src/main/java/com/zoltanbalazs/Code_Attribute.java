@@ -63,16 +63,16 @@ class Code_Attribute {
         str.append("\tcode = " + code + "\n");
         str.append("\texception_table_length = " + exception_table_length + "\n");
 
-        for (Exception_Table EXCEPTION : exception_table) {
-            str.append(EXCEPTION + "\n");
+        for (Exception_Table exception : exception_table) {
+            str.append(exception + "\n");
         }
 
         str.append("\tattributes_count = " + attributes_count + "\n");
 
         if (attributes_count != 0) {
             str.append("\tattributes: \n");
-            for (Attribute_Info ATTRIBUTE : attributes) {
-                str.append("\t\t" + ATTRIBUTE + "\n");
+            for (Attribute_Info attribute : attributes) {
+                str.append("\t\t" + attribute + "\n");
             }
         }
         if (attributes_count == 0) {

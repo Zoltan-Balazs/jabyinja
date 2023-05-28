@@ -45,8 +45,8 @@ class Method_Info {
 		str.append("Method: " + access_flags + " - " + name_index + " - " + description_index + " - " + attributes_count
 				+ "\n");
 
-		for (Attribute_Info ATTRIBUTE : attributes) {
-			str.append("\t" + ATTRIBUTE + "\n");
+		for (Attribute_Info attribute : attributes) {
+			str.append("\t" + attribute + "\n");
 		}
 		str.deleteCharAt(str.length() - 1);
 
