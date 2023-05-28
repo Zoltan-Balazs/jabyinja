@@ -891,7 +891,7 @@ class ClassFile {
                 }
                 case INVOKEINTERFACE -> {
                     short index = ClassFile_Helper.readShort(code, codeIndex);
-                    byte count = code[codeIndex.Next()]; // TODO: Unsigned byte...
+                    byte count = code[codeIndex.Next()];
                     codeIndex.Next();
 
                     Instructions.INVOKEINTERFACE(stack, CONSTANT_POOL, index, count, local, FILE_NAME, this);

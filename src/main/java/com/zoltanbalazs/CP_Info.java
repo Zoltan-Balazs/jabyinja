@@ -539,6 +539,12 @@ enum ConstantPoolTag {
 		return tagValue;
 	}
 
+	/***
+	 * Get the enum tag value from the tag (int)
+	 * 
+	 * @param tag The tag (int)
+	 * @return The tag value (enum)
+	 */
 	public static ConstantPoolTag getValue(int tag) {
 		ConstantPoolTag[] tags = ConstantPoolTag.values();
 		for (int i = 0; i < tags.length; ++i) {

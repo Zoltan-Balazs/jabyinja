@@ -1205,7 +1205,6 @@ public class Instructions {
                         }
                     }
                 } catch (Throwable ee) {
-                    // TODO
                     Pair<String, Class<?>> returned = Instructions_Helper.loadClassFromOtherFile(file_name,
                             ee.getMessage());
                     reference_to_class = returned.second;
@@ -1528,7 +1527,6 @@ public class Instructions {
             Object[] local,
             String file_name, ClassFile cf)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        // TODO
         CP_Info reference_to_interface = (CONSTANT_InterfaceMethodref_Info) constant_pool.get(index - 1);
         String name_of_class = cf.getNameOfClass(reference_to_interface.getClassIndex());
         String name_and_type_of_member = cf.getNameOfMember(reference_to_interface.getNameAndTypeIndex());
