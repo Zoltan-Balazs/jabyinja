@@ -16,5 +16,5 @@ thesis/images/*
 !thesis/images/elte_cimer_szines.eps
 !thesis/images/jabyinja_memory.png
 !thesis/images/testing_results.png
-!thesis/images/classfile_diagram.png
-!thesis/images/classfile_execute.png
+!thesis/images/jabyinja_diagram_parsing.png
+!thesis/images/jabyinja_diagram_execute.png

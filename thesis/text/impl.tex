@@ -1,7 +1,7 @@
 \chapter{Fejlesztői dokumentáció}
 \label{ch:impl}
 
-A program számos segítséget ad fejlesztőknek a kód egyszerű értelmezésére; a kód bővítésére. Vállalkozó szellemű embereknek a program egy teljes Java interpretert tud nyújtani viszonylag kevés továbbfejlesztéssel. A Java bájtkód instrukciók megértése során bármely Java fejlesztő jobban tudja értékelni, hogy mit is csinál a Java fordítóprogram a háttérben. A program nagyon szorosan épül a JVM specifikációra, a specifikációt annak megfelelően próbálja implementálni.
+A program számos segítséget ad fejlesztőknek a kód egyszerű értelmezésére; a kód bővítésére. Vállalkozó szellemű embereknek a program egy teljes Java interpretert tud nyújtani viszonylag kevés továbbfejlesztéssel. A Java bájtkód instrukciók megértése során bármely Java fejlesztő jobban tudja értékelni, hogy mit is csinál a Java fordítóprogram a háttérben. A program nagyon szorosan épül a JVM specifikációra\cite{jvm_specification}, a specifikációt megfelelően próbálja implementálni.
 
 \section{Probléma specifikációja}
 
@@ -24,7 +24,7 @@ Természetesen ugyanígy a sikeres futást is szeretnénk a felhasználó felé 
 
 \subsection{Class fájl felépítése}
 
-A specifikáció alapján a class fájl felépítése a következő:
+A specifikáció\cite{jvm_specification_classFile} alapján a class fájl felépítése a következő:
 
 \begin{compactitem}
 	\item 4 bájt konstans bájt sorozat (\lstinline{CA FE BA BE})
@@ -64,7 +64,7 @@ public Method_Info findMethodsByName(String methodName, String methodDescription
 \end{minted}
 Ez egy adott függvénynévre a megfelelő nevű metódust visszaadja a beolvasott fájlból (ha nem talál ilyet akkor \lstinline{null}-t ad vissza). 
 
-Opcionális paraméterként megadhatjuk a metódus szignatúráját is, ehhez a JVM specifikációban szereplő típus szöveggé való kódolásának mintája használandó.
+Opcionális paraméterként megadhatjuk a metódus szignatúráját is, ehhez a JVM specifikációban\cite{jvm_specification_type_encode} szereplő típus szöveggé való kódolásának mintája használandó.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{ | m{0.25\textwidth} | m{0.65\textwidth} | }
@@ -93,7 +93,7 @@ Opcionális paraméterként megadhatjuk a metódus szignatúráját is, ehhez a 
 		\hline
 	\end{tabular}
 	\caption{Típust tartalmazó szöveg dekódolásá Java típusokká a JVM specifikáció alapján}
-	\label{tab:jvmtypeencoding}
+	\label{tab:jvm-type-encoding}
 \end{table}
 
 A bemeneti paramétereket zárójelek választják el, ezután szerepel a visszatérési érték. Tehát az általános Java belépési függvény, a \lstinline{main} java kódja:
@@ -127,7 +127,7 @@ Mivel \lstinline{Code} attribútumokról beszélünk, ezért a következő aján
 \begin{minted}{java}
 public static Code_Attribute readCodeAttributes(Attribute_Info attribute) throws IOException
 \end{minted}
-A függvény egy attribútumot vár (például az előbbi kódrészlet \lstinline{attribute} változóját), majd pedig beolvassa a specifikációnak megfelelően a \lstinline{Code_Attribute}-ot, és visszaadja azt, ha valamiért nem sikerült a beolvasás, akkor \lstinline{IOException}-t dob a függvény.
+A függvény egy attribútumot vár (például az előbbi kódrészlet \lstinline{attribute} változóját), majd pedig beolvassa a specifikációnak\cite{jvm_specification_code_attribute} megfelelően a \lstinline{Code_Attribute}-ot, és visszaadja azt, ha valamiért nem sikerült a beolvasás, akkor \lstinline{IOException}-t dob a függvény.
 \begin{minted}{java}
 Code_Attribute codeAttribute = Code_Attribute_Helper.readCodeAttributes(attribute);
 \end{minted}
@@ -285,7 +285,7 @@ class fájl formátumának magyarázata:
 \item \stageattributes{00 00}: Osztály attribútumainak száma (00 00\textsubscript{16} = 0\textsubscript{10} db)
 \end{compactitem}
 
-A legegyszerűbb class fájl amelyet a már a beépített 17-es verziójú \lstinline{java} interpretáló program is le tud futtatni, ez már teljesen megfelel a JVM specifikációnak (Fontos hogy a fájl neve \lstinline{Main.class} legyen):
+A legegyszerűbb class fájl amelyet a már a beépített 17-es verziójú \lstinline{java} interpretáló program is le tud futtatni, ez már teljesen megfelel a JVM specifikációnak\cite{jvm_specification} (Fontos hogy a fájl neve \lstinline{Main.class} legyen):
 
 \begin{center}
 \begin{tabular}{ c c c c c c c c c c c c c c c c }
@@ -679,9 +679,9 @@ Természetesen a \lstinline{main} függvényben is megfelelően kell felépíten
 \begin{figure}[H]
 	A class fájl beolvasása során a képen látható szerkezeti egység valósul meg a programban. 
 	\centering
-	\includegraphics[width=0.9\textwidth,frame]{classfile_diagram}
+	\includegraphics[width=0.9\textwidth,frame]{jabyinja_diagram_parsing}
 	\caption{Class fájl beolvasása során a program szerkezete}
-	\label{fig:classfile_parse}
+	\label{fig:jabyinja_diagram_parsing}
 \end{figure}
 
 Az ábrán látható, hogy a beolvasás feladata is egy komplex feladat. A különböző segédosztályok viszont megsegítik ennek a kisebb részek való lebontását, azoknak egyszerűbb megértését.
@@ -689,9 +689,9 @@ Az ábrán látható, hogy a beolvasás feladata is egy komplex feladat. A kül�
 \begin{figure}[H]
 	A bájt sorozat értelmezése során a képen látható szerkezeti egység valósul meg a programban. 
 	\centering
-	\includegraphics[width=0.9\textwidth,frame]{classfile_execute}
+	\includegraphics[width=0.9\textwidth,frame]{jabyinja_diagram_execute}
 	\caption{Bájt sorozat értelmezése során a program szerkezete}
-	\label{fig:classfile_execute}
+	\label{fig:jabyinja_diagram_execute}
 \end{figure}
 
 Az ábrán látható, hogy némely osztály tagjait nem veszi figyelembe az értelmezés. Ennek oka a reflekció használata, amely során ezen adatokat elhanyagolhatjuk.
@@ -780,12 +780,12 @@ A másik komoly probléma a szakdolgozatban a reflekció használatával, a kép
 
 \subsection{Érdekességek a JVM specifikációból}
 
-A specifikációt olvasva számos érdekességre bukkanhat az ember, ezek között vannak tervezési anomáliák, jó megoldások és trükkök. Ezek közül pár:
+A specifikációt\cite{jvm_specification} olvasva számos érdekességre bukkanhat az ember, ezek között vannak tervezési anomáliák, jó megoldások és trükkök. Ezek közül pár:
 
 \begin{compactitem}
  \item A Java 7-es verzió előtt a Java bájtkód instrukciók viszonylag egyszerűek voltak, a 7-es verzióval lett az \lstinline{invokedynamic} bevezetve, mely közelebbi ránézésre igazából egy "szuperinstrukció", ezzel az összes többi \lstinline{invoke} instrukció implementálható, sőt, egy teljes Java bájtkód interpreter is megírható csak \lstinline{invokedynamic} utasításokkal. Az \lstinline{invokedynamic} utasítás a dinamikusság kérdésére volt a válasz. Lényege, hogy azon függvényhívásokat, amelyek paramatéreit fordítási időben nem tudjuk, egy hívási helynek (\lstinline{CallSite}) megfelelően kerülnek a JVM-be bele, amely a hívás során a megfelelő paraméterekkel hívja meg azt.
  \item Elméletileg a lokális változók száma nem kéne hogy $65536$ legyen. Ha megnézi az ember, akkor minden \lstinline{store} és \lstinline{load} utasítás egy darab 8 bites előjel-mentes számot olvas be paraméterként. Ez azt jelenti hogy összesen $2^{8} = 256$ lehetséges index kellene hogy legyen. A \lstinline{wide} módosító utasítás miatt viszont ezek az utasítások beolvashatnak két darab 8 bites előjel-mentes számot, tehát lényegében egy darab 16 bites előjel-mentes szám lesz a paraméterük. Ez azt jelenti hogy $256$ lehetőség hirtelen $2^{16} = 65536$-ra ugrik fel.
- \item Minden \lstinline{Long} és \lstinline{Double} típusú adattag két (egymást követő) helyet foglal el a class fájlon belüli \lstinline{Constant Pool}-ban. Ennek oka hogy minden \lstinline{Constant Pool}-beli elem tényleges felhasználható adata $4$ bájton van, kívéve a \lstinline{Long} és \lstinline{Double}, amelyek felhasználható adatai $8$ bájton vannak. Így a fájlon belüli folytonosság miatt a specifikáció készítői jobbnak látták hogy inkább két helyet foglaljon el. A specifikációban azóta is a "\textit{In retrospect, making 8-byte constants take two constant pool entries was a poor choice.}", magyarul: "\textit{Utólag visszagondolva, rossz döntés volt, hogy a 8 bájtos konstansok két konstans pool bejegyzést igényelnek.}" idézet áll.
+ \item Minden \lstinline{Long} és \lstinline{Double} típusú adattag két (egymást követő) helyet foglal el a class fájlon belüli \lstinline{Constant Pool}-ban. Ennek oka hogy minden \lstinline{Constant Pool}-beli elem tényleges felhasználható adata $4$ bájton van, kívéve a \lstinline{Long} és \lstinline{Double}, amelyek felhasználható adatai $8$ bájton vannak. Így a fájlon belüli folytonosság miatt a specifikáció készítői jobbnak látták hogy inkább két helyet foglaljon el. A specifikációban azóta is a "\textit{In retrospect, making 8-byte constants take two constant pool entries was a poor choice.}"\cite{jvm_specification_long_double_poor_choice}, magyarul: "\textit{Utólag visszagondolva, rossz döntés volt, hogy a 8 bájtos konstansok két konstans pool bejegyzést igényelnek.}" idézet szerepel.
  \item A \lstinline{Long} és \lstinline{Double} típusokhoz kapcsolódoan, egy hatalmas különbség a primitívek (\lstinline{double, long}) és osztály (\lstinline{java.lang.Double, java.lang.Long}) típusok között, hogy lokális változókként a primitívek két helyet foglalnak el a lokális változók között; míg az osztály típusok csak egy helyet. Ez azt jelenti, hogyha függvény paraméterként adunk át egy \lstinline{double} primitívet, akkor valójában 2 helyet foglalunk el a lokális változók között, míg ha egy \lstinline{java.lang.Double} értéket adunk át, csak egy 1 helyet fogunk elfoglalni.
  \item A \lstinline{Constant Pool} darabszámára 2 bájt áll rendelkezésre, így maximum $2^{2 * 8} = 65536$ érték szerepelhet a \lstinline{Constant Pool}-ban egy class fájlon belül (ténylegesen a \lstinline{Double} és \lstinline{Long} értékek miatt ez lehet kevesebb). Ez azt jelenti, hogyha különösen nagy a forráskódot tartalmazó fájlunk, akkor lehet, hogy a fordítás során az információ nem fér bele egyetlen class fájlba.
  \item Az előző ponthoz kapcsolódoan, egy függvény maximális paramétereinek száma $2^{16} = 65536$ lehet, mivel a lokális változók darabszámát 2 bájton tárolja el a függvény attribútuma.

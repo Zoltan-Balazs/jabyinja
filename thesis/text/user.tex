@@ -19,7 +19,7 @@ A megoldáshoz be kell olvasnia a programnak egy class fájlt, helyesen értelme
 
 \section{Megoldás rövid leírása}
 
-A megoldás erősen alapszik a JVM specifikációra, annak is a 7-es verziójára. Ebben a dokumentumban elsősorban le van írva a class fájl felépítése. Mik követik egymást, ezen belül fontos nekünk a \lstinline{Constant Pool} és a \lstinline{Methods} rész. A \lstinline{Constant Pool}-ban találunk minden olyan információt amely szükséges ahhoz, hogy milyen osztályaink, metódusaink, metódus szignatúráink és változóértékeink vannak. A \lstinline{Methods} részben találjuk a tényleges utasításokat, itt hívodnak meg a \lstinline{Constant Pool}-ban leírt osztályoknak a metódusai, itt végezzük el az értelmezést.
+A megoldás erősen alapszik a JVM specifikációra\cite{jvm_specification}, annak is a 7-es verziójára. Ebben a dokumentumban elsősorban le van írva a class fájl felépítése. Mik követik egymást, ezen belül fontos nekünk a \lstinline{Constant Pool} és a \lstinline{Methods} rész. A \lstinline{Constant Pool}-ban találunk minden olyan információt amely szükséges ahhoz, hogy milyen osztályaink, metódusaink, metódus szignatúráink és változóértékeink vannak. A \lstinline{Methods} részben találjuk a tényleges utasításokat, itt hívodnak meg a \lstinline{Constant Pool}-ban leírt osztályoknak a metódusai, itt végezzük el az értelmezést.
 
 A programban szerepelnek a szükséges adatszerkezetek: a \lstinline{stack} és a lokális változók. Az interpretált kódot egy bájt tömbként értelmezi a program, amelyhez szükséges a jelenlegi indexet egy külön változóban eltárolnunk. Ez a változó azért is szükséges, hogy a különböző elágazások, ciklusok működni tudjanak, leegyszerűsítve a ciklus csak egy elágazás, amely többször hajtódik végre.
 
@@ -52,6 +52,8 @@ A program fordításához legalább a Java 17-es verziója szükséges. Ez alatt
 
 A könnyebb fordítás (illetve egyszerűbb jar fájl készítés) érdekében a Maven fordítás automatizálási program telepítése ajánlott, ezen belül is a 3.9.0-ás verzió.
 
+A szakdolgozatban megtalálható \lstinline{target} mappában megtalálhatóak a lefordított class fájl, illetve a jar fájl is.
+
 \subsubsection{Fordítás}
 
 Ha nem akarunk Maven-t használni, akkor a fordítás menete a következő:
@@ -80,13 +82,18 @@ $ mvn package
 
 Ha a generált class fájllal akarjuk futtatni a programot, futtassuk le a \lstinline{java com.zoltanbalazs.Main} parancsot a \lstinline{src/main/java} mappában.\ (ha Maven-nel fordítottunk akkor a \lstinline{target/classes} mappában futtassuk le a korábbi parancsot)
 
-A maven által készített jar fájllal való futtatáshoz, futtassuk le a \lstinline{java -jar target/jabyinja-1.0.0.jar} parancsot a főmappában.
+A Maven által készített jar fájllal való futtatáshoz, futtassuk le a \lstinline{java -jar target/jabyinja-1.0.0.jar} parancsot a főmappában.
 
 Mindkét esetben egy opcionális argumentumot (argumentum sorozatot ha a futtatandó programunk vár parancssori argumentumot) meg tudunk adni, ez a \lstinline{main} metódust tartalmazó class fájl elérési útvonala. Alapvető esetben a program a futási mappában próbál meg egy \lstinline{Main.class} fájlt futtatni.
 
 Futásra egy példa:
 \begin{minted}{bash}
 $ java -jar target/jabyinja-1.0.0.jar target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World
+\end{minted}
+
+A class fájl futtatása esetén ne felejtsük el a megfelelő class fájl elérési utat beállítani a \lstinline{cp} kapcsolóval:
+\begin{minted}{bash}
+$ java -cp target/classes com.zoltanbalazs.Main target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World
 \end{minted}
 
 \subsubsection{Önfuttatás}
@@ -96,6 +103,11 @@ Az elkészült interpreter képes saját magát is futtatni, ehhez a futtatásho
 Ez a futtatás jar fájl esetén így néz ki, a főkönyvtárból futtatva:
 \begin{minted}{bash}
 $ java -jar target/jabyinja-1.0.0.jar target/classes/com/zoltanbalazs/Main.class target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World
+\end{minted}
+
+Ugyanez a class fájllal való futtatás esetén:
+\begin{minted}{bash}
+$ java -cp target/classes com.zoltanbalazs.Main target/classes/com/zoltanbalazs/Main.class target/test-classes/com/zoltanbalazs/PTI/_01/Greet.class World
 \end{minted}
 
 \subsection{Felmerülő problémák}
