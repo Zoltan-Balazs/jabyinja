@@ -1,0 +1,166 @@
+\documentclass[14pt, aspectratio=169]{beamer}
+\usetheme{Copenhagen}
+\usepackage{xcolor}
+\usepackage[newfloat]{minted}
+\usepackage[utf8]{inputenc}
+\usepackage[magyar]{babel}
+\usepackage{listings}
+% \setbeamertemplate{navigation symbols}{}
+\setbeamercovered{transparent}
+
+\title{Java bytecode interpreter Javában}
+\institute{Eötvös Loránd Tudományegyetem}
+\author{Balázs Zoltán}
+\date{\today}
+
+\setminted{
+   frame=lines,
+   framesep=2mm,
+   baselinestretch=1.2,
+   bgcolor=lightgray,
+   fontsize=\footnotesize,
+   linenos
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}[fragile]{Java kód}
+
+Vegyük az alábbi példakódot (\texttt{Main.java}):
+\begin{minted}{java}
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}
+\end{minted}
+Hogyan lesz ebből futtatható állomány?
+
+\end{frame}
+
+\begin{frame}[fragile]{Java kódból futtatható állományig}
+
+\begin{itemize}
+    \item<+-> Forráskód (\texttt{Main.java})
+    \item<+-> Fordítás (\texttt{/usr/bin/javac})
+    \item<+-> Bájtkód (\texttt{Main.class})
+    \item<+-> Interpretálás (Virtuális gép - \texttt{/usr/bin/java})
+    \item<+-> "Hello, World!"
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Szakdolgozatom témája}
+
+Saját bájtkód interpretáló írása
+
+\begin{itemize}
+    \item<2-> Forráskód (\texttt{Main.java})
+    \item<2-> Fordítás (\texttt{/usr/bin/javac})
+    \item<2-> Bájtkód (\texttt{Main.class})
+    \item<2-> Interpretálás (Virtuális gép - \alert{\texttt{jabyinja}})
+    \item<2-> "Hello, World!"
+\end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Class fájl beolvasása}
+
+\small\texttt{Main.class}:
+
+\begin{center}
+\tiny
+\begin{tabular}{ c c c c c c c c c c c c c c c c }
+CA & FE & BA & BE & 00 & 00 & 00 & 3D & 00 & 1D & \alert<2>{\textbf<2>{0A}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{02}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{03}} & \alert<2>{\textbf<2>{07}} \\
+\alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{04}} & \alert<2>{\textbf<2>{0C}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{05}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{06}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{10}} & \alert<2>{\textbf<2>{6A}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{76}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{6C}} \\
+\alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{67}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{4F}} & \alert<2>{\textbf<2>{62}} & \alert<2>{\textbf<2>{6A}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{63}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{06}} & \alert<2>{\textbf<2>{3C}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} \\
+\alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{3E}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{03}} & \alert<2>{\textbf<2>{28}} & \alert<2>{\textbf<2>{29}} & \alert<2>{\textbf<2>{56}} & \alert<2>{\textbf<2>{09}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{08}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{09}} & \alert<2>{\textbf<2>{07}} & \alert<2>{\textbf<2>{00}} \\
+\alert<2>{\textbf<2>{0A}} & \alert<2>{\textbf<2>{0C}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{0B}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{0C}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{10}} & \alert<2>{\textbf<2>{6A}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{76}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{6C}} & \alert<2>{\textbf<2>{61}} \\
+\alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{67}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{53}} & \alert<2>{\textbf<2>{79}} & \alert<2>{\textbf<2>{73}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{6D}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{03}} & \alert<2>{\textbf<2>{6F}} & \alert<2>{\textbf<2>{75}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{01}} \\
+\alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{15}} & \alert<2>{\textbf<2>{4C}} & \alert<2>{\textbf<2>{6A}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{76}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6F}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{50}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{74}} \\
+\alert<2>{\textbf<2>{53}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{6D}} & \alert<2>{\textbf<2>{3B}} & \alert<2>{\textbf<2>{08}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{0E}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{0D}} & \alert<2>{\textbf<2>{48}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{6C}} \\
+\alert<2>{\textbf<2>{6C}} & \alert<2>{\textbf<2>{6F}} & \alert<2>{\textbf<2>{2C}} & \alert<2>{\textbf<2>{20}} & \alert<2>{\textbf<2>{57}} & \alert<2>{\textbf<2>{6F}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{6C}} & \alert<2>{\textbf<2>{64}} & \alert<2>{\textbf<2>{21}} & \alert<2>{\textbf<2>{0A}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{10}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{11}} & \alert<2>{\textbf<2>{07}} \\
+\alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{12}} & \alert<2>{\textbf<2>{0C}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{13}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{14}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{13}} & \alert<2>{\textbf<2>{6A}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{76}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{69}} \\
+\alert<2>{\textbf<2>{6F}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{50}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{53}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{6D}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{07}} \\
+\alert<2>{\textbf<2>{70}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{6C}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{15}} & \alert<2>{\textbf<2>{28}} & \alert<2>{\textbf<2>{4C}} & \alert<2>{\textbf<2>{6A}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{76}} & \alert<2>{\textbf<2>{61}} \\
+\alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{6C}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{67}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{53}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{67}} & \alert<2>{\textbf<2>{3B}} & \alert<2>{\textbf<2>{29}} & \alert<2>{\textbf<2>{56}} & \alert<2>{\textbf<2>{07}} \\
+\alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{16}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{04}} & \alert<2>{\textbf<2>{4D}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{04}} & \alert<2>{\textbf<2>{43}} & \alert<2>{\textbf<2>{6F}} & \alert<2>{\textbf<2>{64}} & \alert<2>{\textbf<2>{65}} \\
+\alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{0F}} & \alert<2>{\textbf<2>{4C}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{4E}} & \alert<2>{\textbf<2>{75}} & \alert<2>{\textbf<2>{6D}} & \alert<2>{\textbf<2>{62}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{54}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{62}} \\
+\alert<2>{\textbf<2>{6C}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{04}} & \alert<2>{\textbf<2>{6D}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{16}} & \alert<2>{\textbf<2>{28}} & \alert<2>{\textbf<2>{5B}} & \alert<2>{\textbf<2>{4C}} & \alert<2>{\textbf<2>{6A}} \\
+\alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{76}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{6C}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{67}} & \alert<2>{\textbf<2>{2F}} & \alert<2>{\textbf<2>{53}} & \alert<2>{\textbf<2>{74}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{67}} & \alert<2>{\textbf<2>{3B}} \\
+\alert<2>{\textbf<2>{29}} & \alert<2>{\textbf<2>{56}} & \alert<2>{\textbf<2>{01}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{0A}} & \alert<2>{\textbf<2>{53}} & \alert<2>{\textbf<2>{6F}} & \alert<2>{\textbf<2>{75}} & \alert<2>{\textbf<2>{72}} & \alert<2>{\textbf<2>{63}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{46}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6C}} & \alert<2>{\textbf<2>{65}} & \alert<2>{\textbf<2>{01}} \\
+\alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{09}} & \alert<2>{\textbf<2>{4D}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{69}} & \alert<2>{\textbf<2>{6E}} & \alert<2>{\textbf<2>{2E}} & \alert<2>{\textbf<2>{6A}} & \alert<2>{\textbf<2>{61}} & \alert<2>{\textbf<2>{76}} & \alert<2>{\textbf<2>{61}} & 00 & 21 & 00 & 15 & 00 \\
+02 & 00 & 00 & 00 & 00 & 00 & 02 & 00 & 01 & 00 & 05 & 00 & 06 & 00 & 01 & 00 \\
+17 & 00 & 00 & 00 & 1D & 00 & 01 & 00 & 01 & 00 & 00 & 00 & 05 & 2A & B7 & 00 \\
+01 & B1 & 00 & 00 & 00 & 01 & 00 & 18 & 00 & 00 & 00 & 06 & 00 & 01 & 00 & 00 \\
+00 & 01 & 00 & 09 & 00 & 19 & 00 & 1A & 00 & 01 & 00 & 17 & 00 & 00 & 00 & 25 \\
+00 & 02 & 00 & 01 & 00 & 00 & 00 & 09 & \alert<2>{\textbf<2>{B2}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{07}} & \alert<2>{\textbf<2>{12}} & \alert<2>{\textbf<2>{0D}} & \alert<2>{\textbf<2>{B6}} & \alert<2>{\textbf<2>{00}} & \alert<2>{\textbf<2>{0F}} \\
+\alert<2>{\textbf<2>{B1}} & 00 & 00 & 00 & 01 & 00 & 18 & 00 & 00 & 00 & 0A & 00 & 02 & 00 & 00 & 00 \\
+03 & 00 & 08 & 00 & 04 & 00 & 01 & 00 & 1B & 00 & 00 & 00 & 02 & 00 & 1C
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Constant Pool}
+
+\tiny
+\begin{columns}
+\column{0.5\textwidth}
+\begin{enumerate}
+   \item \texttt{Methodref          2.3}
+   \item \texttt{Class              4}
+   \item \texttt{NameAndType        5:6}
+   \item \texttt{Utf8               java/lang/Object}
+   \item \texttt{Utf8               <init>}
+   \item \texttt{Utf8               ()V}
+   \item \texttt{Fieldref           8.9}
+   \item \texttt{Class              10}
+   \item \texttt{NameAndType        11:12}
+   \item \texttt{Utf8               java/lang/System}
+   \item \texttt{Utf8               out}
+   \item \texttt{Utf8               Ljava/io/PrintStream;}
+   \item \texttt{String             14}
+   \item \texttt{Utf8               Hello, World!}
+\end{enumerate}
+\column{0.5\textwidth}
+\begin{enumerate}
+    \setcounter{enumi}{14}
+   \item \texttt{Methodref          16.17}
+   \item \texttt{Class              18}
+   \item \texttt{NameAndType        19:20}
+   \item \texttt{Utf8               java/io/PrintStream}
+   \item \texttt{Utf8               println}
+   \item \texttt{Utf8               (Ljava/lang/String;)V}
+   \item \texttt{Class              22}
+   \item \texttt{Utf8               Main}
+   \item \texttt{Utf8               Code}
+   \item \texttt{Utf8               LineNumberTable}
+   \item \texttt{Utf8               main}
+   \item \texttt{Utf8               ([Ljava/lang/String;)V}
+   \item \texttt{Utf8               SourceFile}
+   \item \texttt{Utf8               Main.java}
+\end{enumerate}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Bájtkód interpretálása}
+
+\textbf{B2 00 07 12 0D B6 00 0F B1}
+
+\begin{itemize}
+    \small \item<+->\texttt{B2 (GETSTATIC) 00 07 - 7. Constant Pool elem (java/lang/System.out:Ljava/io/PrintStream;) stack-re helyezése}
+    \small \item<+->\texttt{12 (LDC) 0D - 14. Constant Pool elem (Hello, World!) stack-re helyezése}
+    \small \item<+->\texttt{B6 (INVOKEVIRTUAL) 00 0F - 15. Constant Pool elem (java/io/PrintStream.println:(Ljava/lang/String;)V) meghívása}
+    \small \item<+->\texttt{B1 (RETURN) - visszatérés}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Köszönöm a figyelmet}
+
+\end{frame}
+
+\end{document}

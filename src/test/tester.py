@@ -34,7 +34,7 @@ class ARG_TYPES(Enum):
 
 
 java_command = "java -cp target/test-classes/ "
-jabyinja_command = "java -jar target/jabyinja-*.jar "
+jabyinja_command = "java -jar target/jabyinja-1.0.0.jar "
 
 base_dir = "target/test-classes/"
 
@@ -224,7 +224,7 @@ def tester(test_files, line_length, test_type, timing, memory_usage):
             if timing:
                 subprocess.call("hyperfine '" + jabyinja_command_current +
                                 "' '" + java_command_current + "' 2>&1 | grep 'Time (mean ± σ)'", shell=True)
-            if memory:
+            if memory_usage:
                 print("\tJabyinja: ", end='', flush=True)
                 subprocess.call("/usr/bin/time --verbose " + jabyinja_command_current +
                                 " 2>&1 | grep 'Maximum resident'", shell=True)

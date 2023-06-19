@@ -18,3 +18,7 @@ thesis/images/*
 !thesis/images/testing_results.png
 !thesis/images/jabyinja_diagram_parsing.png
 !thesis/images/jabyinja_diagram_execute.png
+!thesis/defense/
+thesis/defense/*
+!thesis/defense/thesisdefense.tex
+!thesis/defense/thesisdefense.pdf
