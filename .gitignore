@@ -22,3 +22,4 @@ thesis/images/*
 thesis/defense/*
 !thesis/defense/thesisdefense.tex
 !thesis/defense/thesisdefense.pdf
+!thesis/defense/extra.txt

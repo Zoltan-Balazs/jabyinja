@@ -1,4 +1,4 @@
-\documentclass[14pt, aspectratio=169]{beamer}
+\documentclass[14pt, aspectratio=1610]{beamer}
 \usetheme{Copenhagen}
 \usepackage{xcolor}
 \usepackage[newfloat]{minted}
@@ -148,13 +148,13 @@ CA & FE & BA & BE & 00 & 00 & 00 & 3D & 00 & 1D & \alert<2>{\textbf<2>{0A}} & \a
 
 \begin{frame}[fragile]{Bájtkód interpretálása}
 
-\textbf{B2 00 07 12 0D B6 00 0F B1}
+\alert<2>{\textbf{B2 00 07}} \alert<3>{\textbf{12 0D}} \alert<4>{\textbf{B6 00 0F}} \alert<5>{\textbf{B1}}
 
 \begin{itemize}
-    \small \item<+->\texttt{B2 (GETSTATIC) 00 07 - 7. Constant Pool elem (java/lang/System.out:Ljava/io/PrintStream;) stack-re helyezése}
-    \small \item<+->\texttt{12 (LDC) 0D - 14. Constant Pool elem (Hello, World!) stack-re helyezése}
-    \small \item<+->\texttt{B6 (INVOKEVIRTUAL) 00 0F - 15. Constant Pool elem (java/io/PrintStream.println:(Ljava/lang/String;)V) meghívása}
-    \small \item<+->\texttt{B1 (RETURN) - visszatérés}
+    \small \item<2->\texttt{B2 (GETSTATIC) 00 07: 7. Constant Pool elem (java/lang/System.out:Ljava/io/PrintStream;) stack-re helyezése}
+    \small \item<3->\texttt{12 (LDC) 0D: 14. Constant Pool elem (Hello, World!) stack-re helyezése}
+    \small \item<4->\texttt{B6 (INVOKEVIRTUAL) 00 0F: 15. Constant Pool elem (java/io/PrintStream.println:(Ljava/lang/String;)V) meghívása}
+    \small \item<5->\texttt{B1 (RETURN): visszatérés}
 \end{itemize}
 
 \end{frame}
